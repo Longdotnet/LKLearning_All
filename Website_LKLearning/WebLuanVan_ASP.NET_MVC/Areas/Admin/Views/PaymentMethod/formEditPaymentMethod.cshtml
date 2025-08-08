@@ -1,0 +1,105 @@
+﻿@model WebLuanVan_ASP.NET_MVC.Areas.Admin.Models.CPaymentMethod
+
+@{
+    ViewData["Title"] = "Sửa phương thức thanh toán";
+    Layout = "~/Areas/Admin/Views/Shared/_LayoutAdmin.cshtml";
+}
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-lg-8 mx-auto">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Thông tin phương thức thanh toán</h5>
+
+                    <form asp-action="EditPaymentMethod" class="needs-validation" novalidate method="post" asp-route-id="@Model.PaymentMethodId">
+                        <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+                        <input asp-for="PaymentMethodId" type="hidden" />
+
+                        <div class="mb-3">
+                            <label asp-for="Name" class="control-label">Tên phương thức</label>
+                            <input asp-for="Name" class="form-control" placeholder="Nhập tên phương thức" required />
+                            <span asp-validation-for="Name" class="invalid-feedback"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="UrlImage" class="form-label">Ảnh Logo (URL)</label>
+                            <input asp-for="Logo" class="form-control" id="UrlImage" data-placeholder="Nhập URL ảnh" />
+                            <span asp-validation-for="Logo" class="invalid-feedback"></span>
+                            <div id="imagePreviewContainer" style="display:none;" class="mt-2">
+                                <img id="imagePreview" src="#" alt="Image Preview" style="max-width:300px;max-height:200px;" />
+                                <p id="imageError" class="text-danger small mt-2" style="display:none;"></p>
+                            </div>
+                        </div>
+
+                        <div class="d-flex justify-content-between mt-4">
+                            <a asp-action="Index" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left me-1"></i> Back to List
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save me-1"></i> Save Changes
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            // Enable Bootstrap 5 validation
+            (function () {
+                'use strict'
+                var forms = document.querySelectorAll('.needs-validation')
+                Array.prototype.slice.call(forms)
+                    .forEach(function (form) {
+                        form.addEventListener('submit', function (event) {
+                            if (!form.checkValidity()) {
+                                event.preventDefault()
+                                event.stopPropagation()
+                            }
+                            form.classList.add('was-validated')
+                        }, false)
+                    })
+            })();
+
+            // Preview image logic
+            $('#UrlImage').on('input', function () {
+                var url = $(this).val();
+                var $container = $('#imagePreviewContainer');
+                var $img = $('#imagePreview');
+                var $error = $('#imageError');
+
+                if (url) {
+                    if (/^https?:\/\/.+(\.(jpg|jpeg|png|gif|webp))$/i.test(url)) {
+                        $img.attr('src', url)
+                            .on('load', function () {
+                                $container.show();
+                                $error.hide();
+                            })
+                            .on('error', function () {
+                                $container.show();
+                                $error.text('Không thể tải ảnh. Vui lòng kiểm tra lại URL.').show();
+                                $img.attr('src', '#');
+                            });
+                    } else {
+                        $container.show();
+                        $error.text('URL không hợp lệ. Phải bắt đầu bằng http:// hoặc https://').show();
+                        $img.attr('src', '#');
+                    }
+                } else {
+                    $container.hide();
+                }
+            });
+
+            // Hiển thị preview nếu có giá trị ban đầu
+            var initialUrl = $('#UrlImage').val();
+            if (initialUrl) {
+                $('#UrlImage').trigger('input');
+            }
+        });
+    </script>
+}

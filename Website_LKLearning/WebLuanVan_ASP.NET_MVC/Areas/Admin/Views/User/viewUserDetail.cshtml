@@ -1,0 +1,228 @@
+﻿@model WebLuanVan_ASP.NET_MVC.Areas.Admin.Models.CUsers
+@using WebLuanVan_ASP.NET_MVC.Areas.Admin.Models;
+@{
+    ViewData["Title"] = "Chi tiết người dùng";
+    Layout = "~/Areas/Admin/Views/Shared/_LayoutAdmin.cshtml";
+}
+<link rel="stylesheet" href="~/AdminTL/assets/css/index.css">
+
+<div class="container-fluid px-4">
+    <div class="card mb-4">
+        <div class="card-header bg-primary text-white">
+            <div class="d-flex justify-content-between align-items-center">
+                <h4 class="mb-0">
+                    <i class="fas fa-user-circle me-2"></i>Chi tiết người dùng
+                </h4>
+                <div>
+                    <a asp-action="formSuaUser" asp-route-id="@Model.UserId" class="btn btn-warning btn-sm">
+                        <i class="fas fa-edit me-1"></i>Sửa
+                    </a>
+                    <a asp-action="Index" class="btn btn-secondary btn-sm">
+                        <i class="fas fa-arrow-left me-1"></i>Quay lại
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="card-body">
+            <div class="row">
+                <!-- Thông tin cơ bản -->
+                <div class="col-md-6">
+                    <div class="card mb-4">
+                        <div class="card-header bg-light">
+                            <h5 class="mb-0"><i class="fas fa-id-card me-2"></i>Thông tin cá nhân</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row mb-3">
+                                <div class="col-sm-4 fw-bold">
+                                    <label asp-for="Fullname" class="control-label"></label>
+                                </div>
+                                <div class="col-sm-8">@Model.Fullname</div>
+                            </div>
+                            <div class="row mb-3">
+                                <div class="col-sm-4 fw-bold">
+                                    <label asp-for="Email" class="control-label"></label>
+                                </div>
+                                <div class="col-sm-8">@Model.Email</div>
+                            </div>
+                            <div class="row mb-3">
+                                <div class="col-sm-4 fw-bold">
+                                    <label asp-for="Phone" class="control-label"></label>
+                                </div>
+                                <div class="col-sm-8">@(Model.Phone ?? "Chưa cập nhật")</div>
+                            </div>
+                            <div class="row mb-3">
+                                <div class="col-sm-4 fw-bold">
+                                    <label asp-for="Gender" class="control-label"></label>
+                                </div>
+                                <div class="col-sm-8">
+                                    @if (Model.Gender == true)
+                                    {
+                                        <span>Nam</span>
+                                    }
+                                    else if (Model.Gender == false)
+                                    {
+                                        <span>Nữ</span>
+                                    }
+                                    else
+                                    {
+                                        <span>Chưa cập nhật</span>
+                                    }
+                                </div>
+                            </div>
+                            <div class="row mb-3">
+                                <div class="col-sm-4 fw-bold">
+                                    <label asp-for="Age" class="control-label"></label>
+                                </div>
+                                <div class="col-sm-8">@(Model.Age?.ToString() ?? "Chưa cập nhật")</div>
+                            </div>
+                            <div class="row mb-3">
+                                <div class="col-sm-4 fw-bold">
+                                    <label asp-for="DateofBirth" class="control-label"></label>
+                                </div>
+                                <div class="col-sm-8">@(Model.DateofBirth?.ToString("dd/MM/yyyy") ?? "Chưa cập nhật")</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Thông tin tài khoản và hoạt động -->
+                <div class="col-md-6">
+                    <div class="card mb-4">
+                        <div class="card-header bg-light">
+                            <h5 class="mb-0"><i class="fas fa-user-shield me-2"></i>Thông tin tài khoản</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row mb-3">
+                                <div class="col-sm-4 fw-bold">
+                                    <label asp-for="DisplayUserId" class="control-label"></label>
+                                </div>
+                                <div class="col-sm-8">@Model.DisplayUserId</div>
+
+                            </div>
+                            <div class="row mb-3">
+                                <div class="col-sm-4 fw-bold">
+                                    <label asp-for="RoleId" class="control-label"></label>
+                                </div>
+                                <div class="col-sm-8">
+                                    @{
+                                        var roles = ViewBag.Roles as List<CRole>;
+                                        var roleName = roles?.FirstOrDefault(r => r.RoleId == Model.RoleId)?.RoleName ?? "Chưa xác định";
+                                    }
+                                    @roleName
+                                </div>
+                            </div>
+                            <div class="row mb-3">
+                                <div class="col-sm-4 fw-bold">
+                                    <label asp-for="LastLoginDate" class="control-label"></label>
+                                </div>
+                                <div class="col-sm-8">@(Model.LastLoginDate?.ToString("dd/MM/yyyy") ?? "Chưa đăng nhập")</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Các tab thông tin bổ sung -->
+            <div class="row mt-4">
+                <div class="col-12">
+                    <ul class="nav nav-tabs" id="userDetailTabs" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active" id="courses-tab" data-bs-toggle="tab" data-bs-target="#courses" type="button" role="tab" aria-controls="courses" aria-selected="true">
+                                <i class="fas fa-book me-1"></i>Khóa học
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="payment-tab" data-bs-toggle="tab" data-bs-target="#payment" type="button" role="tab" aria-controls="payment" aria-selected="false">
+                                <i class="fas fa-credit-card me-1"></i>Thanh toán
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="activity-tab" data-bs-toggle="tab" data-bs-target="#activity" type="button" role="tab" aria-controls="activity" aria-selected="false">
+                                <i class="fas fa-history me-1"></i>Lịch sử hoạt động
+                            </button>
+                        </li>
+                    </ul>
+                    <div class="tab-content p-3 border border-top-0 rounded-bottom" id="userDetailTabsContent">
+                        <div class="tab-pane fade show active" id="courses" role="tabpanel" aria-labelledby="courses-tab">
+                            <div class="alert alert-info">
+                                <i class="fas fa-info-circle me-2"></i>Danh sách khóa học đang tham gia sẽ được hiển thị ở đây.
+                            </div>
+                        </div>
+                        <div class="tab-pane fade" id="payment" role="tabpanel" aria-labelledby="payment-tab">
+                            <div class="card">
+                                @if (ViewBag.UserOrders != null && ViewBag.UserOrders.Count > 0)
+                                {
+                                    <div class="table-responsive">
+                                        <table class="table table-striped table-hover">
+                                            <thead class="table-dark">
+                                                <tr>
+                                                    <th>Mã giao dịch</th>
+                                                    <th>Gói cước </th>
+                                                    <th>Ngày mua</th>
+                                                    <th>Trạng thái </th>
+                                                    <th>Phương thức thanh toán</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @foreach (var order in ViewBag.UserOrders as List<COrders>)
+                                                {
+                                                    <tr>
+                                                        <td>@order.OrderId</td>
+                                                        <td>
+                                                            @{
+                                                                var packageName = (ViewBag.Packages as List<CPackage>)?.FirstOrDefault(p => p.PackageId == order.PackageId)?.PackageName ?? "Không xác định / Unknown";
+                                                            }
+                                                            @packageName
+                                                        </td>
+                                                        <td>@order.CreatedAt.ToString("dd/MM/yyyy")</td>
+                                                        <td>
+                                                            <span class="badge @(order.Status == "Completed" ? "badge-success" : order.Status == "Pending" ? "badge-warning" : "badge-danger")">
+                                                                @order.Status
+                                                            </span>
+                                                        </td>
+                                                        <td>
+                                                            @{
+                                                                var paymentMethodName = (ViewBag.PaymentMethods as List<CPaymentMethod>)?.FirstOrDefault(pm => pm.PaymentMethodId == order.PaymentMethodId)?.Name ?? "Không xác định / Unknown";
+                                                            }
+                                                            @paymentMethodName
+                                                        </td>
+                                                    </tr>
+                                                }
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                }
+                                else
+                                {
+                                    <div class="alert alert-info">
+                                        <i class="fas fa-info-circle me-2"></i>Không có lịch sử thanh toán / No payment history available.
+                                    </div>
+                                }
+                           
+                            </div>
+                        <div class="tab-pane fade" id="activity" role="tabpanel" aria-labelledby="activity-tab">
+                            <div class="alert alert-info">
+                                <i class="fas fa-info-circle me-2"></i>Nhật ký hoạt động sẽ được hiển thị ở đây.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function() {
+            // Khởi tạo các tab
+            $('#userDetailTabs button').on('click', function (event) {
+                event.preventDefault();
+                $(this).tab('show');
+            });
+
+            // Có thể thêm các xử lý AJAX ở đây để tải dữ liệu cho các tab khi được chọn
+        });
+    </script>
+}

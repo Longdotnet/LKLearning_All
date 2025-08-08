@@ -1,0 +1,45 @@
+﻿@model WebLuanVan_ASP.NET_MVC.Areas.Admin.Models.CQuestionLevel
+
+@{
+    ViewData["Title"] = "Sửa cấp độ";
+    Layout = "~/Areas/Admin/Views/Shared/_LayoutAdmin.cshtml";
+}
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-lg-8 mx-auto">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Thông tin cấp độ</h5>
+
+
+                    <form asp-action="Edit" class="needs-validation" novalidate method="post" asp-route-id="@Model.QuestionLevelId">
+                        <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+
+                        <input asp-for="QuestionLevelId" type="hidden" />
+
+
+
+                        <div class="mb-3">
+                            <label asp-for="QuestionName" class="control-label"></label>
+                            <input asp-for="QuestionName" class="form-control" placeholder="Nhập cấp độ" required />
+                            <span asp-validation-for="QuestionName" class="invalid-feedback"></span>
+                        </div>
+
+
+
+
+                        <div class="d-flex justify-content-between mt-4">
+                            <a asp-action="Index" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left me-1"></i> Back to List
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save me-1"></i> Save Changes
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,366 @@
+﻿@model IEnumerable<WebLuanVan_ASP.NET_MVC.Areas.Admin.Models.CQuestion>
+@using WebLuanVan_ASP.NET_MVC.Areas.Admin.Models
+@{
+    ViewData["Title"] = "Xem câu hỏi";
+    Layout = "~/Areas/Admin/Views/Shared/_LayoutAdmin.cshtml";
+    var lessons = ViewBag.Lessons as List<CLesson>;
+    var questionTypes = ViewBag.QuestionTypes as List<CQuestionType>;
+    var currentLessonId = ViewBag.LessonId;
+    int? currentQuestionTypeId = ViewBag.CurrentQuestionTypeId;
+    var currentLesson = ViewBag.CurrentLesson;
+    Paginate paginate = ViewBag.Paginate ?? new Paginate();
+    int pageNo = paginate.CurrentPage;
+    var lessonQuestions = ViewBag.LessonQuestions as List<CLessonQuestion> ?? new List<CLessonQuestion>();
+}
+<link rel="stylesheet" href="~/AdminTL/assets/css/index.css">
+
+<div class="container-fluid px-4">
+    <div class="card mb-4">
+        <div class="card-header bg-primary text-white">
+            <h4 class="mb-0">
+                <i class="fas fa-edit me-2"></i>Thông tin bài học
+            </h4>
+        </div>
+        <div class="card-body">
+            <form>
+                <div class="row g-3">
+                    <div class="col-md-12">
+                        <label class="control-label">Tên bài học</label>
+                        @currentLesson?.LessonTitle
+                    </div>
+                    <div class="col-md-12">
+                        <label class="control-label">Nội dung bài học</label>
+                        <div>@Html.Raw(currentLesson?.LessonContent)</div>
+                    </div>
+                    <div class="col-md-12">
+                        <label class="control-label">Mô tả</label>
+                        <div>@Html.Raw(currentLesson?.LessonDescription)</div>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="control-label">Ngày tạo</label>
+                        @currentLesson?.Duration.ToString("dd/MM/yyyy")
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Ảnh Bài học</label>
+                        @if (!string.IsNullOrEmpty(currentLesson?.UrlImageLesson))
+                        {
+                            <img src="@currentLesson?.UrlImageLesson" alt="Banner" class="img-fluid rounded" style="max-width:300px;max-height:200px;" />
+                        }
+                        else
+                        {
+                            <span class="text-muted">Không có ảnh</span>
+                        }
+                    </div>
+                    <div class="col-md-6">
+                        <label  class="control-label">Thời gian hoàn thành dự kiến</label>
+                        @currentLesson?.DurationMinute phút
+                    </div>
+                    <div class="col-md-6">
+                        <label class="control-label">Trạng thái</label>
+                        <span class="badge @(currentLesson?.IsActivate == true ? "bg-success" : "bg-secondary")">
+                            @(currentLesson?.IsActivate == true ? "Kích hoạt" : "Chưa kích hoạt")
+                        </span>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="card mb-4">
+        <div class="card-header bg-primary text-white">
+            <h4 class="mb-0">
+                <i class="fas fa-book me-2"></i>Danh sách câu hỏi
+            </h4>
+        </div>
+        <div class="card-body">
+            <div class="mb-3">
+                <h5>Bộ lọc</h5>
+                <form method="get" class="row g-3">
+                    <input type="hidden" name="id" value="@currentLessonId" />
+                    <div class="col-md-4">
+                        <label class="form-label">Loại câu hỏi</label>
+                        <select id="questionTypeSelect" name="questionTypeId" class="form-select select2">
+                            <option value="">-- Tất cả loại --</option>
+                            @foreach (var type in questionTypes)
+                            {
+                                <option value="@type.QuestionTypeId" selected="@(currentQuestionTypeId == type.QuestionTypeId)">
+                                    @type.TypeName
+                                </option>
+                            }
+                        </select>
+                    </div>
+                    <div class="col-md-4 d-flex align-items-end">
+                        <button type="submit" class="btn btn-primary">Lọc</button>
+                        @if (currentQuestionTypeId.HasValue)
+                        {
+                            <a asp-area="Admin" asp-action="viewQuestion" asp-controller="Lesson" asp-route-id="@currentLessonId" class="btn btn-outline-secondary ms-2">Xóa lọc</a>
+                        }
+                    </div>
+                </form>
+            </div>
+
+            <form id="deleteForm" asp-action="DeleteMultipleQuestion" method="post">
+                <input type="hidden" name="lessonId" value="@currentLessonId" />
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th><input type="checkbox" id="selectAll" /></th>
+                                <th>Thứ tự</th>
+                                <th>Câu hỏi</th>
+                                <th>Loại câu hỏi</th>
+                                <th style="text-align:center">Thao tác</th>
+                                <th style="text-align:center">Điều chỉnh thứ tự</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if (Model != null && Model.Any())
+                            {
+                                foreach (var question in Model)
+                                {
+                                    var orderNo = lessonQuestions.FirstOrDefault(lq => lq.QuestionId == question.QuestionId)?.OrderNo ?? 0;
+                                    <tr data-question-id="@question.QuestionId" data-order-no="@orderNo">
+                                        <td><input type="checkbox" name="selectedIds" value="@question.QuestionId" class="rowCheckbox" /></td>
+                                        <td class="order-no">
+                                            <input type="number" class="form-control order-input"
+                                                   data-question-id="@question.QuestionId"
+                                                   data-order-no="@orderNo"
+                                                   value="@orderNo"
+                                                   min="1"
+                                                   style="width: 80px; -moz-appearance: textfield;"
+                                                   onwheel="this.blur()" />
+                                                 
+                                            <style>
+                                                input[type=number]::-webkit-inner-spin-button, 
+                                                input[type=number]::-webkit-outer-spin-button {
+                                                    -webkit-appearance: none;
+                                                    margin: 0;
+                                                }
+
+                                                input[type=number] {
+                                                    -moz-appearance: textfield;
+                                                }
+                                            </style>
+                                        </td>
+                                        <td><div>@Html.Raw(question.QuestionText)</div></td>
+                                        <td>
+                                            @{
+                                                var typeName = questionTypes?.FirstOrDefault(t => t.QuestionTypeId == question.QuestionTypeId)?.TypeName ?? "N/A";
+                                            }
+                                            @typeName
+                                        </td>
+                                        <td style="text-align:center">
+                                            <a asp-action="xoaQuestionRaKhoiBaiHoc" asp-controller="Lesson" asp-route-lessonId="@currentLessonId" asp-route-questionId="@question.QuestionId" onclick="confirmDelete(event)" class="btn btn-sm btn-danger">
+                                                <i class="fas fa-trash"></i>
+                                            </a>
+                                            <a asp-action="viewDetail" asp-controller="Question" asp-route-id="@question.QuestionId" class="btn btn-sm btn-primary">
+                                            <i class="fas fa-eye"></i>
+                                            </a>
+                                        </td>
+                                        <td style="text-align:center">
+                                            <button class="btn btn-sm btn-outline-primary move-up"
+                                                    data-question-id="@question.QuestionId"
+                                                    data-order-no="@orderNo">
+                                                <i class="fas fa-arrow-up"></i>
+                                            </button>
+                                            <button class="btn btn-sm btn-outline-primary move-down"
+                                                    data-question-id="@question.QuestionId"
+                                                    data-order-no="@orderNo">
+                                                <i class="fas fa-arrow-down"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                }
+                            }
+                            else
+                            {
+                                <tr>
+                                    <td colspan="6" class="text-center">Không có câu hỏi nào.</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </form>
+
+            <partial name="_Paging" model="@paginate" />
+
+            <a asp-action="Index" asp-area="Admin" asp-controller="Question" class="btn btn-primary mt-3">
+                <i class="fas fa-plus me-2"></i>Thêm câu hỏi
+            </a>
+        </div>
+    </div>
+
+    <a asp-action="Index" asp-controller="Lesson" class="btn btn-outline-secondary">
+        <i class="fas fa-arrow-left me-2"></i>Quay lại danh sách bài học
+    </a>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            $('.select2').select2({
+                theme: 'bootstrap-5',
+                placeholder: 'Tìm kiếm...',
+                allowClear: true,
+                width: '100%'
+            });
+
+            $('#selectAll').change(function () {
+                $('.rowCheckbox').prop('checked', $(this).prop('checked'));
+                toggleDeleteButton();
+            });
+
+            $('.rowCheckbox').change(function () {
+                if ($('.rowCheckbox:checked').length === $('.rowCheckbox').length) {
+                    $('#selectAll').prop('checked', true);
+                } else {
+                    $('#selectAll').prop('checked', false);
+                }
+                toggleDeleteButton();
+            });
+
+            function toggleDeleteButton() {
+                var checkedCount = $('.rowCheckbox:checked').length;
+                $('#deleteSelected').prop('disabled', checkedCount === 0);
+                $('#deleteSelected').text(checkedCount > 0 ? `Xóa (${checkedCount}) đã chọn` : 'Xóa đã chọn');
+            }
+
+            $('#deleteSelected').click(function (e) {
+                e.preventDefault();
+                confirmDeleteMultiple(e, function () {
+                    $('#deleteForm').submit();
+                });
+            });
+
+            // Xử lý thay đổi OrderNo qua textbox
+            $('.order-input').on('change', debounce(function () {
+                var $input = $(this);
+                var questionId = $input.data('question-id');
+                var newOrderNo = parseInt($input.val());
+                var oldOrderNo = parseInt($input.data('order-no'));
+                var lessonId = @currentLessonId;
+                var totalQuestions = @ViewBag.Paginate.TotalItems;
+
+                if (isNaN(newOrderNo) || newOrderNo < 1 || newOrderNo > totalQuestions) {
+                    toastr.error(`Thứ tự phải từ 1 đến ${totalQuestions}`);
+                    $input.val(oldOrderNo);
+                    return;
+                }
+
+                if (newOrderNo === oldOrderNo) {
+                    return;
+                }
+
+                $.ajax({
+                    url: '@Url.Action("UpdateQuestionOrder", "Lesson")',
+                    type: 'PUT',
+                    contentType: 'application/json',
+                    data: JSON.stringify({
+                        lessonId: lessonId,
+                        questionId: questionId,
+                        orderNo: newOrderNo
+                    }),
+                    beforeSend: function () {
+                        $input.prop('disabled', true);
+                        toastr.info('Đang lưu...');
+                    },
+                    success: function (response) {
+                        if (response.success) {
+                            toastr.success(response.message);
+                            window.location.reload();
+                        } else {
+                            toastr.error(response.message || 'Không thể cập nhật thứ tự.');
+                            $input.val(oldOrderNo);
+                        }
+                    },
+                    error: function (xhr) {
+                        toastr.error('Lỗi khi cập nhật: ' + (xhr.responseJSON?.message || 'Lỗi không xác định'));
+                        $input.val(oldOrderNo);
+                    },
+                    complete: function () {
+                        $input.prop('disabled', false);
+                    }
+                });
+            }, 500));
+
+            // Xử lý nút Move Up
+            $('.move-up').click(function (event) {
+                event.preventDefault();
+                var $button = $(this);
+                var currentOrder = parseInt($button.attr('data-order-no'));
+                if (currentOrder <= 1) {
+                    toastr.warning('Câu hỏi đã ở vị trí đầu tiên');
+                    return;
+                }
+                var lessonId = @currentLessonId;
+                swapQuestionOrder(lessonId, currentOrder, currentOrder - 1, $button.closest('tr'));
+            });
+
+            // Xử lý nút Move Down
+            $('.move-down').click(function (event) {
+                event.preventDefault();
+                var $button = $(this);
+                var currentOrder = parseInt($button.attr('data-order-no'));
+                var lessonId = @currentLessonId;
+                var totalQuestions = @ViewBag.Paginate.TotalItems;
+                if (currentOrder >= totalQuestions) {
+                    toastr.warning('Câu hỏi đã ở vị trí cuối cùng');
+                    return;
+                }
+                swapQuestionOrder(lessonId, currentOrder, currentOrder + 1, $button.closest('tr'));
+            });
+
+            function swapQuestionOrder(lessonId, sourceOrder, targetOrder, $row) {
+                $.ajax({
+                    url: '@Url.Action("SwapQuestionOrder", "Lesson")',
+                    type: 'PUT',
+                    contentType: 'application/json',
+                    data: JSON.stringify({
+                        lessonId: lessonId,
+                        sourceOrderNo: sourceOrder,
+                        targetOrderNo: targetOrder
+                    }),
+                    success: function (response) {
+                        if (response.success) {
+                            updateUIAfterSwap(sourceOrder, targetOrder, $row);
+                        } else {
+                            toastr.error(response.message || 'Không thể hoán đổi thứ tự câu hỏi.');
+                        }
+                    },
+                    error: function (xhr) {
+                        toastr.error('Lỗi khi hoán đổi: ' + (xhr.responseJSON?.message || 'Lỗi không xác định'));
+                    }
+                });
+            }
+
+            function updateUIAfterSwap(sourceOrder, targetOrder, $row) {
+                var $targetRow = $('tr[data-order-no="' + targetOrder + '"]');
+                if ($targetRow.length > 0) {
+                    $row.find('.order-no input').val(targetOrder);
+                    $row.attr('data-order-no', targetOrder);
+                    $row.find('.move-up, .move-down').attr('data-order-no', targetOrder);
+                    $targetRow.find('.order-no input').val(sourceOrder);
+                    $targetRow.attr('data-order-no', sourceOrder);
+                    $targetRow.find('.move-up, .move-down').attr('data-order-no', sourceOrder);
+                    if (targetOrder < sourceOrder) {
+                        $row.insertBefore($targetRow);
+                    } else {
+                        $row.insertAfter($targetRow);
+                    }
+                    toastr.success('Hoán đổi thứ tự câu hỏi thành công!');
+                } else {
+                    window.location.reload();
+                }
+            }
+
+            function debounce(func, wait) {
+                let timeout;
+                return function (...args) {
+                    clearTimeout(timeout);
+                    timeout = setTimeout(() => func.apply(this, args), wait);
+                };
+            }
+        });
+    </script>
+}

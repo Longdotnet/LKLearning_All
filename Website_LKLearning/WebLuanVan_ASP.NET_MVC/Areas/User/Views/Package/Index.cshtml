@@ -1,0 +1,146 @@
+﻿@model dynamic
+@{
+    ViewData["Title"] = "Packages";
+    Layout = "~/Areas/User/Views/Shared/_LayoutKhung.cshtml";
+}
+@using WebLuanVan_ASP.NET_MVC.Areas.Admin.Models;
+@{
+    var packages = ViewBag.dsPackage as List<CPackage> ?? new List<CPackage>();
+    var paymentMethods = ViewBag.dsPaymentMethod as List<CPaymentMethod> ?? new List<CPaymentMethod>();
+
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Packages</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <style>
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        .btn-buy:hover {
+            background-color: #2563eb;
+        }
+
+        .card-footer {
+            border-top: 1px solid #e5e7eb;
+            background-color: #f9fafb;
+        }
+    </style>
+</head>
+<body class="bg-gray-100">
+    <section class="py-12 px-4 sm:px-6 lg:px-8">
+        <div class="max-w-7xl mx-auto">
+            <div class="text-center mb-12">
+                <h1 class="text-4xl font-bold text-gray-900">Lựa gói cước mua để học</h1>
+                <p class="mt-4 text-lg text-gray-600">Mở khóa các khóa học và tài nguyên cao cấp phù hợp với mục tiêu học tập của bạn.</p>
+
+                @if (TempData["SuccessMessage"] != null)
+                {
+                    <div class="alert alert-success">
+                        @TempData["SuccessMessage"]
+                    </div>
+                }
+                @if (TempData["ErrorMessage"] != null)
+                {
+                    <div class="alert alert-danger">
+                        @TempData["ErrorMessage"]
+                    </div>
+                }
+            
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                @foreach (var package in packages)
+                {
+                    <div class="card bg-white rounded-lg shadow-md flex flex-col transition-transform duration-300">
+                        <div class="p-6 flex-grow">
+                            <h3 class="text-2xl font-semibold text-gray-900 text-center">@package.PackageName</h3>
+                            <div class="mt-4 text-center">
+                                <span class="text-4xl font-bold text-blue-600">@(package.Price?.ToString("N0") ?? "Contact Us")</span>
+                                <span class="text-gray-500"> VND</span>
+                            </div>
+                            <p class="mt-2 text-center text-gray-600">
+                                @(package.DurationDay < 0 || package.DurationDay == null ? "Lifetime Access" : $"{package.DurationDay} Ngày")
+                            </p>
+                            <ul class="mt-6 space-y-4">
+                                <li class="flex items-center">
+                                    <svg class="h-5 w-5 text-green-500 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+                                    </svg>
+                                    24/7 Support
+                                </li>
+                                <li class="flex items-center">
+                                    <svg class="h-5 w-5 text-green-500 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+                                    </svg>
+                                    Mở khóa tất cả khóa học thuộc dạng này
+                                </li>
+                                @if (package.IncludedPackageIds != null && package.IncludedPackageIds.Any())
+                                {
+                                    <li class="flex items-start">
+                                        <svg class="h-5 w-5 text-green-500 mr-2 mt-1" fill="currentColor" viewBox="0 0 20 20">
+                                            <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+                                        </svg>
+                                        <div>
+                                            <span>Sỡ hữu thêm gói:</span>
+                                            <ul class="list-disc list-inside ml-4">
+                                                @foreach (var includedId in package.IncludedPackageIds)
+                                                {
+                                                    var includedPackage = CXuLy.getPackageById(includedId.ToString());
+                                                    if (includedPackage != null)
+                                                    {
+                                                        <li>@includedPackage.PackageName</li>
+                                                    }
+                                                    else
+                                                    {
+                                                        <li>Package ID @includedId (Not Found)</li>
+                                                    }
+                                                }
+                                            </ul>
+                                        </div>
+                                    </li>
+                                }
+                                else
+                                {
+                                    <li class="flex items-center">
+                                        <svg class="h-5 w-5 text-green-500 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                                            <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+                                        </svg>
+                                        Không có gói cước bao gồm
+                                    </li>
+                                }
+                            </ul>
+                        </div>
+                        <div class="card-footer mt-auto p-4">
+                            <form method="post" action="@Url.Action("Purchase", "Package", new { packageId = package.PackageId, area = "User" })">
+                                <div class="mt-4 text-center flex flex-wrap justify-center gap-4">
+                                    @foreach (var method in paymentMethods)
+                                    {
+                                        <label class="flex items-center cursor-pointer space-x-2 px-3 py-2 border rounded hover:bg-gray-100">
+                                            <input type="radio" name="paymentMethod" value="@method.Name" @(method == paymentMethods.First() ? "checked" : "") />
+                                            @if (!string.IsNullOrEmpty(method.Logo))
+                                            {
+                                                <img src="@method.Logo" alt="@method.Name" class="h-6 w-6 object-contain" />
+                                            }
+                                            <span class="font-medium">@method.Name</span>
+                                        </label>
+                                    }
+                                </div>
+                                <button type="submit" class="btn-buy w-full block text-center bg-blue-600 text-white font-semibold py-3 rounded-lg mt-4 transition-colors duration-300">
+                                    Buy Now
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                }
+            </div>
+
+        </div>
+    </section>
+</body>
+</html>

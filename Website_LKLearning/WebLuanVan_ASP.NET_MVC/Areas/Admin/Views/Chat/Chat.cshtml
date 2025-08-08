@@ -1,0 +1,327 @@
+﻿@model IEnumerable<WebLuanVan_ASP.NET_MVC.Areas.Admin.Models.CMessage>
+@using WebLuanVan_ASP.NET_MVC.Areas.Admin.Models;
+@{
+     ViewData["Title"] = "Danh sách trò chuyện";
+    Layout = "~/Areas/Admin/Views/Shared/_LayoutAdmin.cshtml";
+    var users = ViewBag.Users as List<COnlineUserInfo>;
+    var selectedUserId = ViewBag.SelectedUserId as int? ?? 0;
+    var selectedUserName = ViewBag.SelectedUserName as string ?? "";
+    var conversationId = ViewBag.ConversationId as int? ?? 0;
+    var senderName = ViewBag.SenderName as string ?? "";
+    var currentUserId = ViewBag.UserId as int? ?? 0;
+    var token = Context.Session.GetString("AuthToken");
+}
+
+<style>
+    .chat-wrapper {
+        display: flex;
+        height: 80vh;
+        min-height: 500px;
+        max-height: 80vh;
+        gap: 0;
+    }
+    .chat-sidebar {
+        width: 320px;
+        background: #f4f6fb;
+        border-radius: 18px 0 0 18px;
+        box-shadow: 0 8px 32px rgba(0,0,0,0.10);
+        display: flex;
+        flex-direction: column;
+        padding-top: 18px;
+    }
+    .chat-search {
+        padding: 0 18px 12px 18px;
+    }
+    .chat-search input {
+        width: 100%;
+        border-radius: 12px;
+        border: none;
+        padding: 10px 14px;
+        background: #e9eaf3;
+        font-size: 15px;
+        outline: none;
+        margin-bottom: 8px;
+    }
+    .user-list {
+        flex: 1;
+        overflow-y: auto;
+        padding: 0 8px 8px 8px;
+    }
+    .user-item {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        padding: 12px 10px;
+        border-radius: 12px;
+        margin-bottom: 4px;
+        background: #fff;
+        cursor: pointer;
+        transition: background 0.2s;
+        text-decoration: none;
+        color: #222;
+    }
+    .user-item.active, .user-item:hover {
+        background: #e9eaf3;
+    }
+    .user-avatar {
+        width: 44px;
+        height: 44px;
+        border-radius: 50%;
+        background: #d2f8d2;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        font-size: 20px;
+        color: #0078d7;
+    }
+    .user-info {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+    }
+    .user-name {
+        font-weight: 600;
+        font-size: 16px;
+    }
+    .user-lastmsg {
+        font-size: 13px;
+        color: #888;
+    }
+    .chat-main {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        background: #fff;
+        border-radius: 0 18px 18px 0;
+        box-shadow: 0 8px 32px rgba(0,0,0,0.18), 0 1.5px 6px rgba(0,0,0,0.08);
+        min-width: 0;
+    }
+    .chat-header {
+        background: #0078d7;
+        color: #fff;
+        padding: 14px 20px;
+        font-weight: bold;
+        border-radius: 0 18px 0 0;
+        font-size: 18px;
+        letter-spacing: 0.5px;
+        position: sticky;
+        top: 0;
+        z-index: 2;
+    }
+    #chatMessages {
+        flex: 1;
+        min-height: 340px;
+        max-height: 420px;
+        overflow-y: auto;
+        padding: 18px 14px 10px 14px;
+        background: #f4f6fb;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        border-radius: 0 0 0 0;
+        scroll-behavior: smooth;
+    }
+    .chat-bubble {
+        max-width: 75%;
+        padding: 12px 18px;
+        border-radius: 18px;
+        margin-bottom: 2px;
+        position: relative;
+        font-size: 15px;
+        box-shadow: 0 1px 2px rgba(0,0,0,0.07);
+        word-break: break-word;
+        display: inline-block;
+        transition: background 0.2s;
+    }
+    .chat-bubble.me {
+        background: #d2f8d2;
+        align-self: flex-end;
+        margin-left: auto;
+        color: #222;
+    }
+    .chat-bubble.other {
+        background: #f1f1f1;
+        align-self: flex-start;
+        margin-right: auto;
+        color: #222;
+    }
+    .chat-date {
+        font-size: 12px;
+        color: #888;
+        margin-top: 4px;
+        text-align: right;
+    }
+    .chat-input-row {
+        display: flex;
+        border-top: 1px solid #e0e0e0;
+        padding: 10px 12px;
+        background: #fff;
+        border-radius: 0 0 18px 18px;
+        gap: 8px;
+        align-items: center;
+    }
+    #messageInput {
+        flex: 1;
+        border-radius: 8px;
+        border: 1px solid #ccc;
+        padding: 10px 12px;
+        font-size: 15px;
+        outline: none;
+        transition: border 0.2s;
+    }
+    #messageInput:focus {
+        border: 1.5px solid #0078d7;
+    }
+    .btn-send {
+        background: #0078d7;
+        color: #fff;
+        border: none;
+        border-radius: 8px;
+        padding: 9px 20px;
+        font-size: 15px;
+        font-weight: 600;
+        transition: background 0.2s;
+        box-shadow: 0 1px 2px rgba(0,0,0,0.07);
+    }
+    .btn-send:hover {
+        background: #005fa3;
+    }
+</style>
+
+<div class="chat-wrapper">
+    <!-- Sidebar: Danh sách user -->
+    <div class="chat-sidebar">
+        <div class="chat-search">
+            <input type="text" id="searchUser" placeholder="Search..." onkeyup="filterUsers()" />
+        </div>
+        <div class="user-list" id="userList">
+            @if (users != null)
+            {
+                foreach (var user in users)
+                {
+                    <a class="user-item @(user.UserId == selectedUserId ? "active" : "")"
+                       href="@Url.Action("ChatWithUser", "Chat", new { area = "Admin", userId = user.UserId })">
+                        <div class="user-avatar">
+                            @user.Fullname.Substring(0, 1).ToUpper()
+                        </div>
+                        <div class="user-info">
+                            <span class="user-name">@user.Fullname</span>
+                            <span class="user-lastmsg">Bấm để xem trò chuyện</span>
+                        </div>
+                    </a>
+                }
+            }
+        </div>
+    </div>
+
+    <!-- Main: Khung chat -->
+    <div class="chat-main">
+        <div class="chat-header">
+            @selectedUserName
+        </div>
+        <div id="chatMessages">
+            @foreach (var message in Model)
+            {
+                var isMe = message.SenderID == currentUserId;
+                <div class="chat-bubble @(isMe ? "me" : "other")">
+                    @message.Content
+                    <div class="chat-date">
+                        @message.SenderName, @message.SentAt.ToString("HH:mm dd/MM/yyyy")
+                    </div>
+                </div>
+            }
+        </div>
+        @if (selectedUserId != 0)
+        {
+            <div class="chat-input-row">
+                <input type="text" id="messageInput" class="form-control" placeholder="Type your message..." autocomplete="off" />
+                <button onclick="sendMessage()" class="btn-send">Send</button>
+            </div>
+        }
+    </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/8.0.0/signalr.min.js"></script>
+<script>
+    function filterUsers() {
+        var input = document.getElementById("searchUser");
+        var filter = input.value.toLowerCase();
+        var userList = document.getElementById("userList");
+        var items = userList.getElementsByClassName("user-item");
+        for (var i = 0; i < items.length; i++) {
+            var name = items[i].querySelector(".user-name").textContent.toLowerCase();
+            items[i].style.display = name.includes(filter) ? "" : "none";
+        }
+    }
+
+    function scrollToBottom() {
+        var chatMessages = document.getElementById("chatMessages");
+        if (chatMessages) {
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+    }
+    window.onload = scrollToBottom;
+
+    const currentUserId = @currentUserId;
+    const conversationId = @conversationId;
+    const senderName = '@senderName';
+    const token = '@(token?.Replace("'", "\\'"))';
+    const apiBaseUrl = '@ViewBag.ApiBaseUrl';
+
+      const connection = new signalR.HubConnectionBuilder()
+        .withUrl("https://testwebapi.somee.com/chatHub", {
+            accessTokenFactory: () => token
+        })
+        .build();
+
+    connection.on("ReceiveMessage", (senderId, senderName, content, sentAt) => {
+        appendMessage(senderId, senderName, content, sentAt);
+    });
+
+    // Start the connection and join the group
+    connection.start().then(() => {
+        connection.invoke("JoinConversation", conversationId);
+    }).catch(err => console.error(err));
+
+
+    function appendMessage(senderId, senderName, content, sentAt) {
+        const chatMessages = document.getElementById("chatMessages");
+        const bubble = document.createElement("div");
+        bubble.className = "chat-bubble " + (senderId == currentUserId ? "me" : "other");
+        bubble.innerHTML = `
+            ${content}
+            <div class="chat-date">${senderName}, ${formatDate(sentAt)}</div>
+        `;
+        chatMessages.appendChild(bubble);
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+
+    function formatDate(dateString) {
+        const d = new Date(dateString);
+        return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) + " " +
+            d.toLocaleDateString('vi-VN');
+    }
+
+        function sendMessage() {
+        const message = document.getElementById("messageInput").value;
+        if (message) {
+            fetch('@Url.Action("SendMessage", "Chat")', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    conversationId: conversationId,
+                    senderId: currentUserId,
+                    senderName: senderName,
+                    content: message
+                })
+            }).then(response => {
+                if (response.ok) {
+                    // KHÔNG gọi connection.invoke ở đây nữa!
+                    document.getElementById("messageInput").value = '';
+                }
+            }).catch(err => console.error(err));
+        }
+    }
+
+</script>

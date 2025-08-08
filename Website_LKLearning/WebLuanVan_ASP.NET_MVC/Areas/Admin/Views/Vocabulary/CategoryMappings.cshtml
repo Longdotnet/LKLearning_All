@@ -1,0 +1,131 @@
+﻿@model IEnumerable<WebLuanVan_ASP.NET_MVC.Areas.Admin.Models.CVocabularyCategoryMapping>
+@using WebLuanVan_ASP.NET_MVC.Areas.Admin.Models
+@{
+	ViewData["Title"] = "Liên kết từ vựng & danh mục";
+	Layout = "~/Areas/Admin/Views/Shared/_LayoutAdmin.cshtml";
+    var vocabularies = ViewBag.Vocabularies as List<CVocabulary>;
+    var categories = ViewBag.Categories as List<CVocabularyCategory>;
+    var paginate = ViewBag.Paginate as Paginate ?? new Paginate();
+    int? currentCategoryId = ViewBag.CurrentCategoryId as int?;
+    int? currentVocabularyId = ViewBag.CurrentVocabularyId as int?;
+}
+<link rel="stylesheet" href="~/AdminTL/assets/css/index.css">
+
+<div class="content-header mb-4">
+    <h1>Liên kết từ vựng & danh mục</h1>
+    <form method="get" class="row mb-3">
+        <div class="col-md-4">
+            <select name="categoryId" class="form-select select2" data-placeholder="Chọn danh mục">
+                <option value="">-- Tất cả danh mục --</option>
+                @foreach (var cat in categories)
+                {
+                    <option value="@cat.VocabularyCategoryId" selected="@(currentCategoryId == cat.VocabularyCategoryId)">@cat.VocabularyCategoryName</option>
+                }
+            </select>
+        </div>
+        <div class="col-md-4">
+            <select name="vocabularyId" class="form-select select2" data-placeholder="Chọn từ vựng">
+                <option value="">-- Tất cả từ vựng --</option>
+                @foreach (var v in vocabularies)
+                {
+                    <option value="@v.VocabularyId" selected="@(currentVocabularyId == v.VocabularyId)">@v.Word</option>
+                }
+            </select>
+        </div>
+        <div class="col-md-4 d-flex align-items-end">
+            <button type="submit" class="btn btn-primary">Lọc</button>
+            @if (currentVocabularyId.HasValue || currentCategoryId.HasValue)
+            {
+                <a asp-area="Admin" asp-controller="Vocabulary" asp-action="Index" class="btn btn-outline-secondary ms-2">Xóa lọc</a>
+            }
+        </div>
+    </form>
+    <a asp-area="Admin" asp-controller="Vocabulary" asp-action="Index" class="btn btn-outline-secondary">
+        <i class="fas fa-arrow-left"></i> Quay lại danh sách từ vựng
+    </a>
+</div>
+
+<div class="card mb-4">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <span>Danh sách liên kết</span>
+        <a asp-area="Admin" asp-controller="Vocabulary" asp-action="formAddMapping" class="btn btn-primary btn-sm">
+            <i class="fas fa-plus"></i> Thêm liên kết
+        </a>
+    </div>
+    <div class="card-body">
+        <table class="table table-bordered table-hover table-responsive">
+            <thead class="table-light">
+                <tr>
+                    <th>#</th>
+                    <th>Từ vựng</th>
+                    <th>Danh mục</th>
+                    <th>Ngày thêm</th>
+                    <th>Thao tác</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (Model != null && Model.Any())
+                {
+                    int stt = 1;
+                    foreach (var map in Model)
+                    {
+                        var vocab = vocabularies?.FirstOrDefault(v => v.VocabularyId == map.VocabularyId);
+                        var cat = categories?.FirstOrDefault(c => c.VocabularyCategoryId == map.VocabularyCategoryId);
+                        <tr>
+                            <td>@stt</td>
+                            <td>
+                                @if (vocab != null)
+                                {
+                                    <a asp-area="Admin" asp-controller="Vocabulary" asp-action="Details" asp-route-id="@vocab.VocabularyId" class="fw-bold text-primary">
+                                        @vocab.Word
+                                    </a>
+                                }
+                                else
+                                {
+                                    <span class="text-muted">ID: @map.VocabularyId</span>
+                                }
+                            </td>
+                            <td>
+                                @if (cat != null)
+                                {
+                                    <span class="badge bg-info text-dark">@cat.VocabularyCategoryName</span>
+                                }
+                                else
+                                {
+                                    <span class="text-muted">ID: @map.VocabularyCategoryId</span>
+                                }
+                            </td>
+                            <td>@map.DateAdded?.ToString("dd/MM/yyyy HH:mm")</td>
+                            <td>
+                                <a asp-area="Admin" asp-controller="Vocabulary" asp-action="formEditMapping" asp-route-vocabularyId="@map.VocabularyId" asp-route-categoryId="@map.VocabularyCategoryId" class="btn btn-sm btn-warning me-1">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                <a asp-area="Admin" asp-controller="Vocabulary" asp-action="DeleteMapping" asp-route-vocabularyId="@map.VocabularyId" asp-route-categoryId="@map.VocabularyCategoryId" class="btn btn-sm btn-danger" onclick="return confirm('Bạn có chắc muốn xóa liên kết này?');">
+                                    <i class="fas fa-trash"></i>
+                                </a>
+                            </td>
+                        </tr>
+                        stt++;
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="5" class="text-center text-muted">Không có liên kết nào.</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<partial name="_Paging" model="@paginate" />
+
+@section Scripts {
+    <script>
+        $('.select2').select2({
+            theme: 'bootstrap-5',
+            width: '100%'
+        });
+    </script>
+}

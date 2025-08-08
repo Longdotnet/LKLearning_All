@@ -1,0 +1,105 @@
+﻿@using WebLuanVan_ASP.NET_MVC.Areas.Admin.Models
+@model CUsers
+@{
+    var userpackages = ViewBag.UserPackages as List<CUserPackage>;
+
+}
+<div class="card shadow-sm mb-4">
+    <div class="card-header bg-light">
+        <h5 class="mb-0"><i class="fas fa-user-circle me-2"></i>Thông tin người dùng</h5>
+    </div>
+    <div class="card-body">
+        @if (Model != null)
+        {
+            <div class="row mb-3">
+                <div class="col-sm-4 fw-bold">Mã người dùng</div>
+                <div class="col-sm-8">@Model.DisplayUserId</div>
+            </div>
+            <div class="row mb-3">
+                <div class="col-sm-4 fw-bold">Tên người dùng</div>
+                <div class="col-sm-8">@(Model.Fullname ?? "Chưa cập nhật")</div>
+            </div>
+            <div class="row mb-3">
+                <div class="col-sm-4 fw-bold">Email</div>
+                <div class="col-sm-8">@(Model.Email ?? "Chưa cập nhật")</div>
+            </div>
+            <div class="row mb-3">
+                <div class="col-sm-4 fw-bold">Số điện thoại</div>
+                <div class="col-sm-8">@(Model.Phone ?? "Chưa cập nhật")</div>
+            </div>
+            <div class="row mb-3">
+                <div class="col-sm-4 fw-bold">Giới tính</div>
+                <div class="col-sm-8">
+                    @(Model.Gender.HasValue ? (Model.Gender.Value ? "Nam" : "Nữ") : "Chưa cập nhật")
+                </div>
+            </div>
+            <div class="row mb-3">
+                <div class="col-sm-4 fw-bold">Tuổi</div>
+                <div class="col-sm-8">@(Model.Age?.ToString() ?? "Chưa cập nhật")</div>
+            </div>
+            <div class="row mb-3">
+                <div class="col-sm-4 fw-bold">Ngày sinh</div>
+                <div class="col-sm-8">@(Model.DateofBirth?.ToString("dd/MM/yyyy") ?? "Chưa cập nhật")</div>
+            </div>
+            <div class="row mb-3">
+                <div class="col-sm-4 fw-bold">Đăng nhập gần đây</div>
+                <div class="col-sm-8">@(Model.LastLoginDate?.ToString("dd/MM/yyyy") ?? "Chưa đăng nhập")</div>
+            </div>
+            <div class="row mb-3">
+                <div class="col-sm-4 fw-bold">Gói cước sở hữu</div>
+                <div class="col-sm-8">
+                    @if (userpackages != null && userpackages.Count > 0)
+                    {
+                        <div class="table-responsive">
+                            <table class="table table-bordered table-hover table-sm align-middle mb-0">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Tên gói</th>
+                                        <th>Ngày đăng ký</th>
+                                        <th>Ngày hết hạn</th>
+                                        <th>Trạng thái</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var package in userpackages)
+                                    {
+                                        <tr>
+                                            <td>
+                                                <strong>@package.PackageName</strong>
+                                            </td>
+                                            <td>
+                                                @package.RegistrationDate.ToString("dd/MM/yyyy")
+                                            </td>
+                                            <td>
+                                                @package.ExpirationDateDisplay
+                                            </td>
+                                            <td>
+                                                @{
+                                                    var isActive = (package.ExpirationDate > DateTime.Now || package.ExpirationDate == null );
+                                                    <span class="badge @(isActive ? "bg-success" : "bg-secondary")">
+                                                        @(isActive ? "Còn hiệu lực" : "Hết hạn")
+                                                    </span>;
+                                                }
+                                            </td>
+                                            
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                    else
+                    {
+                        <span>Chưa có gói cước nào </span>
+                    }
+                </div>
+            </div>
+        }
+        else
+        {
+            <div class="alert alert-info">
+                <i class="fas fa-info-circle me-2"></i>Chọn một người dùng để xem thông tin chi tiết.
+            </div>
+        }
+    </div>
+</div>

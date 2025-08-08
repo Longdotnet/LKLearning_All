@@ -1,0 +1,20 @@
+﻿@model WebLuanVan_ASP.NET_MVC.Areas.Admin.Models.CReview
+@{
+    ViewData["Title"] = "Thêm báo cáo";
+    Layout = "~/Areas/Admin/Views/Shared/_LayoutAdmin.cshtml";
+}
+<div class="card mt-4">
+    <div class="card-header bg-primary text-white">
+        <h4>Thêm báo cáo mới</h4>
+    </div>
+    <div class="card-body">
+        <form asp-action="ThemReport" asp-controller="Report" method="post">
+            @Html.Partial("_ReportForm", Model)
+            <button type="submit" class="btn btn-success">Lưu</button>
+            <a asp-action="Index" class="btn btn-secondary">Quay lại</a>
+        </form>
+    </div>
+</div>
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

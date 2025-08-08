@@ -1,0 +1,111 @@
+﻿@model List<WebLuanVan_ASP.NET_MVC.Areas.Admin.Models.CAcademicResult>
+@{
+    ViewData["Title"] = "Kết quả học tập";
+    Layout = "~/Areas/User/Views/Shared/_LayoutProfile.cshtml";
+    var searchTerm = ViewBag.SearchTerm as string;
+}@{
+    Paginate paginate = new Paginate();
+    int pageNo = 0;
+    if (ViewBag.Paginate != null)
+    {
+        paginate = ViewBag.Paginate;
+        pageNo = paginate.CurrentPage;
+    }
+}
+<div class="container-fluid px-2 px-md-4">
+    <div class="content-header">
+        <h1 class="mb-4 text-primary"><i class="fa fa-graduation-cap me-2"></i> Kết quả học tập</h1>
+    </div>
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5>Bộ lọc & Tìm kiếm</h5>
+        </div>
+        <div class="card-body">
+            <form method="get" class="row g-3 align-items-end">
+                <div class="col-12 col-md-6">
+                    <label class="form-label">Tìm kiếm khóa học hoặc bài học</label>
+                    <input type="text" name="searchTerm" value="@searchTerm" class="form-control" placeholder="Nhập từ khóa..." autocomplete="off" />
+                </div>
+                <div class="col-12 col-md-3">
+                    <button type="submit" class="btn btn-primary w-100 w-md-auto">Tìm kiếm</button>
+                </div>
+                <div class="col-12 col-md-3">
+                    <a asp-area="User" asp-action="AcademicResult" asp-controller="Profile" class="btn btn-outline-secondary w-100 w-md-auto">Xóa lọc</a>
+                </div>
+            </form>
+        </div>
+    </div>
+    <div class="d-flex justify-content-between align-items-center flex-wrap mt-4 mb-3">
+        <h2>Kết quả học tập của bạn</h2>
+    </div>
+    <div class="table-responsive mb-4">
+        <table class="table table-striped align-middle">
+            <thead>
+                <tr>
+                    <th class="text-nowrap">Khóa học</th>
+                    <th class="text-nowrap d-none d-md-table-cell">Bài học</th>
+                    <th class="text-nowrap">Thời gian bắt đầu</th>
+                    <th class="text-nowrap d-none d-md-table-cell">Thời gian cập nhật</th>
+                    <th class="text-nowrap">Thời lượng (phút)</th>
+                    <th class="text-nowrap">Trạng thái</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (Model != null && Model.Count > 0)
+                {
+                    foreach (var result in Model)
+                    {
+                        <tr>
+                            <td class="text-truncate" style="max-width:180px;" title="@result.CourseName">@result.CourseName</td>
+                            <td class="text-truncate d-none d-md-table-cell" style="max-width:140px;" title="@result.LessonTitle">@result.LessonTitle</td>
+                            <td>@result.CreatedAt.ToString("dd/MM/yyyy HH:mm")</td>
+                            <td class="d-none d-md-table-cell">
+                                @if (result.UpdatedAt.HasValue)
+                                {
+                                    @result.UpdatedAt.Value.ToString("dd/MM/yyyy HH:mm")
+                                }
+                                else
+                                {
+                                    <span class="text-muted">-</span>
+                                }
+                            </td>
+                            <td>@(result.TimeSpent / 60)</td>
+                            <td>
+                                @if (result.Status == "Completed")
+                                {
+                                    <span class="badge bg-success">Hoàn thành</span>
+                                }
+                                else if (result.Status == "InProgress")
+                                {
+                                    <span class="badge bg-warning text-dark">Đang học</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-secondary">Chưa hoàn thành</span>
+                                }
+                            </td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="6" class="text-center text-muted">Không có kết quả học tập nào.</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+    <partial name="~/Areas/Admin/Views/Shared/_Paging.cshtml" model="@paginate" />
+
+</div>
+
+@section Scripts {
+    <script>
+        $('input[name="searchTerm"]').keypress(function (e) {
+            if (e.which === 13) {
+                $(this).closest('form').submit();
+            }
+        });
+    </script>
+}

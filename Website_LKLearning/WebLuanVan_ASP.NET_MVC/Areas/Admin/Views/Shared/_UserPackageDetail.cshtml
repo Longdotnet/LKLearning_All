@@ -1,0 +1,39 @@
+﻿@using WebLuanVan_ASP.NET_MVC.Areas.Admin.Models
+@model List<dynamic>
+
+<div class="card-body">
+    @if (Model != null && Model.Any())
+    {
+        <table class="table table-bordered table-hover">
+            <thead class="table-light">
+                <tr>
+                    <th>Mã gói</th>
+                    <th>Tên gói cước</th>
+                    <th>Ngày đăng ký</th>
+                    <th>Ngày hết hạn</th>
+                    <th>Giá</th>
+                    <th>Thời hạn</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var pkg in Model)
+                {
+                    <tr>
+                        <td>@pkg.PackageId</td>
+                        <td>@pkg.PackageName</td>
+                        <td>@pkg.RegistrationDate</td>
+                        <td>@pkg.ExpirationDate</td>
+                        <td>@pkg.Price</td>
+                        <td>@pkg.Duration</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+    else
+    {
+        <div class="alert alert-info">
+            <i class="fas fa-info-circle me-2"></i>Người dùng chưa đăng ký gói cước nào.
+        </div>
+    }
+</div>

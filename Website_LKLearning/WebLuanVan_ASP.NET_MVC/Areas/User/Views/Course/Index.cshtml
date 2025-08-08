@@ -1,0 +1,110 @@
+﻿@model List<WebLuanVan_ASP.NET_MVC.Areas.Admin.Models.CCourse>
+@using WebLuanVan_ASP.NET_MVC.Areas.Admin.Models;
+@{
+    ViewData["Title"] = "Danh sách khóa học";
+    Layout = "~/Areas/User/Views/Shared/_LayoutKhung.cshtml";
+    var categories = ViewBag.Categories as List<CCategory> ?? new List<CCategory>();
+    var levels = ViewBag.Levels as List<CLevel> ?? new List<CLevel>();
+    var packages = ViewBag.Packages as List<CPackage> ?? new List<CPackage>();
+    int? currentCategory = ViewBag.CurrentCategory as int?;
+    int? currentLevel = ViewBag.CurrentLevel as int?;
+    int? currentPackage = ViewBag.CurrentPackage as int?;
+    string searchTerm = ViewBag.SearchTerm as string ?? "";
+}
+@{
+    Paginate paginate = new Paginate();
+    int pageNo = 0;
+    if (ViewBag.Paginate != null)
+    {
+        paginate = ViewBag.Paginate;
+        pageNo = paginate.CurrentPage;
+    }
+}
+
+<div class="container py-5">
+    <div class="section-title text-center mb-5">
+        <h1 class="display-5 mb-4">Danh sách khóa học</h1>
+    </div>
+    <form method="get" class="row g-3 mb-4">
+        <div class="col-md-2">
+            <input type="text" name="searchTerm" class="form-control" placeholder="Tìm kiếm tên khóa học..." value="@searchTerm" />
+        </div>
+        <div class="col-md-2">
+            <select name="categoryId" class="form-select">
+                <option value="">-- Danh mục --</option>
+                @foreach (var cat in categories)
+                {
+                    <option value="@cat.CategoryId" selected="@(currentCategory == cat.CategoryId ? "selected" : null)">@cat.CategoryName</option>
+                }
+            </select>
+        </div>
+        <div class="col-md-2">
+            <select name="levelId" class="form-select">
+                <option value="">-- Cấp độ --</option>
+                @foreach (var lvl in levels)
+                {
+                    <option value="@lvl.LevelId" selected="@(currentLevel == lvl.LevelId ? "selected" : null)">@lvl.LevelName</option>
+                }
+            </select>
+        </div>
+        <div class="col-md-2">
+            <select name="packageId" class="form-select">
+                <option value="">-- Gói cước --</option>
+                @foreach (var pkg in packages)
+                {
+                    <option value="@pkg.PackageId" selected="@(currentPackage == pkg.PackageId ? "selected" : null)">@pkg.PackageName</option>
+                }
+            </select>
+        </div>
+        <div class="col-md-2">
+            <button type="submit" class="btn btn-primary w-100">Lọc / Tìm kiếm</button>
+          
+        </div>
+        <div class="col-md-2">
+           
+            @if (currentCategory.HasValue || currentLevel.HasValue || currentPackage.HasValue || searchTerm != null)
+            {
+                <a asp-area="User" asp-action="Index" asp-controller="Course" class="btn btn-outline-secondary w-100">Xóa lọc</a>
+            }
+        </div>
+    </form>
+
+    <div class="row g-4">
+        @if (Model != null && Model.Any())
+        {
+            foreach (var course in Model)
+            {
+                <div class="col-lg-6 col-xl-4">
+                    <div class="card h-100 shadow-sm">
+                        <img src="@(!string.IsNullOrEmpty(course.UrlImage) ? course.UrlImage : "~/UserTemplate/img/training-1.jpg")"
+                             class="card-img-top" alt="@course.CourseName" style="height:220px;object-fit:cover;">
+                        <div class="card-body">
+                            <h5 class="card-title text-primary">@course.CourseName</h5>
+                            <div class="mb-2">
+                                <span class="badge bg-info">Danh mục: @categories.FirstOrDefault(c => c.CategoryId == course.CategoryId)?.CategoryName</span>
+                                <span class="badge bg-secondary">Cấp độ: @levels.FirstOrDefault(l => l.LevelId == course.LevelId)?.LevelName</span>
+                                @if (course.PackageId.HasValue)
+                                {
+                                    <span class="badge bg-success">Gói cước: @packages.FirstOrDefault(p => p.PackageId == course.PackageId)?.PackageName</span>
+                                }
+                            </div>
+                           
+                        </div>
+                        <div class="card-footer text-end">
+                            <a href="#" class="btn btn-outline-primary btn-sm">Xem chi tiết</a>
+                        </div>
+                    </div>
+                </div>
+            }
+        }
+        else
+        {
+            <div class="col-12">
+                <div class="alert alert-warning text-center">Không có khóa học nào phù hợp.</div>
+            </div>
+        }
+    </div>
+
+    <!-- Pagination -->
+    <partial name="~/Areas/Admin/Views/Shared/_Paging.cshtml" model="@paginate" />
+</div>

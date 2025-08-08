@@ -1,0 +1,114 @@
+﻿@model List<WebLuanVan_ASP.NET_MVC.Areas.Admin.Models.CUserPackage>
+@{
+    ViewData["Title"] = "Quản lý Gói cước";
+    Layout = "~/Areas/User/Views/Shared/_LayoutProfile.cshtml";
+    var allPackages = ViewBag.AllPackages as List<WebLuanVan_ASP.NET_MVC.Areas.Admin.Models.CPackage>;
+}
+@{
+    Paginate paginate = new Paginate();
+    int pageNo = 0;
+    if (ViewBag.Paginate != null)
+    {
+        paginate = ViewBag.Paginate;
+        pageNo = paginate.CurrentPage;
+    }
+}
+<div class="container-fluid px-2 px-md-4">
+    <div class="content-header">
+        <h1 class="mb-4 text-primary"><i class="fa fa-box me-2"></i> Quản lý Gói cước</h1>
+    </div>
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5>Bộ lọc & Tìm kiếm</h5>
+        </div>
+        <div class="card-body">
+            <form method="get" class="row g-3 align-items-end">
+                <div class="col-12 col-md-6">
+                    <label class="form-label">Tìm kiếm tên gói cước</label>
+                    <input type="text" name="searchTerm" value="@ViewBag.SearchTerm" class="form-control" placeholder="Nhập từ khóa..." autocomplete="off" />
+                </div>
+                <div class="col-12 col-md-3">
+                    <button type="submit" class="btn btn-primary w-100 w-md-auto">Tìm kiếm</button>
+                </div>
+                <div class="col-12 col-md-3">
+                    <a asp-area="User" asp-action="Package" asp-controller="Profile" class="btn btn-outline-secondary w-100 w-md-auto">Xóa lọc</a>
+                </div>
+            </form>
+        </div>
+    </div>
+    <div class="d-flex justify-content-between align-items-center flex-wrap mt-4 mb-3">
+        <h2>Danh sách Gói cước đã đăng ký</h2>
+    </div>
+    <div class="table-responsive mb-4">
+        <table class="table table-striped align-middle">
+            <thead>
+                <tr>
+                    <th class="text-nowrap">Tên gói</th>
+                    <th class="text-nowrap d-none d-md-table-cell">Ảnh</th>
+                    <th class="text-nowrap">Ngày đăng ký</th>
+                    <th class="text-nowrap d-none d-md-table-cell">Ngày hết hạn</th>
+                    <th class="text-nowrap">Trạng thái</th>
+                    <th class="text-nowrap">Thao tác</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (Model != null && Model.Count > 0)
+                {
+                    foreach (var pkg in Model)
+                    {
+                        var packageInfo = allPackages?.FirstOrDefault(p => p.PackageId == pkg.PackageId);
+                        <tr>
+                            <td class="text-truncate" style="max-width:180px;" title="@pkg.PackageName">@pkg.PackageName</td>
+                            <td class="d-none d-md-table-cell">
+                                @if (!string.IsNullOrEmpty(packageInfo?.UrlImage))
+                                {
+                                    <img src="@packageInfo.UrlImage" alt="Package" style="max-width:80px;max-height:40px;border-radius:6px;" />
+                                }
+                                else
+                                {
+                                    <span class="text-muted">Không có</span>
+                                }
+                            </td>
+                            <td>@pkg.RegistrationDate.ToString("dd/MM/yyyy")</td>
+                            <td class="d-none d-md-table-cell">
+                                @pkg.ExpirationDateDisplay
+                            </td>
+                            <td>
+                                @if (pkg.ExpirationDate.HasValue && pkg.ExpirationDate.Value < DateTime.Now)
+                                {
+                                    <span class="badge bg-danger">Hết hạn</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-success">Còn hiệu lực</span>
+                                }
+                            </td>
+                            <td>
+                                <a class="btn btn-sm btn-outline-primary" href="@Url.Action("Details", "Package", new { id = pkg.PackageId })" title="Xem chi tiết">
+                                    <i class="fa fa-eye"></i> Chi tiết
+                                </a>
+                            </td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="6" class="text-center text-muted">Bạn chưa đăng ký gói cước nào.</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+    <partial name="~/Areas/Admin/Views/Shared/_Paging.cshtml" model="@paginate" />
+
+</div>
+
+<script>
+    $('input[name="searchTerm"]').keypress(function (e) {
+        if (e.which === 13) {
+            $(this).closest('form').submit();
+        }
+    });
+</script>
+

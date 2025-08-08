@@ -1,0 +1,202 @@
+﻿@using WebLuanVan_ASP.NET_MVC.Areas.Admin.Models
+@model CCourse
+
+@{
+    ViewData["Title"] = "formThemCourse";
+    Layout = "~/Areas/Admin/Views/Shared/_LayoutAdmin.cshtml";
+    int currentcategorys = ViewBag.CurrentCategory;
+    int currentlevels = ViewBag.CurrentLevel;
+    var categorys = ViewBag.Categories as List<CCategory>;
+    var levels = ViewBag.Levels as List<CLevel>;
+    int currentpackages = ViewBag.CurrentPackage;
+    var packages = ViewBag.Packages as List<CPackage>;
+}
+
+<div class="container mt-4">
+    <h2 class="mb-4">Thêm khóa học</h2>
+
+    <form asp-action="ThemCourse">
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+        <input asp-for="CourseId" class="form-control" readonly="readonly" type="hidden" />
+
+        <div class="row">
+            <!-- Cột trái -->
+            <div class="col-md-6">
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <!-- Dropdown cho Category -->
+                        <div class="mb-3">
+                            <label asp-for="CategoryId" class="control-label"></label>
+                            <select id="categorySelect" name="CategoryId" class="form-select select2">
+                                <option value="">-- Select category --</option>
+                                @foreach (var category in categorys)
+                                {
+                                    <option value="@category.CategoryId" selected="@(currentcategorys == category.CategoryId)">
+                                        @category.CategoryName
+                                    </option>
+                                }
+                            </select>
+                            <span asp-validation-for="CategoryId" class="text-danger"></span>
+                        </div>
+
+                        <!-- Dropdown cho Level -->
+                        <div class="mb-3">
+                            <label asp-for="LevelId" class="control-label"></label>
+                            <select id="levelSelect" name="LevelId" class="form-select select2">
+                                <option value="">-- Select level --</option>
+                                @foreach (var level in levels)
+                                {
+                                    <option value="@level.LevelId" selected="@(currentlevels == level.LevelId)">
+                                        @level.LevelName
+                                    </option>
+                                }
+                            </select>
+                            <span asp-validation-for="LevelId" class="text-danger"></span>
+                        </div>
+
+                        <!-- Dropdown cho Packages -->
+                        <div class="mb-3">
+                            <label asp-for="PackageId" class="control-label"></label>
+                            <select id="PackageSelect" name="PackageId" class="form-select select2">
+                                <option value="">-- Select package --</option>
+                                @foreach (var package in packages)
+                                {
+                                    <option value="@package.PackageId" selected="@(currentpackages == package.PackageId)">
+                                        @package.PackageName
+                                    </option>
+                                }
+                            </select>
+                            <span asp-validation-for="PackageId" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="CourseName" class="control-label"></label>
+                            <input asp-for="CourseName" class="form-control" />
+                            <span asp-validation-for="CourseName" class="text-danger"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Cột phải -->
+            <div class="col-md-6">
+                <div class="card mb-4">
+                  
+                    <div class="card-body">
+                   
+
+                        <div class="mb-3">
+                            <label asp-for="DurationInMonths" class="control-label"></label>
+                            <input asp-for="DurationInMonths" class="form-control" />
+                            <span asp-validation-for="DurationInMonths" class="text-danger"></span>
+                        </div>
+                        <div class="mb-3">
+                            <label asp-for="UrlImage" class="control-label"></label>
+                            <input asp-for="UrlImage" class="form-control" id="imageUrlInput" />
+                             <span asp-validation-for="UrlImage" class="text-danger"></span>
+                            @Html.Partial("~/Areas/Admin/Views/Shared/_Preview.cshtml", "imageUrlInput")
+
+                        </div>
+                  
+                    </div>
+                </div>
+            </div>
+            
+            <div class="mb-12">
+                <label asp-for="Description" class="control-label"></label>
+                <div class="card">
+                    <textarea asp-for="Description" id="summernote-description" class="form-control" rows="30"></textarea>
+                    <span asp-validation-for="Description" class="text-danger"></span>
+                </div>
+            </div>
+            <div class="mb-3">
+                <label asp-for="CertificateDurationDays" class="control-label"></label>
+                <div class="card">
+                    <input asp-for="CertificateDurationDays"class="form-control"></input>
+                    <span asp-validation-for="CertificateDurationDays" class="text-danger"></span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Submit Button -->
+        <div class="text-center mt-4">
+            <button type="submit" class="btn btn-primary">Submit</button>
+            <a asp-action="Index" class="btn btn-secondary ms-2">Back to List</a>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function() {
+            // Khởi tạo Select2 với cấu hình đầy đủ
+            $('.select2').select2({
+                theme: 'bootstrap-5',
+                placeholder: function() {
+                    return $(this).data('placeholder') || 'Search...';
+                },
+                allowClear: true,
+                width: '100%',
+                minimumResultsForSearch: 1,
+                dropdownAutoWidth: true,
+                language: {
+                    noResults: function() {
+                        return "No results found";
+                    },
+                    searching: function() {
+                        return "Searching...";
+                    }
+                }
+            });
+
+            $('#categorySelect').select2({
+                ajax: {
+                    url: '@Url.Action("searchCategory", "Course")',
+                    dataType: 'json',
+                    delay: 250,
+                    data: function(params) {
+                        return {
+                            searchTerm: params.term,
+                            page: params.page || 1
+                        };
+                    },
+                    processResults: function(data, params) {
+                        params.page = params.page || 1;
+                        return {
+                            results: data.items,
+                            pagination: {
+                                more: (params.page * 10) < data.totalCount
+                            }
+                        };
+                    },
+                    cache: true
+                }
+            });
+
+            $('#levelSelect').select2({
+                ajax: {
+                    url: '@Url.Action("searchLevel", "Course")',
+                    dataType: 'json',
+                    delay: 250,
+                    data: function(params) {
+                        return {
+                            searchTerm: params.term,
+                            page: params.page || 1
+                        };
+                    },
+                    processResults: function(data, params) {
+                        params.page = params.page || 1;
+                        return {
+                            results: data.items,
+                            pagination: {
+                                more: (params.page * 10) < data.totalCount
+                            }
+                        };
+                    },
+                    cache: true
+                }
+            });
+        });
+    </script>
+}

@@ -1,0 +1,29 @@
+﻿@model IEnumerable<WebLuanVan_ASP.NET_MVC.Areas.Admin.Models.CConversation>
+@{
+    ViewData["Title"] = "Danh sách cuộc trò chuyện";
+    Layout = "~/Areas/Admin/Views/Shared/_LayoutUser.cshtml";
+}
+<h2>Danh sách cuộc trò chuyện</h2>
+<table class="table">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Admin</th>
+            <th>Ngày tạo</th>
+            <th>Chi tiết</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var conv in Model)
+        {
+            <tr>
+                <td>@conv.ConversationID</td>
+                <td>@conv.AdminName</td>
+                <td>@conv.CreatedAt.ToString("dd/MM/yyyy HH:mm")</td>
+                <td>
+                    <a href="@Url.Action("Chat", new { conversationId = conv.ConversationID, userId = ViewBag.UserId })" class="btn btn-info">Xem chi tiết</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

@@ -1,0 +1,342 @@
+﻿@model WebLuanVan_ASP.NET_MVC.Areas.Admin.Models.CQuestion
+@using WebLuanVan_ASP.NET_MVC.Areas.Admin.Models;
+@using Newtonsoft.Json;
+@{
+    ViewData["Title"] = "Chi tiết câu hỏi";
+    Layout = "~/Areas/Admin/Views/Shared/_LayoutAdmin.cshtml";
+    var lessons = ViewBag.dsLesson as List<CLesson>;
+    var questionTypes = ViewBag.QuestionTypes as List<CQuestionType>;
+    var contentTypes = ViewBag.ContentTypes as List<CContentType>;
+    var questionLevels = ViewBag.QuestionLevels as List<CQuestionLevel>;
+    var questionType = questionTypes?.FirstOrDefault(t => t.QuestionTypeId == Model.QuestionTypeId)?.TypeName ?? "N/A";
+    var contentType = contentTypes?.FirstOrDefault(t => t.ContentTypeId == Model.ContentTypeId)?.TypeName ?? "N/A";
+    var questionLevel = questionLevels?.FirstOrDefault(t => t.QuestionLevelId == Model.QuestionLevelId)?.QuestionName ?? "N/A";
+    string transcriptText = "";
+    if (Model.QuestionTypeId == 6 && !string.IsNullOrEmpty(Model.AnswerOptions))
+    {
+        transcriptText = Model.AnswerOptions;
+    }
+}
+<link rel="stylesheet" href="~/AdminTL/assets/css/index.css">
+
+<div class="card shadow mb-4">
+    <div class="card-header py-3 d-flex justify-content-between align-items-center">
+        <h6 class="m-0 font-weight-bold text-primary">Chi tiết câu hỏi</h6>
+        <a asp-action="Index" class="btn btn-secondary btn-sm">Quay lại</a>
+    </div>
+    <div class="card-body">
+        <div class="row mb-3">
+            <div class="col-md-4">
+                <div class="form-group">
+                    <label class="font-weight-bold">ID câu hỏi</label>
+                    <div class="form-control-plaintext">@Model.QuestionId</div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="form-group">
+                    <label asp-for="QuestionTypeId" class="font-weight-bold"></label>
+                    <div class="form-control-plaintext">@questionType</div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="form-group">
+                    <label asp-for="ContentTypeId" class="font-weight-bold"></label>
+                    <div class="form-control-plaintext">@contentType</div>
+                </div>
+            </div>
+        </div>
+        <div class="row mb-3">
+            <div class="col-md-4">
+                <div class="form-group">
+                    <label asp-for="QuestionLevelId" class="font-weight-bold"></label>
+                    <div class="form-control-plaintext">@questionLevel</div>
+                </div>
+            </div>
+            <div class="col-md-8">
+                <div class="form-group">
+                    <label asp-for="CorrectAnswer" class="font-weight-bold"></label>
+                    <div class="form-control-plaintext">@Model.CorrectAnswer</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-group mb-4">
+            <label asp-for="QuestionText" class="font-weight-bold"></label>
+            <div class="form-control-plaintext border p-3 rounded">@Html.Raw(Model.QuestionText)</div>
+        </div>
+        <div class="form-group mb-4">
+            <label asp-for="QuestionDescription" class="font-weight-bold"></label>
+            <div class="form-control-plaintext border p-3 rounded" id="questionDescriptionContent">
+                @Html.Raw(Model.QuestionDescription)
+            </div>
+            <div id="videoPreviewContainer" style="display:none; margin-top:10px;">
+                <div id="videoPreview"></div>
+                <p id="videoPreviewError" class="text-danger small mt-2" style="display:none;"></p>
+            </div>
+        </div>
+
+        <!-- Dynamic content based on question type -->
+        @if (Model.QuestionTypeId == 1) // Multiple Choice
+        {
+            <div class="card mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h6 class="m-0 font-weight-bold">Lựa chọn đáp án</h6>
+                </div>
+                <div class="card-body">
+                    @if (Model.AnswerOptionsList != null && Model.AnswerOptionsList.Count > 0)
+                    {
+                        <ul class="list-group">
+                            @foreach (var option in Model.AnswerOptionsList)
+                            {
+                                <li class="list-group-item @(option == Model.CorrectAnswer ? "list-group-item-success" : "")">
+                                    @option
+                                    @if (option == Model.CorrectAnswer)
+                                    {
+                                        <span class="badge badge-success float-right">Đáp án đúng</span>
+                                    }
+                                </li>
+                            }
+                        </ul>
+                    }
+                </div>
+            </div>
+        }
+        else if (Model.QuestionTypeId == 2) // True/False
+        {
+            <div class="card mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h6 class="m-0 font-weight-bold">Đáp án Đúng/Sai</h6>
+                </div>
+                <div class="card-body">
+                    <span class="badge @(Model.CorrectAnswer == "true" ? "badge-success" : "badge-danger")">
+                        @Model.CorrectAnswer
+                    </span>
+                </div>
+            </div>
+        }
+        else if (Model.QuestionTypeId == 3) // Fill in the Blank
+        {
+            <div class="card mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h6 class="m-0 font-weight-bold">Điền vào chỗ trống</h6>
+                </div>
+                <div class="card-body">
+                    <div class="form-control-plaintext">@Model.CorrectAnswer</div>
+                </div>
+            </div>
+        }
+        else if (Model.QuestionTypeId == 6) // Listening
+        {
+            <div class="card mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h6 class="m-0 font-weight-bold">Transcript Nghe</h6>
+                </div>
+                <div class="card-body">
+                    <div class="form-group">
+                        <label class="font-weight-bold">Nội dung Transcript</label>
+                        <div class="transcript-content">
+                            <textarea id="transcriptViewer" class="form-control summernote" readonly>@transcriptText</textarea>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="CorrectAnswer" class="font-weight-bold"></label>
+                        <div class="form-control-plaintext">@Model.CorrectAnswer</div>
+                    </div>
+                </div>
+            </div>
+        }
+
+        <!-- Media and Explanation -->
+        <div class="card mb-4">
+            <div class="card-header bg-primary text-white">
+                <h6 class="m-0 font-weight-bold">Thông tin bổ sung</h6>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    @if (!string.IsNullOrEmpty(Model.ImageUrl))
+                    {
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label asp-for="ImageUrl" class="font-weight-bold"></label>
+                                <div>
+                                    <img src="@Model.ImageUrl" class="img-responsive img-fluid rounded" />
+                                </div>
+                            </div>
+                        </div>
+                    }
+                    @if (!string.IsNullOrEmpty(Model.AudioUrl))
+                    {
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label asp-for="AudioUrl" class="font-weight-bold"></label>
+                                <div class="mt-2">
+                                    <audio controls class="w-100" id="audioUrlInput">
+                                        <source src="@Model.AudioUrl" type="audio/mpeg">
+                                    </audio>
+                                </div>
+                                <div class="mt-2">
+                                    <a href="@Model.AudioUrl" target="_blank" class="btn btn-sm btn-outline-primary">
+                                        <i class="fas fa-external-link-alt"></i> Download Audio
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+                @if (!string.IsNullOrEmpty(Model.Explanation))
+                {
+                    <div class="form-group mt-3">
+                        <label asp-for="Explanation" class="font-weight-bold"></label>
+                        <div class="form-control-plaintext border p-3 rounded">@Html.Raw(Model.Explanation)</div>
+                    </div>
+                }
+            </div>
+        </div>
+
+        <div class="form-group text-right">
+            <a asp-action="formSuaQuestion" asp-route-id="@Model.QuestionId" class="btn btn-primary">
+                <i class="fas fa-edit"></i> Sửa câu hỏi
+            </a>
+        </div>
+    </div>
+</div>
+
+<style>
+    .badge-success {
+        background-color: #1cc88a;
+    }
+
+    .badge-danger {
+        background-color: #e74a3b;
+    }
+
+    .list-group-item-success {
+        background-color: rgba(28, 200, 138, 0.1);
+    }
+
+    .transcript-content {
+        white-space: pre-wrap;
+        line-height: 1.6;
+        font-size: 16px;
+        background-color: #f8f9fa;
+        padding: 15px;
+        border-radius: 5px;
+    }
+
+        .transcript-content p {
+            margin-bottom: 10px;
+        }
+
+        .transcript-content strong {
+            color: #2c3e50;
+        }
+
+    #transcriptViewer.note-editor.note-frame {
+        pointer-events: none;
+    }
+
+    #transcriptViewer.note-editable {
+        background-color: #f8f9fa;
+    }
+</style>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            // Khởi tạo Summernote cho transcriptViewer ở chế độ chỉ đọc
+            $('#transcriptViewer').summernote({
+                height: 200,
+                toolbar: [],
+                disableDragAndDrop: true,
+                callbacks: {
+                    onInit: function() {
+                        $('#transcriptViewer').summernote('disable');
+                    }
+                }
+            });
+
+            // Video preview logic cho QuestionDescription
+            function isYouTubeUrl(url) {
+                return /^(https?:\/\/)?(www\.)?(youtube\.com|youtu\.be)\//i.test(url);
+            }
+            function getYouTubeId(url) {
+                var regExp = /^.*(youtu\.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
+                var match = url.match(regExp);
+                return (match && match[2].length === 11) ? match[2] : null;
+            }
+            function isVimeoUrl(url) {
+                return /^https?:\/\/(player\.)?vimeo\.com\/video\/\d+/i.test(url) || /^https?:\/\/vimeo\.com\/\d+/i.test(url);
+            }
+            function getVimeoId(url) {
+                var match = url.match(/(?:player\.)?vimeo\.com\/video\/(\d+)/i) || url.match(/vimeo\.com\/(\d+)/i);
+                return match ? match[1] : null;
+            }
+            function isVideoFile(url) {
+                return /^https?:\/\/.+\.(mp4|webm|mov)$/i.test(url);
+            }
+            function showVideoPreview(url) {
+                var $container = $('#videoPreviewContainer');
+                var $preview = $('#videoPreview');
+                var $error = $('#videoPreviewError');
+                $preview.empty();
+                $error.hide();
+
+                if (isYouTubeUrl(url)) {
+                    var videoId = getYouTubeId(url);
+                    if (videoId) {
+                        $preview.html(`<iframe width="320" height="180" src="https://www.youtube.com/embed/${videoId}" frameborder="0" allowfullscreen></iframe>`);
+                        $container.show();
+                    } else {
+                        $error.text('Không nhận diện được video YouTube.').show();
+                        $container.show();
+                    }
+                } else if (isVimeoUrl(url)) {
+                    var vimeoId = getVimeoId(url);
+                    if (vimeoId) {
+                        $preview.html(`<iframe src="https://player.vimeo.com/video/${vimeoId}" width="320" height="180" frameborder="0" allow="autoplay; fullscreen" allowfullscreen></iframe>`);
+                        $container.show();
+                    } else {
+                        $error.text('Không nhận diện được video Vimeo.').show();
+                        $container.show();
+                    }
+                } else if (isVideoFile(url)) {
+                    var video = document.createElement('video');
+                    video.width = 320;
+                    video.height = 180;
+                    video.controls = true;
+                    var source = document.createElement('source');
+                    source.src = url;
+                    source.type = 'video/mp4';
+                    video.appendChild(source);
+                    video.onerror = function () {
+                        $preview.empty();
+                        $error.text('Không thể tải video. Vui lòng kiểm tra lại URL.').show();
+                    };
+                    $preview.html(video);
+                    $container.show();
+                } else {
+                    $container.hide();
+                }
+            }
+            function extractVideoUrl(html) {
+                var url = null;
+                var $a = $('<div>' + html + '</div>').find('a[href^="http"]');
+                if ($a.length > 0) {
+                    url = $a.attr('href');
+                } else {
+                    var text = $('<div>' + html + '</div>').text();
+                    var urlMatch = text.match(/https?:\/\/[^\s"]+/);
+                    if (urlMatch && urlMatch[0]) {
+                        url = urlMatch[0];
+                    }
+                }
+                return url;
+            }
+            var html = $('#questionDescriptionContent').html();
+            var url = extractVideoUrl(html);
+            if (url) {
+                showVideoPreview(url);
+            }
+        });
+    </script>
+}

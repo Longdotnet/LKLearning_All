@@ -1,0 +1,28 @@
+﻿@model WebLuanVan_ASP.NET_MVC.Areas.SignUp.Models.DTOS.DangKyDTO
+@{
+    ViewData["Title"] = "Sign Up";
+    Layout = "~/Areas/SignUp/Views/Shared/_LayoutSignUp.cshtml";
+}
+<p class="text-center">Your Social Campaigns</p>
+<form asp-action="DangKyTK" method="post">
+    <div class="mb-3">
+        <label asp-for="Email" class="form-label">Email Address</label>
+        <input asp-for="Email" class="form-control" type="email" aria-describedby="emailHelp" />
+        <span asp-validation-for="Email" class="text-danger"></span>
+    </div>
+    <div class="mb-4">
+        <label asp-for="Password" class="form-label">Password</label>
+        <input asp-for="Password" class="form-control" type="password" />
+        <span asp-validation-for="Password" class="text-danger"></span>
+    </div>
+    <div class="mb-4">
+        <label asp-for="ConfirmPassword" class="form-label">Confirm Password</label>
+        <input asp-for="ConfirmPassword" class="form-control" type="password" />
+        <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
+    </div>
+    <button type="submit" class="btn btn-primary w-100 py-2 fs-4 mb-4">Sign Up</button>
+    <div class="d-flex align-items-center justify-content-center">
+        <p class="fs-4 mb-0 fw-bold">Already have an Account?</p>
+        <a class="text-primary fw-bold ms-2" asp-area="Login" asp-controller="Login" asp-action="Index">Sign In</a>
+    </div>
+</form>

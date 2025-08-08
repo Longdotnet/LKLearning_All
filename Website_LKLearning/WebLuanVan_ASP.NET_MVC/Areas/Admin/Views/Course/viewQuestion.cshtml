@@ -1,0 +1,431 @@
+﻿@model WebLuanVan_ASP.NET_MVC.Areas.Admin.Models.CCourse
+@using WebLuanVan_ASP.NET_MVC.Areas.Admin.Models;
+@{
+    ViewData["Title"] = "Xem chi tiết";
+    Layout = "~/Areas/Admin/Views/Shared/_LayoutAdmin.cshtml";
+    var packages = ViewBag.Packages as List<CPackage>;
+    var categories = ViewBag.Categories as List<CCategory>;
+    var levels = ViewBag.Levels as List<CLevel>;
+    var package = packages.FirstOrDefault(t => t.PackageId == Model.PackageId).PackageName ?? "N/A";
+    var category = categories.FirstOrDefault(t => t.CategoryId == Model.CategoryId).CategoryName ?? "N/A";
+    var level = levels.FirstOrDefault(t => t.LevelId == Model.LevelId).LevelName ?? "N/A";
+    var lessons = ViewBag.Lessons as List<CLesson>;
+    Paginate paginate = ViewBag.Paginate ?? new Paginate();
+    int pageNo = paginate.CurrentPage;
+    var courseLessons = ViewBag.CourseLessons as List<CCourseLessons> ?? new List<CCourseLessons>();
+}
+<link rel="stylesheet" href="~/AdminTL/assets/css/index.css">
+
+<div class="container-fluid px-4">
+    <div class="card mb-4">
+        <div class="card-header bg-primary text-white">
+            <h4 class="mb-0">
+                <i class="fas fa-edit me-2"></i>Thông tin chi tiết
+            </h4>
+        </div>
+        <div class="card-body">
+            <form>
+                <div class="row g-3">
+                    <!-- Course Name -->
+                    <div class="col-md-12">
+                        <label asp-for="CourseName" class="control-label"></label>
+                        @Model.CourseName
+                        <div class="invalid-feedback">Please provide a course name.</div>
+                    </div>
+                    <!-- Category and Level -->
+                    <div class="col-md-4">
+                        <label asp-for="CategoryId" class="control-label"></label>
+                        @category
+                    </div>
+                    <div class="col-md-4">
+                        <label asp-for="LevelId" class="control-label"></label>
+                        @level
+                    </div>
+                    <div class="col-md-4">
+                        <label asp-for="PackageId" class="control-label"></label>
+                        @package
+                    </div>
+                    <!-- Description -->
+                    <div class="col-md-12">
+                        <label asp-for="Description" class="control-label"></label>
+                        <div>@Html.Raw(Model.Description)</div>
+                    </div>
+                    <!-- Duration -->
+                    <div class="col-md-6">
+                        <label asp-for="DurationInMonths" class="control-label"></label>
+                        @Model.DurationInMonths tháng
+                    </div>
+                    <div class="col-md-6">
+                        <label asp-for="UrlImage" class="control-label"></label>
+                        <img src="@(!string.IsNullOrEmpty(Model.UrlImage)?Model.UrlImage:"N/A")"
+                             class="img-responsive"
+                             alt="chưa có" />
+                    </div>
+                    <div class="col-md-6">
+                        <label asp-for="CertificateDurationDays" class="control-label"></label>
+                        @Model.CertificateDurationDaysView
+                    </div>
+                </div>
+                <hr class="my-4" />
+            </form>
+        </div>
+    </div>
+    <div class="card mb-4">
+        <div class="card-header bg-primary text-white">
+            <h4 class="mb-0">
+                <i class="fas fa-book me-2"></i>Danh sách bài học
+            </h4>
+        </div>
+        <div class="card-body">
+            <!-- Bảng danh sách bài học -->
+            <form id="deleteForm" asp-action="DeleteMultiple" asp-controller="Lesson" method="post">
+                <input type="hidden" name="courseId" value="@Model.CourseId" />
+                <div class="table-responsive">
+                    <table class="table table-striped table-responsive">
+                        <thead>
+                            <tr>
+                                <th><input type="checkbox" id="selectAll" /></th>
+                                <th>Thứ tự</th>
+                                <th>Tên bài học</th>
+                                <th>Ngày tạo</th>
+                                <th>Trạng thái</th>
+                                <th style="text-align:center">Thao tác</th>
+                                <th style="text-align:center">Điều chỉnh thứ tự</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if (lessons != null && lessons.Any())
+                            {
+                                foreach (var lesson in lessons)
+                                {
+                                    var orderNo = courseLessons.FirstOrDefault(cl => cl.LessonId == lesson.LessonId)?.OrderNo ?? 0;
+                                    <tr data-lesson-id="@lesson.LessonId" data-order-no="@orderNo">
+                                        <td><input type="checkbox" name="selectedIds" value="@lesson.LessonId" class="rowCheckbox" /></td>
+                                        <td class="order-no">
+                                            <input type="number" class="form-control order-input"
+                                                        data-lesson-id="@lesson.LessonId"
+                                                        data-order-no="@orderNo"
+                                                        value="@orderNo"
+                                                        min="1"
+                                                        style="width: 80px; -moz-appearance: textfield;"
+                                                        onwheel="this.blur()" />
+                                                <style>
+                                                    /* Hide arrows for input type number in Chrome, Safari, Edge, Opera */
+                                                    input[type=number]::-webkit-inner-spin-button, 
+                                                    input[type=number]::-webkit-outer-spin-button { 
+                                                        -webkit-appearance: none; 
+                                                        margin: 0; 
+                                                    }
+                                                    /* Hide arrows for Firefox */
+                                                    input[type=number] {
+                                                        -moz-appearance: textfield;
+                                                    }
+                                                </style>
+                                       </td>
+                                        <td>@lesson.LessonTitle</td>
+                                        <td>@lesson.Duration.ToString("dd/MM/yyyy")</td>
+                                        <td>
+                                            <span class="badge @(lesson.IsActivate ? "bg-success" : "bg-secondary")">
+                                                @(lesson.IsActivate ? "Kích hoạt" : "Chưa kích hoạt")
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <a asp-action="xoaLessonFromCourse" asp-controller="Course" asp-route-lessonId="@lesson.LessonId" asp-route-courseId="@Model.CourseId" onclick="confirmDelete(event)" class="btn btn-sm btn-danger">
+                                                <i class="fas fa-trash"></i>
+                                            </a>
+                                            <a asp-action="viewQuestion" asp-controller="Lesson" asp-route-id="@lesson.LessonId" class="btn btn-sm btn-primary">
+                                                <i class="fas fa-eye"></i>
+                                            </a>
+                                        </td>
+                                        <td>
+                                            <button class="btn btn-sm btn-outline-primary move-up"
+                                                    data-lesson-id="@lesson.LessonId"
+                                                    data-order-no="@orderNo">
+                                                <i class="fas fa-arrow-up"></i>
+                                            </button>
+                                            <button class="btn btn-sm btn-outline-primary move-down"
+                                                    data-lesson-id="@lesson.LessonId"
+                                                    data-order-no="@orderNo">
+                                                <i class="fas fa-arrow-down"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                }
+                            }
+                            else
+                            {
+                                <tr>
+                                    <td colspan="7" class="text-center">Không có bài học nào.</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </form>
+            <!-- Phân trang -->
+            <partial name="_Paging" model="@paginate" />
+            <a asp-action="Index" asp-controller="Lesson" class="btn btn-primary">
+                <i class="fas fa-arrow-left me-2"></i>Thêm bài học
+            </a>
+        </div>
+    </div>
+    <a asp-action="Index" class="btn btn-outline-secondary">
+        <i class="fas fa-arrow-left me-2"></i>Back to List
+    </a>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            // Khởi tạo Select2 và các logic khác (như trong code gốc)
+            $('.select2').select2({
+                theme: 'bootstrap-5',
+                placeholder: 'Tìm kiếm...',
+                allowClear: true,
+                width: '100%'
+            });
+
+            $('#selectAll').change(function () {
+                $('.rowCheckbox').prop('checked', $(this).prop('checked'));
+                toggleDeleteButton();
+            });
+
+            $('.rowCheckbox').change(function () {
+                if ($('.rowCheckbox:checked').length === $('.rowCheckbox').length) {
+                    $('#selectAll').prop('checked', true);
+                } else {
+                    $('#selectAll').prop('checked', false);
+                }
+                toggleDeleteButton();
+            });
+
+            function toggleDeleteButton() {
+                var checkedCount = $('.rowCheckbox:checked').length;
+                $('#deleteSelected').prop('disabled', checkedCount === 0);
+                $('#deleteSelected').text(checkedCount > 0 ? `Xóa (${checkedCount}) đã chọn` : 'Xóa đã chọn');
+            }
+
+            $('#deleteSelected').click(function (e) {
+                e.preventDefault();
+                confirmDeleteMultiple(e, function () {
+                    $('#deleteForm').submit();
+                });
+            });
+
+            // Xử lý thay đổi OrderNo qua textbox
+            $('.order-input').on('change', debounce(function () {
+                var $input = $(this);
+                var lessonId = $input.data('lesson-id');
+                var newOrderNo = parseInt($input.val());
+                var oldOrderNo = parseInt($input.data('order-no'));
+                var courseId = @Model.CourseId;
+                var totalLessons = @ViewBag.Paginate.TotalItems;
+
+                // Kiểm tra giá trị hợp lệ
+                if (isNaN(newOrderNo) || newOrderNo < 1 || newOrderNo > totalLessons) {
+                    toastr.error(`Thứ tự phải từ 1 đến ${totalLessons}`);
+                    $input.val(oldOrderNo);
+                    return;
+                }
+
+                if (newOrderNo === oldOrderNo) {
+                    return;
+                }
+
+                // Gửi yêu cầu cập nhật OrderNo
+                $.ajax({
+                    url: '@Url.Action("UpdateLessonOrder", "Course")',
+                    type: 'PUT',
+                    contentType: 'application/json',
+                    data: JSON.stringify({
+                        courseId: courseId,
+                        lessonId: lessonId,
+                        orderNo: newOrderNo
+                    }),
+                    beforeSend: function () {
+                        $input.prop('disabled', true);
+                        toastr.info('Đang lưu...');
+                  
+                    },
+                    success: function (response) {
+                        if (response.success) {
+                            
+                            // Cập nhật giao diện
+                            window.location.reload(); // Fallback reload nếu lỗi
+                            toastr.success(response.message);
+
+                        } else {
+                            toastr.error(response.message || 'Không thể cập nhật thứ tự.');
+                            $input.val(oldOrderNo);
+                        }
+                    },
+                    error: function (xhr) {
+                        toastr.error('Lỗi khi cập nhật: ' + (xhr.responseJSON?.message || 'Lỗi không xác định'));
+                        $input.val(oldOrderNo);
+                    },
+                    complete: function () {
+                        $input.prop('disabled', false);
+                    }
+                });
+            }, 500));
+
+            // Hàm cập nhật giao diện sau khi thay đổi OrderNo
+     
+
+            // Gắn sự kiện cho các input và button mới
+            function bindEventsToNewRows() {
+                $('.order-input').off('change').on('change', debounce(function () {
+                    var $input = $(this);
+                    var lessonId = $input.data('lesson-id');
+                    var newOrderNo = parseInt($input.val());
+                    var oldOrderNo = parseInt($input.data('order-no'));
+                    var courseId = @Model.CourseId;
+                    var totalLessons = @ViewBag.Paginate.TotalItems;
+
+                    if (isNaN(newOrderNo) || newOrderNo < 1 || newOrderNo > totalLessons) {
+                        toastr.error(`Thứ tự phải từ 1 đến ${totalLessons}`);
+                        $input.val(oldOrderNo);
+                        return;
+                    }
+
+                    if (newOrderNo === oldOrderNo) {
+                        return;
+                    }
+
+                    $.ajax({
+                        url: '@Url.Action("UpdateLessonOrder", "Course")',
+                        type: 'PUT',
+                        contentType: 'application/json',
+                        data: JSON.stringify({
+                            courseId: courseId,
+                            lessonId: lessonId,
+                            orderNo: newOrderNo
+                        }),
+                        beforeSend: function () {
+                            $input.prop('disabled', true);
+                            toastr.info('Đang lưu...');
+                        },
+                        success: function (response) {
+                            if (response.success) {
+                                toastr.success(response.message);
+                                  window.location.reload(); // Fallback reload nếu lỗi
+                            } else {
+                                toastr.error(response.message || 'Không thể cập nhật thứ tự.');
+                                $input.val(oldOrderNo);
+                            }
+                        },
+                        error: function (xhr) {
+                            toastr.error('Lỗi khi cập nhật: ' + (xhr.responseJSON?.message || 'Lỗi không xác định'));
+                            $input.val(oldOrderNo);
+                        },
+                        complete: function () {
+                            $input.prop('disabled', false);
+                        }
+                    });
+                }, 500));
+
+                $('.move-up').off('click').click(function (event) {
+                    event.preventDefault();
+                    var $button = $(this);
+                    var currentOrder = parseInt($button.attr('data-order-no'));
+                    if (currentOrder <= 1) {
+                        toastr.warning('Bài học đã ở vị trí đầu tiên');
+                        return;
+                    }
+                    var courseId = @Model.CourseId;
+                    swapLessonOrder(courseId, currentOrder, currentOrder - 1, $button.closest('tr'));
+                });
+
+                $('.move-down').off('click').click(function (event) {
+                    event.preventDefault();
+                    var $button = $(this);
+                    var currentOrder = parseInt($button.attr('data-order-no'));
+                    var courseId = @Model.CourseId;
+                    var totalLessons = @ViewBag.Paginate.TotalItems;
+                    if (currentOrder >= totalLessons) {
+                        toastr.warning('Bài học đã ở vị trí cuối cùng');
+                        return;
+                    }
+                    swapLessonOrder(courseId, currentOrder, currentOrder + 1, $button.closest('tr'));
+                });
+            }
+
+            // Giữ logic Move Up và Move Down sử dụng SwapLessonOrder
+            $('.move-up').click(function (event) {
+                event.preventDefault();
+                var $button = $(this);
+                var currentOrder = parseInt($button.attr('data-order-no'));
+                if (currentOrder <= 1) {
+                    toastr.warning('Bài học đã ở vị trí đầu tiên');
+                    return;
+                }
+                var courseId = @Model.CourseId;
+                swapLessonOrder(courseId, currentOrder, currentOrder - 1, $button.closest('tr'));
+            });
+
+            $('.move-down').click(function (event) {
+                event.preventDefault();
+                var $button = $(this);
+                var currentOrder = parseInt($button.attr('data-order-no'));
+                var courseId = @Model.CourseId;
+                var totalLessons = @ViewBag.Paginate.TotalItems;
+                if (currentOrder >= totalLessons) {
+                    toastr.warning('Bài học đã ở vị trí cuối cùng');
+                    return;
+                }
+                swapLessonOrder(courseId, currentOrder, currentOrder + 1, $button.closest('tr'));
+            });
+
+            function swapLessonOrder(courseId, sourceOrder, targetOrder, $row) {
+                $.ajax({
+                    url: '@Url.Action("SwapLessonOrder", "Course")',
+                    type: 'PUT',
+                    contentType: 'application/json',
+                    data: JSON.stringify({
+                        courseId: courseId,
+                        sourceOrderNo: sourceOrder,
+                        targetOrderNo: targetOrder
+                    }),
+                    success: function (response) {
+                        if (response.success) {
+                            updateUIAfterSwap(sourceOrder, targetOrder, $row);
+                        } else {
+                            toastr.error(response.message || 'Không thể hoán đổi thứ tự bài học.');
+                        }
+                    },
+                    error: function (xhr) {
+                        toastr.error('Lỗi khi hoán đổi: ' + (xhr.responseJSON?.message || 'Lỗi không xác định'));
+                    }
+                });
+            }
+
+            function updateUIAfterSwap(sourceOrder, targetOrder, $row) {
+                var $targetRow = $('tr[data-order-no="' + targetOrder + '"]');
+                if ($targetRow.length > 0) {
+                    $row.find('.order-no input').val(targetOrder);
+                    $row.attr('data-order-no', targetOrder);
+                    $row.find('.move-up, .move-down').attr('data-order-no', targetOrder);
+                    $targetRow.find('.order-no input').val(sourceOrder);
+                    $targetRow.attr('data-order-no', sourceOrder);
+                    $targetRow.find('.move-up, .move-down').attr('data-order-no', sourceOrder);
+                    if (targetOrder < sourceOrder) {
+                        $row.insertBefore($targetRow);
+                    } else {
+                        $row.insertAfter($targetRow);
+                    }
+                    toastr.success('Hoán đổi thứ tự bài học thành công!');
+                } else {
+                    window.location.reload();
+                }
+            }
+
+            function debounce(func, wait) {
+                let timeout;
+                return function (...args) {
+                    clearTimeout(timeout);
+                    timeout = setTimeout(() => func.apply(this, args), wait);
+                };
+            }
+        });
+    </script>
+}

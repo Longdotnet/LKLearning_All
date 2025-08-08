@@ -1,0 +1,104 @@
+﻿@using WebLuanVan_ASP.NET_MVC.Areas.Admin.Models
+@model List<CCertificateType>
+@{
+    ViewData["Title"] = "Quản lý Loại Chứng chỉ";
+    Layout = "~/Areas/Admin/Views/Shared/_LayoutAdmin.cshtml";
+    Paginate paginate = ViewBag.Paginate as Paginate ?? new Paginate();
+    int pageNo = paginate.CurrentPage;
+}
+<link rel="stylesheet" href="~/AdminTL/assets/css/index.css">
+
+
+
+<div class="container-fluid px-2 px-md-4">
+    <div class="content-header">
+        <h1>Quản lý Loại Chứng chỉ</h1>
+    </div>
+    <div class="d-flex justify-content-between align-items-center flex-wrap mt-4 mb-3">
+        <h2>Danh sách Loại Chứng chỉ</h2>
+        <div class="d-flex flex-wrap gap-2">
+            <button id="deleteSelected" class="btn btn-danger mr-2" disabled>Xóa đã chọn</button>
+            <a asp-action="formAddType" class="btn btn-primary">Thêm Loại Chứng chỉ</a>
+        </div>
+    </div>
+    <div class="table-responsive mb-4">
+        <table class="table table-striped align-middle">
+            <thead>
+                <tr>
+                    <th><input type="checkbox" id="selectAll" /></th>
+                    <th class="text-nowrap">Tên loại chứng chỉ</th>
+                    <th class="text-nowrap">Thao tác</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (Model != null && Model.Count > 0)
+                {
+                    foreach (var type in Model)
+                    {
+                        <tr>
+                            <td><input type="checkbox" name="selectIds" value="@type.CertificateTypeId" class="rowCheckbox" /></td>
+                            <td class="text-truncate" style="max-width:180px;" title="@type.TypeName">@type.TypeName</td>
+                            <td>
+                                <a asp-action="DeleteType" asp-route-id="@type.CertificateTypeId" onclick="confirmDelete(event)" class="btn btn-sm btn-danger" title="Xóa">
+                                    <i class="fas fa-trash"></i>
+                                </a>
+                                <a asp-action="formEditType" asp-route-id="@type.CertificateTypeId" class="btn btn-sm btn-warning" title="Sửa">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                            </td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="4" class="text-center text-muted">Không có loại chứng chỉ nào.</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+    <partial name="_Paging" model="@paginate" />
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            $('#selectAll').change(function () {
+                $('.rowCheckbox').prop('checked', $(this).prop('checked'));
+                toggleDeleteButton();
+            });
+            $('.rowCheckbox').change(function () {
+                $('#selectAll').prop('checked', $('.rowCheckbox:checked').length === $('.rowCheckbox').length);
+                toggleDeleteButton();
+            });
+
+            function toggleDeleteButton() {
+                var checkedCount = $('.rowCheckbox:checked').length;
+                $('#deleteSelected').prop('disabled', checkedCount === 0);
+                $('#deleteSelected').text(checkedCount > 0 ? `Xóa (${checkedCount}) đã chọn` : 'Xóa đã chọn');
+            }
+
+            $('#deleteSelected').click(function (e) {
+                confirmDeleteMultiple(e, function () {
+                    var selectedIds = $('.rowCheckbox:checked').map(function () {
+                        return $(this).val();
+                    }).get();
+
+                    $.ajax({
+                        url: '@Url.Action("DeleteMultipleType", "CertificateType", new { area = "Admin" })',
+                        type: 'POST',
+                        contentType: 'application/json',
+                        data: JSON.stringify(selectedIds),
+                        success: function () {
+                            location.reload();
+                        },
+                        error: function () {
+                            toastr.error('Đã xảy ra lỗi khi xóa.');
+                        }
+                    });
+                });
+            });
+        });
+    </script>
+}

@@ -1,0 +1,265 @@
+﻿@model WebLuanVan_ASP.NET_MVC.Areas.Admin.Models.CVocabulary
+
+@{
+    ViewData["Title"] = "Thêm từ vựng mới";
+    Layout = "~/Areas/Admin/Views/Shared/_LayoutAdmin.cshtml";
+}
+
+<div class="container py-4">
+    <h2 class="mb-4">Thêm từ vựng mới</h2>
+    <form asp-action="CreateVocabulary" method="post" id="vocabForm" class="needs-validation" novalidate>
+        <input type="hidden" id="MeaningsJson" name="MeaningsJson" value="@((Model?.Meanings != null) ? Newtonsoft.Json.JsonConvert.SerializeObject(Model.Meanings) : "")" />
+        <div class="row g-3">
+            <!-- Từ vựng -->
+            <div class="col-md-6">
+                <label for="Word" class="form-label">Từ vựng <span class="text-danger">*</span></label>
+                <input type="text" class="form-control" id="Word" name="Word" required autocomplete="off" placeholder="Nhập từ vựng..." />
+                <div class="invalid-feedback">Vui lòng nhập từ vựng.</div>
+            </div>
+            <!-- Phát âm -->
+            <div class="col-md-6">
+                <label for="Pronunciation" class="form-label">Phát âm</label>
+                <input type="text" class="form-control" id="Pronunciation" name="Pronunciation" placeholder="Nhập phát âm (nếu có)" />
+            </div>
+            <!-- Audio UK -->
+            <div class="col-md-6">
+                <label for="AudioUrlUk" class="form-label">Audio UK</label>
+                <div class="input-group">
+                    <input type="text" class="form-control" id="AudioUrlUk" name="AudioUrlUk" placeholder="URL audio UK" />
+                    <button type="button" class="btn btn-outline-primary" id="playAudioUk" title="Nghe thử UK">
+                        <i class="fas fa-volume-up"></i>
+                    </button>
+                </div>
+                <audio id="audioUk" style="display:none;"></audio>
+            </div>
+            <!-- Audio US -->
+            <div class="col-md-6">
+                <label for="AudioUrlUs" class="form-label">Audio US</label>
+                <div class="input-group">
+                    <input type="text" class="form-control" id="AudioUrlUs" name="AudioUrlUs" placeholder="URL audio US" />
+                    <button type="button" class="btn btn-outline-primary" id="playAudioUs" title="Nghe thử US">
+                        <i class="fas fa-volume-up"></i>
+                    </button>
+                </div>
+                <audio id="audioUs" style="display:none;"></audio>
+            </div>
+        </div>
+        <hr />
+        <!-- Nghĩa động -->
+        <div class="mb-3">
+            <label class="form-label">Nghĩa của từ vựng (có thể chỉnh sửa trước khi lưu)</label>
+            <div id="meaningsEditor"></div>
+            <div id="relatedError" class="text-danger mt-2" style="display:none;"></div>
+        </div>
+        <div class="mt-4">
+            <button type="submit" class="btn btn-success px-4">Thêm mới</button>
+            <a asp-area="Admin" asp-controller="Vocabulary" asp-action="Index" class="btn btn-secondary ms-2">Quay lại</a>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+        <script>
+            var apiBaseUrl = '@ViewBag.ApiBaseUrl';
+            var meanings = [];
+
+            function debounce(func, wait) {
+                let timeout;
+                return function () {
+                    const context = this, args = arguments;
+                    clearTimeout(timeout);
+                    timeout = setTimeout(() => func.apply(context, args), wait);
+                };
+            }
+
+            function renderMeaningsEditor() {
+                const container = $("#meaningsEditor");
+                if (!meanings.length) {
+                    container.html('<span class="text-muted">Không có nghĩa nào. Hãy nhập từ vựng để lấy nghĩa!</span>');
+                    return;
+                }
+                let html = '<div class="accordion" id="meaningsAccordion">';
+                meanings.forEach(function (m, i) {
+                    html += `
+                    <div class="accordion-item mb-2">
+                        <h2 class="accordion-header" id="heading-${i}">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-${i}" aria-expanded="false" aria-controls="collapse-${i}">
+                                <span class="fw-bold">${m.partOfSpeech || ""}</span>
+                                <span class="ms-2 text-primary">${m.meaning || ""}</span>
+                            </button>
+                        </h2>
+                        <div id="collapse-${i}" class="accordion-collapse collapse" aria-labelledby="heading-${i}" data-bs-parent="#meaningsAccordion">
+                            <div class="accordion-body">
+                                <div class="mb-2">
+                                    <label class="form-label fw-bold">Nghĩa</label>
+                                    <input type="text" class="form-control meaning-input" data-index="${i}" data-field="meaning" value="${m.meaning || ""}" />
+                                </div>
+                                <div class="mb-2">
+                                    <label class="form-label fw-bold">Nghĩa dịch</label>
+                                    <input type="text" class="form-control meaning-input" data-index="${i}" data-field="translatedMeaning" value="${m.translatedMeaning || ""}" />
+                                </div>
+                                <div class="mb-2">
+                                    <label class="form-label fw-bold">Ví dụ</label>
+                                    <input type="text" class="form-control meaning-input" data-index="${i}" data-field="exampleSentence" value="${m.exampleSentence || ""}" />
+                                </div>
+                                <div class="mb-2">
+                                    <label class="form-label fw-bold">Dịch ví dụ</label>
+                                    <input type="text" class="form-control meaning-input" data-index="${i}" data-field="translatedExampleSentence" value="${m.translatedExampleSentence || ""}" />
+                                </div>
+                                <div class="mb-2">
+                                    <label class="form-label fw-bold">Đồng nghĩa</label>
+                                    <input type="text" class="form-control meaning-input" data-index="${i}" data-field="synonyms" value="${m.synonyms || ""}" />
+                                </div>
+                                <div class="mb-2">
+                                    <label class="form-label fw-bold">Trái nghĩa</label>
+                                    <input type="text" class="form-control meaning-input" data-index="${i}" data-field="antonyms" value="${m.antonyms || ""}" />
+                                </div>
+                                <div class="mb-2">
+                                    <label class="form-label fw-bold">Loại từ</label>
+                                    <input type="text" class="form-control meaning-input" data-index="${i}" data-field="partOfSpeech" value="${m.partOfSpeech || ""}" />
+                                </div>
+                                <button type="button" class="btn btn-danger btn-sm mt-2" onclick="removeMeaning(${i})">Xóa nghĩa này</button>
+                            </div>
+                        </div>
+                    </div>
+                    `;
+                });
+                html += '</div>';
+                html += '<button type="button" class="btn btn-primary mt-3" onclick="addMeaning()">Thêm nghĩa mới</button>';
+                container.html(html);
+            }
+
+            window.removeMeaning = function (index) {
+                meanings.splice(index, 1);
+                renderMeaningsEditor();
+            };
+
+            window.addMeaning = function () {
+                meanings.push({
+                    meaning: "",
+                    translatedMeaning: "",
+                    exampleSentence: "",
+                    translatedExampleSentence: "",
+                    synonyms: "",
+                    antonyms: "",
+                    partOfSpeech: ""
+                });
+                renderMeaningsEditor();
+            };
+
+            $(document).on("input", ".meaning-input", function () {
+                var idx = $(this).data("index");
+                var field = $(this).data("field");
+                meanings[idx][field] = $(this).val();
+            });
+
+            $("#Word").on("input", debounce(function () {
+                const keyword = $(this).val().trim();
+                const errorBox = $("#relatedError");
+                errorBox.hide();
+                if (keyword.length < 3) {
+                    meanings = [];
+                    renderMeaningsEditor();
+                    $("#Pronunciation").val("");
+                    $("#AudioUrlUk").val("");
+                    $("#AudioUrlUs").val("");
+                    $("#audioUk").attr("src", "");
+                    $("#audioUs").attr("src", "");
+                    return;
+                }
+                $.ajax({
+                    url: apiBaseUrl + "QuanLyVocabulary/get-word/" + encodeURIComponent(keyword),
+                    type: "GET",
+                    success: function (data) {
+                        $("#Pronunciation").val(data.pronunciation || "");
+                        $("#AudioUrlUk").val(data.audioUrlUk || "");
+                        $("#AudioUrlUs").val(data.audioUrlUs || "");
+                        $("#audioUk").attr("src", data.audioUrlUk || "");
+                        $("#audioUs").attr("src", data.audioUrlUs || "");
+                        meanings = data.meanings || [];
+                        renderMeaningsEditor();
+                    },
+                    error: function (xhr) {
+                        meanings = [];
+                        renderMeaningsEditor();
+                        $("#Pronunciation").val("");
+                        $("#AudioUrlUk").val("");
+                        $("#AudioUrlUs").val("");
+                        $("#audioUk").attr("src", "");
+                        $("#audioUs").attr("src", "");
+                        if (xhr.status === 404) {
+                            errorBox.text("Không tìm thấy từ hoặc API không tồn tại.").show();
+                        } else {
+                            errorBox.text("Lỗi khi kết nối tới API.").show();
+                        }
+                    }
+                });
+            }, 500));
+
+            // Nút nghe thử audio UK
+            $("#playAudioUk").on("click", function () {
+                var url = $("#AudioUrlUk").val();
+                if (url) {
+                    var audio = document.getElementById("audioUk");
+                    audio.src = url;
+                    audio.play();
+                }
+            });
+
+            // Nút nghe thử audio US
+            $("#playAudioUs").on("click", function () {
+                var url = $("#AudioUrlUs").val();
+                if (url) {
+                    var audio = document.getElementById("audioUs");
+                    audio.src = url;
+                    audio.play();
+                }
+            });
+
+            // Trước khi submit, đóng gói meanings vào 1 hidden input
+            $("#vocabForm").on("submit", function () {
+                $("#MeaningsJson").remove();
+                $("<input>")
+                    .attr("type", "hidden")
+                    .attr("id", "MeaningsJson")
+                    .attr("name", "MeaningsJson")
+                    .val(JSON.stringify(meanings))
+                    .appendTo("#vocabForm");
+            });
+
+            // Bootstrap validation
+            (function () {
+                'use strict'
+                var forms = document.querySelectorAll('.needs-validation')
+                Array.prototype.slice.call(forms)
+                    .forEach(function (form) {
+                        form.addEventListener('submit', function (event) {
+                            if (!form.checkValidity()) {
+                                event.preventDefault()
+                                event.stopPropagation()
+                            }
+                            form.classList.add('was-validated')
+                        }, false)
+                    })
+            })();
+        </script>
+}
+
+<style>
+    #meaningsEditor {
+        min-height: 40px;
+        transition: all 0.3s;
+    }
+
+    .accordion-button .text-primary {
+        white-space: normal;
+        word-break: break-word;
+        max-width: 70%;
+        display: inline-block;
+    }
+
+    .accordion-body .text-break {
+        white-space: pre-line;
+        word-break: break-word;
+    }
+</style>

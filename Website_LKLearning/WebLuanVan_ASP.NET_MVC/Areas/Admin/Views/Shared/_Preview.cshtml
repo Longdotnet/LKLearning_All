@@ -1,0 +1,61 @@
+﻿@model string
+<!--Phần data-image-preview = model là để lấy dữ liệu input !-->
+<div class="image-preview-container mt-3" data-image-preview="@Model" style="display:none;">
+    <p class="font-weight-bold">Preview:</p>
+    <img class="img-responsive image-preview" src="#" alt="Image Preview" style="max-width: 300px; max-height: 200px;" />
+    <p class="text-danger small mt-2 image-error" style="display:none;"></p>
+</div>
+
+
+<script>
+    (function() {
+        // Kiểm tra nếu hàm này đã được định nghĩa
+        if (!window.imagePreviewInitialized) {
+            window.imagePreviewInitialized = true;
+            
+            function setupImagePreview(inputSelector, previewContainer) {
+                $(inputSelector).on('input', function() {
+                    const url = $(this).val();
+                    const container = $(previewContainer);
+                    const imagePreview = container.find('.image-preview');
+                    const imageError = container.find('.image-error');
+
+                    if (url) {
+                        if (isValidImageUrl(url)) {
+                            imagePreview.attr('src', url)
+                                .on('load', function() {
+                                    container.show();
+                                    imageError.hide();
+                                })
+                                .on('error', function() {
+                                    showImageError(container, "Không thể tải ảnh. Vui lòng kiểm tra lại URL.");
+                                });
+                        } else {
+                            showImageError(container, "URL không hợp lệ. Phải bắt đầu bằng http:// hoặc https://");
+                        }
+                    } else {
+                        container.hide();
+                    }
+                });
+
+                function isValidImageUrl(url) {
+                    return /^https?:\/\/.+(\.(jpg|jpeg|png|gif|webp))$/i.test(url);
+                }
+
+                function showImageError(container, message) {
+                    container.show();
+                    container.find('.image-preview').attr('src', '#');
+                    container.find('.image-error').text(message).show();
+                }
+            }
+
+            // Khởi tạo khi trang load
+            $(document).ready(function() {
+                $('[data-image-preview]').each(function() {
+                    const inputId = $(this).data('image-preview');
+                    setupImagePreview('#' + inputId, this);
+                });
+            });
+        }
+    })();
+</script>

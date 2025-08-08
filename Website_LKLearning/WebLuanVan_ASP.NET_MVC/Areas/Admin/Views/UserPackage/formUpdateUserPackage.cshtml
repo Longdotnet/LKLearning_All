@@ -1,0 +1,247 @@
+﻿@model WebLuanVan_ASP.NET_MVC.Areas.Admin.Models.CUserPackage
+@using WebLuanVan_ASP.NET_MVC.Areas.Admin.Models
+@{
+    ViewData["Title"] = "Cập nhật đăng ký gói cước";
+    Layout = "~/Areas/Admin/Views/Shared/_LayoutAdmin.cshtml";
+    var users = ViewBag.Users as List<CUsers>;
+    var packages = ViewBag.Packages as List<CPackage>;
+    int currentUserId = ViewBag.CurrentUserId;
+    int currentPackageId = ViewBag.CurrentPackageId;
+    var selectedUser = ViewBag.SelectedUser as CUsers;
+}
+
+<div class="container mt-4">
+    <h2 class="mb-4">Cập nhật đăng ký gói cước</h2>
+
+    <form asp-action="UpdateUserPackage" method="post" id="updateForm">
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+        <input type="hidden" name="OriginalUserId" value="@currentUserId" />
+        <input type="hidden" name="OriginalPackageId" value="@currentPackageId" />
+        <input type="hidden" name="UserId" value="@currentUserId" />
+
+        <div class="row">
+            <!-- Left Column -->
+            <div class="col-md-6">
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <!-- User Information (Read-only) -->
+                        <div class="mb-3">
+                            <label class="control-label">Người dùng</label>
+                            <p class="form-control-static">
+                                @selectedUser?.Fullname (@selectedUser?.Email)
+                            </p>
+                        </div>
+
+                        <!-- Package Dropdown -->
+                        <div class="mb-3">
+                            <label asp-for="PackageId" class="control-label">Gói cước</label>
+                            <select id="packageSelect" name="PackageId" class="form-select select2" required>
+                                <option value="">-- Chọn gói cước --</option>
+                                @foreach (var package in packages)
+                                {
+                                    <option value="@package.PackageId" selected="@(currentPackageId == package.PackageId)">
+                                        @package.PackageName
+                                    </option>
+                                }
+                            </select>
+                            <span asp-validation-for="PackageId" class="text-danger"></span>
+                        </div>
+
+                        <!-- Registration Date -->
+                        <div class="mb-3">
+                            <label asp-for="RegistrationDate" class="control-label">Ngày đăng ký</label>
+                            <input type="date" asp-for="RegistrationDate" class="form-control" required />
+                            <span asp-validation-for="RegistrationDate" class="text-danger"></span>
+                        </div>
+
+                        <!-- Expiration Date (Read-only, calculated in backend) -->
+                        <div class="mb-3">
+                            <label class="control-label">Ngày hết hạn</label>
+                            <p class="form-control-static" id="expirationDateDisplay">
+                                @(Model.ExpirationDateDisplay)
+                            </p>
+                            <small class="form-text text-muted">Tự động tính dựa trên thời hạn gói cước hoặc vĩnh viễn</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Column -->
+            <div class="col-md-6">
+                <!-- User Detail -->
+                <div id="userDetailContainer">
+                    <partial name="_UserDetail" model="@ViewBag.SelectedUser" />
+                </div>
+
+                <!-- Package Detail -->
+                <div id="packageDetailContainer">
+                    <partial name="_PackageDetail" model="@ViewBag.SelectedPackage" />
+                </div>
+            </div>
+        </div>
+
+        <!-- Submit Button -->
+        <div class="text-center mt-4">
+            <button type="submit" class="btn btn-primary">Cập nhật</button>
+            <a asp-action="Index" class="btn btn-secondary ms-2">Quay lại</a>
+        </div>
+    </form>
+</div>
+@section Scripts {
+
+    <script>
+        $(document).ready(function () {
+            // Initialize Select2
+            $('.select2').select2({
+                theme: 'bootstrap-5',
+                placeholder: 'Tìm kiếm...',
+                allowClear: true,
+                width: '100%',
+                minimumResultsForSearch: 1,
+                language: {
+                    noResults: function () { return "Không tìm thấy kết quả"; },
+                    searching: function () { return "Đang tìm kiếm..."; }
+                }
+            });
+
+            // Get token from ViewBag
+            const authToken = '@Html.Raw(ViewBag.AuthToken)';
+            console.log('AuthToken:', authToken);
+
+            // Function to load package details
+            function loadPackageDetails(packageId) {
+                if (!packageId) {
+                    $('#packageDetailContainer').html(`<div class="alert alert-info">
+                        <i class="fas fa-info-circle me-2"></i>Chọn một gói cước để xem thông tin chi tiết.
+                    </div>`);
+                    updateExpirationDate(null); // Clear expiration date if no package is selected
+                    return;
+                }
+
+                if (!authToken) {
+                    $('#packageDetailContainer').html('<div class="alert alert-danger">Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.</div>');
+                    updateExpirationDate(null);
+                    return;
+                }
+
+                $('#DetailContainer').html('<div class="text-center"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">Đang tải...</span></div></div>');
+
+                const url = '@Url.Action("GetPackageDetail", "UserPackage", new { area = "Admin" })' + `/${packageId}`;
+                $.ajax({
+                    url: url,
+                    type: 'GET',
+                    headers: { 'Authorization': 'Bearer ' + authToken },
+                    success: function (data) {
+                        if (data) {
+                            $('#packageDetailContainer').html(data);
+                            // Fetch package duration to update expiration date
+                            fetchPackageDuration(packageId);
+                        } else {
+                            $('#packageDetailContainer').html(`<div class="alert alert-warning">Không có dữ liệu</div>`);
+                            updateExpirationDate(null);
+                        }
+                    },
+                    error: function (xhr) {
+                        console.error('AJAX Error:', xhr.responseText);
+                        $('#packageDetailContainer').html(`<div class="alert alert-danger">Lỗi khi tải thông tin gói cước</div>`);
+                        updateExpirationDate(null);
+                    }
+                });
+            }
+
+            // Function to fetch package duration
+            function fetchPackageDuration(packageId) {
+                if (!packageId) {
+                    updateExpirationDate(null);
+                    return;
+                }
+
+                const url = '@Url.Action("GetPackageById", "UserPackage", new { area = "Admin" })' + `/${packageId}`;
+                $.ajax({
+                    url: url,
+                    type: 'GET',
+                    headers: { 'Authorization': 'Bearer ' + authToken },
+                    success: function (data) {
+                        if (data && data.durationDay !== undefined) {
+                            updateExpirationDate(data.durationDay);
+                        } else {
+                            updateExpirationDate(null);
+                        }
+                    },
+                    error: function (xhr) {
+                        console.error('Error fetching package duration:', xhr.responseText);
+                        updateExpirationDate(null);
+                    }
+                });
+            }
+
+            // Function to update expiration date
+            function updateExpirationDate(durationDay) {
+                const registrationDate = $('#RegistrationDate').val();
+                if (!registrationDate || !durationDay) {
+                    $('#expirationDateDisplay').text('vĩnh viễn');
+                    return;
+                }
+
+                const regDate = new Date(registrationDate);
+                if (isNaN(regDate)) {
+                    $('#expirationDateDisplay').text('vĩnh viễn');
+                    return;
+                }
+
+                const expirationDate = new Date(regDate.getTime() + durationDay * 24 * 60 * 60 * 1000);
+                const formattedDate = expirationDate.toLocaleDateString('vi-VN', {
+                    day: '2-digit',
+                    month: '2-digit',
+                    year: 'numeric'
+                });
+                $('#expirationDateDisplay').text(formattedDate);
+            }
+
+            // Handle package selection
+            $('#packageSelect').on('select2:select', function (e) {
+                var packageId = e.params.data.id;
+                loadPackageDetails(packageId);
+            });
+
+            // Handle clear package selection
+            $('#packageSelect').on('select2:clear', function () {
+                $('#packageDetailContainer').html(`<div class="alert alert-info">
+                    <i class="fas fa-info-circle me-2"></i>Chọn một gói cước để xem thông tin chi tiết.
+                </div>`);
+                updateExpirationDate(null);
+            });
+
+            // Handle registration date change
+            $('#RegistrationDate').on('change', function () {
+                const packageId = $('#packageSelect').val();
+                if (packageId) {
+                    fetchPackageDuration(packageId);
+                } else {
+                    updateExpirationDate(null);
+                }
+            });
+
+            // Load initial package details
+            const selectedPackageId = '@currentPackageId';
+            if (selectedPackageId && authToken) {
+                loadPackageDetails(selectedPackageId);
+            }
+
+            // Form validation
+            $('#updateForm').validate({
+                rules: {
+                    PackageId: { required: true },
+                    RegistrationDate: { required: true, date: true }
+                },
+                messages: {
+                    PackageId: { required: "Vui lòng chọn gói cước." },
+                    RegistrationDate: {
+                        required: "Vui lòng nhập ngày đăng ký.",
+                        date: "Vui lòng nhập định dạng ngày hợp lệ."
+                    }
+                }
+            });
+        });
+    </script>
+}

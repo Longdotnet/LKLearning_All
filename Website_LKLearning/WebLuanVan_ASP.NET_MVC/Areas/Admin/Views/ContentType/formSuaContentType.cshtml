@@ -1,0 +1,88 @@
+﻿@model WebLuanVan_ASP.NET_MVC.Areas.Admin.Models.CContentType
+
+@{
+    ViewData["Title"] = "Sửa chủ đề nội dung";
+    Layout = "~/Areas/Admin/Views/Shared/_LayoutAdmin.cshtml";
+}
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-lg-8 mx-auto">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Thông tin chủ đề</h5>
+
+
+                    <form asp-action="SuaContentType" class="needs-validation" novalidate method="post" asp-route-id="@Model.ContentTypeId">
+                        <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+
+                        <input asp-for="ContentTypeId" type="hidden" />
+
+                     
+
+                        <div class="mb-3">
+                            <label asp-for="TypeName" class="control-label"></label>
+                            <input asp-for="TypeName" class="form-control" placeholder="Nhập chủ đề câu hỏi" required />
+                            <span asp-validation-for="TypeName" class="invalid-feedback"></span>
+                        </div>
+                     
+
+                        <div class="mb-3">
+                            <label asp-for="TypeDescription" class="control-label"></label>
+                            <textarea asp-for="TypeDescription" id="summernote-description" class="form-control" rows="30" placeholder="Mô tả"></textarea>
+                            <span asp-validation-for="TypeDescription" class="invalid-feedback"></span>
+                        </div>
+
+                        
+
+                        <div class="d-flex justify-content-between mt-4">
+                            <a asp-action="Index" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left me-1"></i> Back to List
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save me-1"></i> Save Changes
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+
+@section Scripts {
+
+
+
+
+    <script>
+        $(document).ready(function() {
+            // Initialize select2
+            $('.form-select').select2({
+                placeholder: "Select a course",
+                allowClear: true
+            });
+            // Enable Bootstrap 5 validation
+            // kiểm tra nhập vào hợp lệ không
+            (function () {
+                'use strict'
+                var forms = document.querySelectorAll('.needs-validation')
+                Array.prototype.slice.call(forms)
+                    .forEach(function (form) {
+                        form.addEventListener('submit', function (event) {
+                            if (!form.checkValidity()) {
+                                event.preventDefault()
+                                event.stopPropagation()
+                            }
+                            form.classList.add('was-validated')
+                        }, false)
+                    })
+            })()
+        });
+    </script>
+}

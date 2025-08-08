@@ -1,0 +1,307 @@
+﻿@model List<WebLuanVan_ASP.NET_MVC.Areas.Admin.Models.CExamSetQuestion>
+@using WebLuanVan_ASP.NET_MVC.Areas.Admin.Models;
+@{
+    ViewData["Title"] = "Chi tiết bộ đề";
+    Layout = "~/Areas/Admin/Views/Shared/_LayoutAdmin.cshtml";
+    var examSet = ViewBag.ExamSet as CExamSet;
+}
+<link rel="stylesheet" href="~/AdminTL/assets/css/index.css">
+
+<div class="container-fluid px-4">
+    <div class="card mb-4">
+        <div class="card-header bg-primary text-white">
+            <h4 class="mb-0">
+                <i class="fas fa-info-circle me-2"></i>Thông tin bộ đề
+            </h4>
+        </div>
+        <div class="card-body">
+            @if (examSet != null)
+            {
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label class="fw-bold">Tên bộ đề:</label> @examSet.Name
+                    </div>
+                    <div class="col-md-6">
+                        <label class="fw-bold">Khóa học:</label> @examSet.CourseName
+                    </div>
+                    <div class="col-md-4">
+                        <label class="fw-bold">Điểm đạt:</label> @examSet.PassingScore
+                    </div>
+                    <div class="col-md-4">
+                        <label class="fw-bold">Thời gian (giây):</label> @(examSet.TimeLimitSec ?? 0)
+                    </div>
+                    <div class="col-md-4">
+                        <label class="fw-bold">Ngày tạo:</label> @examSet.CreatedDate.ToString("dd/MM/yyyy HH:mm")
+                    </div>
+                    <div class="col-md-12">
+                        <label class="fw-bold">Mô tả:</label>
+                        <div>@Html.Raw(examSet.Description)</div>
+                    </div>
+                </div>
+            }
+            else
+            {
+                <div class="alert alert-danger">Không tìm thấy thông tin bộ đề.</div>
+            }
+        </div>
+    </div>
+
+    <div class="card mb-4">
+        <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+            <h4 class="mb-0">
+                <i class="fas fa-list me-2"></i>Danh sách câu hỏi trong bộ đề
+            </h4>
+            <div>
+                <button id="deleteSelected" class="btn btn-danger btn-sm" disabled>Xóa đã chọn</button>
+                <a asp-action="Index" class="btn btn-outline-secondary btn-sm ms-2">
+                    <i class="fas fa-arrow-left me-2"></i>Quay lại danh sách
+                </a>
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-striped table-bordered align-middle">
+                    <thead>
+                        <tr>
+                            <th><input type="checkbox" id="selectAll" /></th>
+                            <th>Tên câu hỏi</th>
+                            <th>Điểm</th>
+                            <th>Thứ tự</th>
+                            <th style="text-align:center">Thao tác</th>
+                            <th style="text-align:center">Điều chỉnh thứ tự</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model != null && Model.Any())
+                        {
+                            foreach (var q in Model.OrderBy(x => x.QuestionOrder))
+                            {
+                                <tr data-question-id="@q.QuestionId" data-order-no="@q.QuestionOrder">
+                                    <td>
+                                        <input type="checkbox" name="selectedIds" value="@q.QuestionId" class="rowCheckbox" />
+                                    </td>
+                                    <td>@q.QuestionText</td>
+                                    <td>@q.QuestionScore</td>
+                                    <td>
+                                        <input type="number" class="form-control order-input"
+                                               data-question-id="@q.QuestionId"
+                                               data-order-no="@q.QuestionOrder"
+                                               value="@q.QuestionOrder"
+                                               min="1"
+                                               style="width: 80px; -moz-appearance: textfield;"
+                                               onwheel="this.blur()" />
+                                    </td>
+                                    <td style="text-align:center">
+                                        <a href="javascript:void(0);" onclick="confirmDelete(event, function() { deleteQuestion(@examSet.ExamSetId, @q.QuestionId); })" class="btn btn-sm btn-danger" title="Xóa">
+                                            <i class="fas fa-trash"></i>
+                                        </a>
+                                        <a asp-action="viewDetail" asp-controller="Question" asp-route-id="@q.QuestionId" class="btn btn-sm btn-primary">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
+                                    </td>
+                                    <td style="text-align:center">
+                                        <button class="btn btn-sm btn-outline-primary move-up"
+                                                data-question-id="@q.QuestionId"
+                                                data-order-no="@q.QuestionOrder">
+                                            <i class="fas fa-arrow-up"></i>
+                                        </button>
+                                        <button class="btn btn-sm btn-outline-primary move-down"
+                                                data-question-id="@q.QuestionId"
+                                                data-order-no="@q.QuestionOrder">
+                                            <i class="fas fa-arrow-down"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr>
+                                <td colspan="6" class="text-center">Bộ đề chưa có câu hỏi.</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            $('#selectAll').change(function () {
+                $('.rowCheckbox').prop('checked', $(this).prop('checked'));
+                toggleDeleteButton();
+            });
+
+            $('.rowCheckbox').change(function () {
+                $('#selectAll').prop('checked', $('.rowCheckbox:checked').length === $('.rowCheckbox').length);
+                toggleDeleteButton();
+            });
+
+            function toggleDeleteButton() {
+                var checkedCount = $('.rowCheckbox:checked').length;
+                $('#deleteSelected').prop('disabled', checkedCount === 0);
+                $('#deleteSelected').text(checkedCount > 0 ? `Xóa (${checkedCount}) đã chọn` : 'Xóa đã chọn');
+            }
+
+            $('#deleteSelected').click(function (e) {
+                e.preventDefault();
+                confirmDeleteMultiple(e, function () {
+                    var selectedIds = $('.rowCheckbox:checked').map(function () {
+                        return $(this).val();
+                    }).get();
+                    $.ajax({
+                        url: '@Url.Action("DeleteMultipleQuestionsFromExamSet", "ExamSet", new { area = "Admin" })',
+                        type: 'POST',
+                        contentType: 'application/json',
+                        data: JSON.stringify(selectedIds.map(id => ({
+                            ExamSetId: @examSet.ExamSetId,
+                            QuestionId: id
+                        }))),
+                        success: function (response) {
+                            if (response.success) {
+                                location.reload();
+                            } else {
+                                toastr.error(response.message || 'Xóa không thành công');
+                            }
+                        },
+                        error: function () {
+                            toastr.error('Đã xảy ra lỗi khi xóa.');
+                        }
+                    });
+                });
+            });
+
+            window.deleteQuestion = function (examSetId, questionId) {
+                $.ajax({
+                    url: '@Url.Action("xoaQuestionFromExamSet", "ExamSet", new { area = "Admin" })',
+                    type: 'POST',
+                    data: { examSetId: examSetId, questionId: questionId },
+                    success: function (response) {
+                        if (response.success) {
+                            location.reload();
+                        } else {
+                            toastr.error('Xóa không thành công');
+                        }
+                    },
+                    error: function () {
+                        toastr.error('Đã xảy ra lỗi khi xóa.');
+                    }
+                });
+            };
+
+            // Move up/down logic
+            $('.move-up').click(function (event) {
+                event.preventDefault();
+                var $button = $(this);
+                var currentOrder = parseInt($button.attr('data-order-no'));
+                if (currentOrder <= 1) {
+                    toastr.warning('Câu hỏi đã ở vị trí đầu tiên');
+                    return;
+                }
+                swapQuestionOrder(currentOrder, currentOrder - 1, $button.closest('tr'));
+            });
+
+            $('.move-down').click(function (event) {
+                event.preventDefault();
+                var $button = $(this);
+                var currentOrder = parseInt($button.attr('data-order-no'));
+                var totalQuestions = $('.rowCheckbox').length;
+                if (currentOrder >= totalQuestions) {
+                    toastr.warning('Câu hỏi đã ở vị trí cuối cùng');
+                    return;
+                }
+                
+                swapQuestionOrder(currentOrder, currentOrder + 1, $button.closest('tr'));
+            });
+
+                  function swapQuestionOrder(sourceOrder, targetOrder, $row) {
+            $.ajax({
+                url: '@Url.Action("SwapExamQuestionOrder", "ExamSet", new { area = "Admin" })',
+                type: 'PUT',
+                contentType: 'application/json',
+                data: JSON.stringify({
+                    ExamSetId: @examSet.ExamSetId,
+                    SourceOrderNo: sourceOrder,
+                    TargetOrderNo: targetOrder
+                }),
+                success: function (response) {
+                    if (response.success) {
+                        // Tìm dòng hiện tại và dòng target
+                        var $currentRow = $('tr[data-order-no="' + sourceOrder + '"]');
+                        var $targetRow = $('tr[data-order-no="' + targetOrder + '"]');
+                        if ($currentRow.length && $targetRow.length) {
+                            // Đổi giá trị data-order-no và input
+                            $currentRow.attr('data-order-no', targetOrder);
+                            $currentRow.find('.order-input').val(targetOrder).attr('data-order-no', targetOrder);
+                            $currentRow.find('.move-up, .move-down').attr('data-order-no', targetOrder);
+
+                            $targetRow.attr('data-order-no', sourceOrder);
+                            $targetRow.find('.order-input').val(sourceOrder).attr('data-order-no', sourceOrder);
+                            $targetRow.find('.move-up, .move-down').attr('data-order-no', sourceOrder);
+
+                            // Hoán đổi vị trí trong DOM
+                            if (targetOrder < sourceOrder) {
+                                $currentRow.insertBefore($targetRow);
+                            } else {
+                                $currentRow.insertAfter($targetRow);
+                            }
+                        }
+                        toastr.success('Hoán đổi thứ tự thành công');
+                    } else {
+                        toastr.error(response.message || 'Không thể hoán đổi thứ tự câu hỏi.');
+                    }
+                },
+                error: function (xhr) {
+                    toastr.error('Lỗi khi hoán đổi: ' + (xhr.responseJSON?.message || 'Lỗi không xác định'));
+                }
+            });
+        }
+
+            // Đổi thứ tự bằng input
+            $('.order-input').on('change', function () {
+                var $input = $(this);
+                var questionId = $input.data('question-id');
+                var newOrderNo = parseInt($input.val());
+                var oldOrderNo = parseInt($input.data('order-no'));
+                var totalQuestions = $('.rowCheckbox').length;
+
+                if (isNaN(newOrderNo) || newOrderNo < 1 || newOrderNo > totalQuestions) {
+                    toastr.error(`Thứ tự phải từ 1 đến ${totalQuestions}`);
+                    $input.val(oldOrderNo);
+                    return;
+                }
+                if (newOrderNo === oldOrderNo) {
+                    return;
+                }
+                $.ajax({
+                    url: '@Url.Action("UpdateExamQuestionOrder", "ExamSet", new { area = "Admin" })',
+                    type: 'PUT',
+                    contentType: 'application/json',
+                    data: JSON.stringify({
+                        ExamSetId: @examSet.ExamSetId,
+                        QuestionId: questionId,
+                        QuestionOrder: newOrderNo
+                    }),
+                    beforeSend: function () {
+                        $input.prop('disabled', true);
+                        toastr.info('Đang lưu...');
+                    },
+                    success: function (response) {
+                        toastr.success('Cập nhật thứ tự thành công');
+                        location.reload();
+                    },
+                    error: function (xhr) {
+                        toastr.error('Lỗi khi cập nhật: ' + (xhr.responseJSON?.message || 'Lỗi không xác định'));
+                        $input.val(oldOrderNo);
+                    },
+                    complete: function () {
+                        $input.prop('disabled', false);
+                    }
+                });
+            });
+        });
+    </script>
+}

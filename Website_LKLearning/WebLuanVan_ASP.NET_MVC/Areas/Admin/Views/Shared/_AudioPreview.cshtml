@@ -1,0 +1,66 @@
+﻿@model string
+
+<div class="audio-preview-container mt-3" data-audio-preview="@Model" style="display:none;">
+    <p class="font-weight-bold">Audio Preview:</p>
+    <audio controls class="audio-preview" style="width: 100%; max-width: 300px;">
+        <source src="#" type="audio/mpeg">
+        Your browser does not support the audio element.
+    </audio>
+    <p class="text-danger small mt-2 audio-error" style="display:none;"></p>
+</div>
+
+<script>
+    (function() {
+        // Kiểm tra nếu hàm này đã được định nghĩa
+        if (!window.audioPreviewInitialized) {
+            window.audioPreviewInitialized = true;
+
+            function setupAudioPreview(inputSelector, previewContainer) {
+                $(inputSelector).on('input', function() {
+                    const url = $(this).val();
+                    const container = $(previewContainer);
+                    const audioPreview = container.find('.audio-preview');
+                    const audioError = container.find('.audio-error');
+
+                    if (url) {
+                        if (isValidAudioUrl(url)) {
+                            audioPreview.find('source').attr('src', url);
+                            audioPreview[0].load();
+
+                            audioPreview.on('canplaythrough', function() {
+                                container.show();
+                                audioError.hide();
+                            })
+                            .on('error', function() {
+                                showAudioError(container, "Không thể tải audio. Vui lòng kiểm tra lại URL.");
+                            });
+                        } else {
+                            showAudioError(container, "URL không hợp lệ. Phải bắt đầu bằng http:// hoặc https://");
+                        }
+                    } else {
+                        container.hide();
+                    }
+                });
+
+                function isValidAudioUrl(url) {
+                    return /^https?:\/\/.+(\.(mp3|ogg|wav))$/i.test(url);
+                }
+
+                function showAudioError(container, message) {
+                    container.show();
+                    container.find('.audio-preview source').attr('src', '#');
+                    container.find('.audio-preview')[0].load();
+                    container.find('.audio-error').text(message).show();
+                }
+            }
+
+            // Khởi tạo khi trang load
+            $(document).ready(function() {
+                $('[data-audio-preview]').each(function() {
+                    const inputId = $(this).data('audio-preview');
+                    setupAudioPreview('#' + inputId, this);
+                });
+            });
+        }
+    })();
+</script>

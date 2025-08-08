@@ -1,0 +1,60 @@
+﻿@model List<WebLuanVan_ASP.NET_MVC.Areas.Admin.Models.CVocabulary>
+@{
+    ViewData["Title"] = "Tìm kiếm từ vựng";
+    var searchTerm = ViewBag.SearchTerm as string;
+}
+
+<div class="container py-4">
+    <h2 class="mb-4 text-primary">Kết quả tìm kiếm từ vựng</h2>
+    <form class="mb-4" method="get" asp-area="User" asp-controller="Dashboard" asp-action="VocabularySearch">
+        <div class="input-group rounded-pill shadow-sm" style="max-width:350px;">
+            <input type="search" name="q" class="form-control border-0 rounded-pill" placeholder="Tìm từ vựng..." value="@searchTerm" />
+            <button class="btn btn-outline-primary rounded-pill" type="submit">
+                <i class="fas fa-search"></i>
+            </button>
+        </div>
+    </form>
+
+    @if (Model.Any())
+    {
+        <div class="row g-4">
+            @foreach (var vocab in Model)
+            {
+                <div class="col-12 col-md-6 col-lg-4">
+                    <div class="card h-100 shadow-sm rounded-3">
+                        <div class="card-body">
+                            <h5 class="card-title text-primary">@vocab.Word</h5>
+                            <p class="mb-1 text-muted">/ @vocab.Pronunciation /</p>
+                            <audio controls style="width:100%;">
+                                <source src="@vocab.AudioUrlUk" type="audio/mpeg" />
+                                <source src="@vocab.AudioUrlUs" type="audio/mpeg" />
+                                Trình duyệt không hỗ trợ audio.
+                            </audio>
+                            <hr />
+                            @foreach (var meaning in vocab.Meanings)
+                            {
+                                <div class="mb-2">
+                                    <span class="badge bg-info text-dark">@meaning.PartOfSpeech</span>
+                                    <div><strong>EN:</strong> @meaning.Meaning</div>
+                                    <div><strong>VI:</strong> @meaning.TranslatedMeaning</div>
+                                    @if (!string.IsNullOrEmpty(meaning.ExampleSentence))
+                                    {
+                                        <div class="fst-italic text-secondary">VD: @meaning.ExampleSentence</div>
+                                    }
+                                    @if (!string.IsNullOrEmpty(meaning.TranslatedExampleSentence))
+                                    {
+                                        <div class="fst-italic text-success">VD dịch: @meaning.TranslatedExampleSentence</div>
+                                    }
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+    else
+    {
+        <div class="alert alert-warning mt-4">Không tìm thấy từ vựng phù hợp.</div>
+    }
+</div>

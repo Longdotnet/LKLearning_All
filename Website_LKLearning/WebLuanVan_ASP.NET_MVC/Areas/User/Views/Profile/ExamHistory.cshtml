@@ -1,0 +1,94 @@
+﻿@model List<WebLuanVan_ASP.NET_MVC.Areas.Admin.Models.CUserExamHistory>
+@{
+    ViewData["Title"] = "Lịch sử làm bài thi";
+    Layout = "~/Areas/User/Views/Shared/_LayoutProfile.cshtml";
+}
+@{
+    Paginate paginate = new Paginate();
+    int pageNo = 0;
+    if (ViewBag.Paginate != null)
+    {
+        paginate = ViewBag.Paginate;
+        pageNo = paginate.CurrentPage;
+    }
+}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <h2 class="mb-4 text-primary text-center">
+                <i class="fa fa-history me-2"></i> Lịch sử làm bài thi
+            </h2>
+            @if (Model != null && Model.Any())
+            {
+                <div class="table-responsive">
+                    <table class="table table-bordered table-hover align-middle bg-white">
+                        <thead class="table-secondary">
+                            <tr>
+                                <th>#</th>
+                                <th>Thời gian làm bài</th>
+                                <th>Tổng điểm</th>
+                                <th>Kết quả</th>
+                                <th>Thời lượng (giây)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @for (int i = 0; i < Model.Count; i++)
+                            {
+                                var item = Model[i];
+                                <tr>
+                                    <td>@(i + 1)</td>
+                                    <td>@item.TakenAt.ToString("dd/MM/yyyy HH:mm")</td>
+                                    <td>
+                                        @if (item.TotalScore.HasValue)
+                                        {
+                                            <span class="fw-bold text-success">@item.TotalScore.Value</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="text-muted">Chưa có</span>
+                                        }
+                                    </td>
+                                    <td>
+                                        @if (item.IsPassed.HasValue)
+                                        {
+                                            if (item.IsPassed.Value)
+                                            {
+                                                <span class="badge bg-success">Đạt</span>
+                                            }
+                                            else
+                                            {
+                                                <span class="badge bg-danger">Không đạt</span>
+                                            }
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-secondary">Chưa nộp</span>
+                                        }
+                                    </td>
+                                    <td>
+                                        @if (item.DurationSec.HasValue)
+                                        {
+                                            <span>@item.DurationSec.Value</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="text-muted">-</span>
+                                        }
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+            else
+            {
+                <div class="alert alert-info text-center mt-4">
+                    <i class="fa fa-info-circle me-2"></i> Bạn chưa có lịch sử làm bài thi nào.
+                </div>
+            }
+        </div>
+    </div>
+    <partial name="~/Areas/Admin/Views/Shared/_Paging.cshtml" model="@paginate" />
+
+</div>

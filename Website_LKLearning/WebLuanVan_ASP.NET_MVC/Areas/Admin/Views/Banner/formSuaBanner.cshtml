@@ -1,0 +1,114 @@
+﻿@model WebLuanVan_ASP.NET_MVC.Areas.Admin.Models.CBanner
+@{
+    ViewData["Title"] = "Sửa Banner";
+    Layout = "~/Areas/Admin/Views/Shared/_LayoutAdmin.cshtml";
+}
+
+<div class="container mt-4">
+    <div class="card shadow-sm">
+        <div class="card-header bg-primary text-white">
+            <h5 class="mb-0">@ViewData["Title"]</h5>
+        </div>
+        <div class="card-body">
+            <form asp-action="suaBanner" method="post" autocomplete="off" asp-route-id="@Model.BannerId">
+                <input asp-for="BannerId" type="hidden" />
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label asp-for="BannerTitle" class="form-label">Tiêu đề <span class="text-danger">*</span></label>
+                        <input asp-for="BannerTitle" class="form-control" required maxlength="100" placeholder="Tiêu đề banner" />
+                        <span asp-validation-for="BannerTitle" class="text-danger"></span>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label asp-for="BannerSubtitle" class="form-label">Phụ đề</label>
+                        <input asp-for="BannerSubtitle" class="form-control" maxlength="100" placeholder="Phụ đề (tùy chọn)" />
+                        <span asp-validation-for="BannerSubtitle" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label asp-for="BannerDescription" class="form-label">Mô tả</label>
+                    <textarea asp-for="BannerDescription" class="form-control" rows="3" maxlength="300" placeholder="Mô tả (tùy chọn)"></textarea>
+                    <span asp-validation-for="BannerDescription" class="text-danger"></span>
+                </div>
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label asp-for="BannerImageUrl" class="form-label">Ảnh Banner (URL) <span class="text-danger">*</span></label>
+                        <input asp-for="BannerImageUrl" class="form-control" id="BannerImageUrl" required placeholder="Nhập URL ảnh banner" />
+                        <span asp-validation-for="BannerImageUrl" class="text-danger"></span>
+                        <div id="bannerImagePreviewContainer" style="display:none;" class="mt-2">
+                            <img id="bannerImagePreview" src="#" alt="Banner Preview" style="max-width:300px;max-height:200px;" />
+                            <p id="bannerImageError" class="text-danger small mt-2" style="display:none;"></p>
+                        </div>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label asp-for="LinkUrl" class="form-label">Đường dẫn liên kết (nếu có)</label>
+                        <input asp-for="LinkUrl" class="form-control" placeholder="URL liên kết (tùy chọn)" />
+                        <span asp-validation-for="LinkUrl" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-4 mb-3">
+                        <label asp-for="IsActive" class="form-label">Trạng thái hiển thị</label>
+                        <select asp-for="IsActive" class="form-select">
+                            <option value="true">Hiện</option>
+                            <option value="false">Ẩn</option>
+                        </select>
+                        <span asp-validation-for="IsActive" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="d-flex justify-content-end gap-2 mt-3">
+                    <button type="submit" class="btn btn-primary" id="btnSave">
+                        <span id="btnSaveText">Lưu thay đổi</span>
+                        <span id="btnSaveLoading" class="spinner-border spinner-border-sm d-none"></span>
+                    </button>
+                    <a asp-action="Index" class="btn btn-secondary">Quay lại</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        $(document).ready(function () {
+            $('#BannerImageUrl').on('input', function () {
+                var url = $(this).val();
+                var $container = $('#bannerImagePreviewContainer');
+                var $img = $('#bannerImagePreview');
+                var $error = $('#bannerImageError');
+
+                if (url) {
+                    if (/^https?:\/\/.+(\.(jpg|jpeg|png|gif|webp))$/i.test(url)) {
+                        $img.attr('src', url)
+                            .on('load', function () {
+                                $container.show();
+                                $error.hide();
+                            })
+                            .on('error', function () {
+                                $container.show();
+                                $error.text('Không thể tải ảnh. Vui lòng kiểm tra lại URL.').show();
+                                $img.attr('src', '#');
+                            });
+                    } else {
+                        $container.show();
+                        $error.text('URL không hợp lệ. Phải bắt đầu bằng http:// hoặc https://').show();
+                        $img.attr('src', '#');
+                    }
+                } else {
+                    $container.hide();
+                }
+            });
+
+            // Hiển thị preview nếu có giá trị ban đầu
+            var initialUrl = $('#BannerImageUrl').val();
+            if (initialUrl) {
+                $('#BannerImageUrl').trigger('input');
+            }
+
+            $('form').on('submit', function () {
+                $('#btnSaveText').addClass('d-none');
+                $('#btnSaveLoading').removeClass('d-none');
+            });
+        });
+    </script>
+}

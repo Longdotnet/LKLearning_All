@@ -1,0 +1,170 @@
+﻿@using WebLuanVan_ASP.NET_MVC.Areas.Admin.Models
+@model List<CCertificate>
+@{
+    ViewData["Title"] = "Quản lý Chứng chỉ";
+    Layout = "~/Areas/Admin/Views/Shared/_LayoutAdmin.cshtml";
+    var courses = ViewBag.Courses as List<CCourse> ?? new List<CCourse>();
+    var currentCourse = ViewBag.CurrentCourse;
+    Paginate paginate = ViewBag.Paginate as Paginate ?? new Paginate();
+    int pageNo = paginate.CurrentPage;
+}
+<link rel="stylesheet" href="~/AdminTL/assets/css/index.css">
+
+
+
+<div class="container-fluid px-2 px-md-4">
+    <div class="content-header">
+        <h1>Quản lý Chứng chỉ</h1>
+    </div>
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5>Bộ lọc & Tìm kiếm</h5>
+        </div>
+        <div class="card-body">
+            <form method="get" class="row g-3 align-items-end">
+                <div class="col-12 col-md-4">
+                    <label class="form-label">Lọc theo khóa học</label>
+                    <select name="courseId" class="form-select select2">
+                        <option value="">-- Tất cả khóa học --</option>
+                        @if (courses != null)
+                        {
+                            foreach (var c in courses)
+                            {
+                                <option value="@c.CourseId" selected="@(currentCourse == c.CourseId)">
+                                    @c.CourseName
+                                </option>
+                            }
+                        }
+                    </select>
+                </div>
+                <div class="col-12 col-md-4">
+                    <label class="form-label">Tìm kiếm tên người nhận</label>
+                    <input type="text" name="searchTerm" class="form-control" placeholder="Nhập tên người nhận..." value="@ViewBag.SearchTerm" />
+                </div>
+                <div class="col-12 col-md-2">
+                    <button type="submit" class="btn btn-primary w-100 w-md-auto">Lọc</button>
+                </div>
+                <div class="col-12 col-md-2">
+                    <a asp-area="Admin" asp-action="Index" asp-controller="Certificate" class="btn btn-outline-secondary w-100 w-md-auto">Xóa lọc</a>
+                </div>
+            </form>
+        </div>
+    </div>
+    <div class="d-flex justify-content-between align-items-center flex-wrap mt-4 mb-3">
+        <h2>Danh sách Chứng chỉ</h2>
+        <div class="d-flex flex-wrap gap-2">
+            <button id="deleteSelected" class="btn btn-danger mr-2" disabled>Xóa đã chọn</button>
+        </div>
+    </div>
+    <div class="table-responsive mb-4">
+        <table class="table table-striped align-middle">
+            <thead>
+                <tr>
+                    <th><input type="checkbox" id="selectAll" /></th>
+                    <th class="text-nowrap">Tên người nhận</th>
+                    <th class="text-nowrap d-none d-md-table-cell">Khóa học</th>
+                    <th class="text-nowrap d-none d-md-table-cell">Loại chứng chỉ</th>
+                    <th class="text-nowrap">Mã xác thực</th>
+                    <th class="text-nowrap">Ảnh chứng chỉ</th>
+                    <th class="text-nowrap">Ngày cấp</th>
+                    <th class="text-nowrap">Thao tác</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (Model != null && Model.Count > 0)
+                {
+                    foreach (var cert in Model)
+                    {
+                        <tr>
+                            <td><input type="checkbox" name="selectIds" value="@cert.CertificateId" class="rowCheckbox" /></td>
+                            <td class="text-truncate" style="max-width:140px;" title="@cert.Fullname">@cert.Fullname</td>
+                            <td class="text-truncate d-none d-md-table-cell" style="max-width:140px;" title="@cert.CourseName">@cert.CourseName</td>
+                            <td class="text-truncate d-none d-md-table-cell" style="max-width:120px;" title="@cert.CertificateTypeName">@cert.CertificateTypeName</td>
+                            <td class="text-truncate" style="max-width:120px;" title="@cert.VerificationCode">@cert.VerificationCode</td>
+                            <td>
+                                @if (!string.IsNullOrEmpty(cert.ImageUrl))
+                                {
+                                    <a href="@cert.ImageUrl" target="_blank">
+                                        <img src="@cert.ImageUrl" alt="Certificate" style="max-width:80px;max-height:40px;border-radius:6px;" />
+                                    </a>
+                                }
+                                else
+                                {
+                                    <span class="text-muted">Không có</span>
+                                }
+                            </td>
+                            <td>
+                                @cert.CreatedAt.ToString("dd/MM/yyyy")
+                            </td>
+                            <td>
+                              
+                                <a asp-action="Delete" asp-route-id="@cert.CertificateId" onclick="confirmDelete(event)" class="btn btn-sm btn-danger" title="Xóa">
+                                    <i class="fas fa-trash"></i>
+                                </a>
+                                <a asp-action="viewDetail" asp-route-id="@cert.CertificateId" class="btn btn-sm btn-primary" title="Xem chi tiết">
+                                    <i class="fas fa-eye"></i>
+                                </a>
+                            </td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="8" class="text-center text-muted">Không có chứng chỉ nào.</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+    <partial name="_Paging" model="@paginate" />
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            $('.select2').select2({
+                theme: 'bootstrap-5',
+                placeholder: 'Tìm kiếm...',
+                allowClear: true,
+                width: '100%'
+            });
+
+            $('#selectAll').change(function () {
+                $('.rowCheckbox').prop('checked', $(this).prop('checked'));
+                toggleDeleteButton();
+            });
+            $('.rowCheckbox').change(function () {
+                $('#selectAll').prop('checked', $('.rowCheckbox:checked').length === $('.rowCheckbox').length);
+                toggleDeleteButton();
+            });
+
+            function toggleDeleteButton() {
+                var checkedCount = $('.rowCheckbox:checked').length;
+                $('#deleteSelected').prop('disabled', checkedCount === 0);
+                $('#deleteSelected').text(checkedCount > 0 ? `Xóa (${checkedCount}) đã chọn` : 'Xóa đã chọn');
+            }
+
+            $('#deleteSelected').click(function (e) {
+                confirmDeleteMultiple(e, function () {
+                    var selectedIds = $('.rowCheckbox:checked').map(function () {
+                        return $(this).val();
+                    }).get();
+
+                    // Submit via POST to DeleteMultiple (no JSON notification, just reload and use TempData for toastr)
+                    $.ajax({
+                        url: '@Url.Action("DeleteMultiple", "Certificate", new { area = "Admin" })',
+                        type: 'POST',
+                        data: { selectedIds: selectedIds },
+                        success: function () {
+                            location.reload();
+                        },
+                        error: function () {
+                            toastr.error('Đã xảy ra lỗi khi xóa.');
+                        }
+                    });
+                });
+            });
+        });
+    </script>
+}

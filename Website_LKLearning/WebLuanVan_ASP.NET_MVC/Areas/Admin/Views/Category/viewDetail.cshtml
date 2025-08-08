@@ -1,0 +1,44 @@
+﻿@model WebLuanVan_ASP.NET_MVC.Areas.Admin.Models.CCategory
+@{
+    ViewData["Title"] = "Xem danh mục";
+    Layout = "~/Areas/Admin/Views/Shared/_LayoutAdmin.cshtml";
+
+}
+<link rel="stylesheet" href="~/AdminTL/assets/css/index.css">
+
+<div class="container-fluid px-4">
+    <div class="card mb-4">
+        <div class="card-header bg-primary text-white">
+            <h4 class="mb-0">
+                <i class="fas fa-edit me-2"></i>Thông tin danh mục
+            </h4>
+        </div>
+        <div class="card-body">
+            <form>
+                <div class="row g-3">
+                    <!-- Lesson Title -->
+                    <div class="col-md-12">
+                        <label asp-for="CategoryName" class="control-label"></label>
+                        @Model.CategoryName
+                    </div>
+
+
+                    <!-- Lesson Description -->
+                    <div class="col-md-12">
+                        <label asp-for="Description" class="control-label"></label>
+                        <div>@Html.Raw(Model.Description)</div>
+                    </div>
+
+
+                </div>
+            </form>
+        </div>
+    </div>
+
+
+
+    <a asp-action="Index" class="btn btn-outline-secondary">
+        <i class="fas fa-arrow-left me-2"></i>Quay lại danh sách danh mục
+    </a>
+</div>
+

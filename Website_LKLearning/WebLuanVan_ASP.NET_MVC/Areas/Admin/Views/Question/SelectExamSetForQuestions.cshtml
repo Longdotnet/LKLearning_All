@@ -1,0 +1,93 @@
+﻿@{
+    ViewData["Title"] = "Chọn Bộ Đề & Nhập điểm/thứ tự";
+    Layout = "~/Areas/Admin/Views/Shared/_LayoutAdmin.cshtml";
+    var examSets = ViewBag.ExamSets as List<WebLuanVan_ASP.NET_MVC.Areas.Admin.Models.CExamSet>;
+    var questions = ViewBag.Questions as List<WebLuanVan_ASP.NET_MVC.Areas.Admin.Models.CQuestion>;
+    var questionIds = ViewBag.QuestionIds as string;
+}
+<style>
+    .responsive-table-wrapper {
+        overflow-x: auto;
+        width: 100%;
+    }
+
+    .table th, .table td {
+        vertical-align: middle;
+        word-break: break-word;
+        overflow-wrap: break-word;
+        max-width: 350px;
+    }
+
+
+    }
+</style>
+
+<div class="content-header">
+    <h1>Thêm câu hỏi vào bộ đề</h1>
+</div>
+<div class="card">
+    <div class="card-header">
+        <h5>Chọn bộ đề và nhập điểm/thứ tự</h5>
+    </div>
+    <div class="card-body">
+        <form asp-action="InsertMultipleToExamSet" method="post">
+            <input type="hidden" name="questionIds" value="@questionIds" />
+            <div class="form-group">
+                <label>Bộ đề</label>
+                <select name="examSetId" class="form-control" required>
+                    <option value="">-- Chọn bộ đề --</option>
+                    @foreach (var set in examSets)
+                    {
+                        <option value="@set.ExamSetId">@set.Name</option>
+                    }
+                </select>
+            </div>
+            <div class="responsive-table-wrapper">
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th>Câu hỏi</th>
+                            <th>Điểm</th>
+                            <th>Thứ tự</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @for (int i = 0; i < questions.Count; i++)
+                        {
+                            <tr>
+                                <td>
+                                    @{
+                                        var plainText = Html.Raw(questions[i].QuestionText).ToString();
+                                        var shortText = plainText.Length > 50 ? plainText.Substring(0, 50) + "..." : plainText;
+                                    }
+                                    @Html.Raw(shortText)
+                                    <input type="hidden" name="SelectedQuestions[@i].QuestionId" value="@questions[i].QuestionId" />
+                                </td>
+                                <td>
+                                    <input type="number" name="SelectedQuestions[@i].QuestionScore" class="form-control" value="10" min="1" required />
+                                </td>
+                                <td>
+                                    <input type="number" name="SelectedQuestions[@i].QuestionOrder" class="form-control" value="@(i+1)" min="1" required />
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+            <button type="submit" class="btn btn-primary">Xác nhận thêm</button>
+            <a asp-action="Index" class="btn btn-secondary">Quay lại</a>
+        </form>
+    </div>
+</div>
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <script>
+        $(document).ready(function () {
+            $('select[name="examSetId"]').select2({
+                width: '100%',
+                placeholder: "-- Chọn bộ đề --"
+            });
+        });
+    </script>
+}

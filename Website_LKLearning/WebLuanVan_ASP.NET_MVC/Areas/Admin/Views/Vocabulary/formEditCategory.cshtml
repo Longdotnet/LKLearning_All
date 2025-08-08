@@ -1,0 +1,96 @@
+﻿@model WebLuanVan_ASP.NET_MVC.Areas.Admin.Models.CVocabularyCategory
+@{
+    ViewData["Title"] = "Sửa danh mục từ vựng";
+    Layout = "~/Areas/Admin/Views/Shared/_LayoutAdmin.cshtml";
+}
+
+<div class="container mt-4">
+    <div class="card shadow-sm">
+        <div class="card-header bg-warning text-dark">
+            <h5 class="mb-0">@ViewData["Title"]</h5>
+        </div>
+        <div class="card-body">
+            <form asp-area="Admin" asp-controller="Vocabulary" asp-action="EditCategory" asp-route-id="@Model.VocabularyCategoryId" method="post" id="categoryForm" autocomplete="off">
+                <input asp-for="VocabularyCategoryId" type="hidden" />
+
+                <div class="mb-3">
+                    <label for="VocabularyCategoryName" class="form-label">Tên danh mục <span class="text-danger">*</span></label>
+                    <input asp-for="VocabularyCategoryName" class="form-control" required data-placeholder="Nhập tên danh mục" />
+                    <span asp-validation-for="VocabularyCategoryName" class="text-danger"></span>
+                </div>
+                <div class="mb-3">
+                    <label for="VocabularyCategoryDescription" class="form-label">Mô tả</label>
+                    <textarea asp-for="VocabularyCategoryDescription" class="form-control" rows="3" data-placeholder="Nhập mô tả"></textarea>
+                </div>
+                <div class="mb-3">
+                    <label for="UrlImage" class="form-label">Ảnh đại diện (URL)</label>
+                    <input asp-for="UrlImage" class="form-control" id="UrlImage" data-placeholder="Nhập URL ảnh" />
+                    <span asp-validation-for="UrlImage" class="text-danger"></span>
+                    <div id="imagePreviewContainer" style="display:none;" class="mt-2">
+                        <img id="imagePreview" src="#" alt="Image Preview" style="max-width:300px;max-height:200px;" />
+                        <p id="imageError" class="text-danger small mt-2" style="display:none;"></p>
+                    </div>
+                </div>
+                <div class="d-flex justify-content-end gap-2">
+                    <button type="submit" class="btn @(Model.VocabularyCategoryId == 0 ? "btn-primary" : "btn-warning")" id="btnSave">
+                        <span id="btnSaveText">@((Model.VocabularyCategoryId == 0) ? "Thêm" : "Cập nhật")</span>
+                        <span id="btnSaveLoading" class="spinner-border spinner-border-sm d-none"></span>
+                    </button>
+                    <a asp-area="Admin" asp-controller="Vocabulary" asp-action="Categories" class="btn btn-secondary">Hủy</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            $('.select2').select2({
+                theme: 'bootstrap-5',
+                width: '100%',
+                allowClear: true,
+                placeholder: function () {
+                    return $(this).data('placeholder');
+                }
+            });
+            $('#categoryForm').on('submit', function () {
+                $('#btnSaveText').addClass('d-none');
+                $('#btnSaveLoading').removeClass('d-inline-block');
+            });
+            $('#UrlImage').on('input', function () {
+                var url = $(this).val();
+                var $container = $('#imagePreviewContainer');
+                var $img = $('#imagePreview');
+                var $error = $('#imageError');
+
+                if (url) {
+                    if (/^https?:\/\/.+(\.(jpg|jpeg|png|gif|webp))$/i.test(url)) {
+                        $img.attr('src', url)
+                            .on('load', function () {
+                                $container.show();
+                                $error.hide();
+                            })
+                            .on('error', function () {
+                                $container.show();
+                                $error.text('Không thể tải ảnh. Vui lòng kiểm tra lại URL.').show();
+                                $img.attr('src', '#');
+                            });
+                    } else {
+                        $container.show();
+                        $error.text('URL không hợp lệ. Phải bắt đầu bằng http:// hoặc https://').show();
+                        $img.attr('src', '#');
+                    }
+                } else {
+                    $container.hide();
+                }
+            });
+
+            // Nếu có giá trị ban đầu thì hiển thị luôn
+            var initialUrl = $('#UrlImage').val();
+            if (initialUrl) {
+                $('#UrlImage').trigger('input');
+            }
+        });
+    </script>
+}

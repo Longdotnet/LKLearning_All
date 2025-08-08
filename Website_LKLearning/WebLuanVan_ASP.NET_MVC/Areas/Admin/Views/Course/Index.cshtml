@@ -1,0 +1,282 @@
+﻿@using WebLuanVan_ASP.NET_MVC.Areas.Admin.Models
+@{
+    ViewData["Title"] = "Index";
+    Layout = "~/Areas/Admin/Views/Shared/_LayoutAdmin.cshtml";
+}
+@{
+    int? currentcategorys = ViewBag.CurrentCategory;
+    int? currentlevels = ViewBag.CurrentLevel;
+    int? currentPackages = ViewBag.CurrentPackage;
+    var categories = ViewBag.Categories as List<CCategory>;
+    var levels = ViewBag.Levels as List<CLevel>;
+    var packages = ViewBag.Packages as List<CPackage>;
+}
+@{
+    Paginate paginate = new Paginate();
+    int pageNo = 0;
+    if (ViewBag.Paginate != null)
+    {
+        paginate = ViewBag.Paginate;
+        pageNo = paginate.CurrentPage;
+    }
+}
+<link rel="stylesheet" href="~/AdminTL/assets/css/index.css">
+
+
+<div class="container-fluid px-2 px-md-4">
+    <div class="content-header">
+        <h1>Quản lý khóa học</h1>
+    </div>
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5>Bộ lọc</h5>
+        </div>
+        <div class="card-body">
+            <form method="get" class="row g-3">
+                <div class="col-12 col-md-3">
+                    <label class="form-label">Danh mục</label>
+                    <select id="categorySelect" name="categoryId" class="form-select select2">
+                        <option value="">-- Tất cả danh mục --</option>
+                        @foreach (var lesson in categories)
+                        {
+                            <option value="@lesson.CategoryId" selected="@(currentcategorys == lesson.CategoryId)">
+                                @lesson.CategoryName
+                            </option>
+                        }
+                    </select>
+                </div>
+                <div class="col-12 col-md-3">
+                    <label class="form-label">Loại cấp độ</label>
+                    <select id="levelSelect" name="levelId" class="form-select select2">
+                        <option value="">-- Tất cả loại --</option>
+                        @foreach (var type in levels)
+                        {
+                            <option value="@type.LevelId" selected="@(currentlevels == type.LevelId)">
+                                @type.LevelName
+                            </option>
+                        }
+                    </select>
+                </div>
+                <div class="col-12 col-md-3">
+                    <label class="form-label">Loại gói cước</label>
+                    <select id="packageSelect" name="packageId" class="form-select select2">
+                        <option value="">-- Tất cả loại --</option>
+                        @foreach (var package in packages)
+                        {
+                            <option value="@package.PackageId" selected="@(currentPackages == package.PackageId)">
+                                @package.PackageName
+                            </option>
+                        }
+                    </select>
+                </div>
+                <div class="col-12 col-md-3 d-flex align-items-end">
+                    <button type="submit" class="btn btn-primary w-100 w-md-auto">Lọc</button>
+                    @if (currentcategorys.HasValue || currentlevels.HasValue || currentPackages.HasValue)
+                    {
+                        <a asp-area="Admin" asp-action="Index" asp-controller="Course" class="btn btn-outline-secondary ms-2 w-100 w-md-auto">Xóa lọc</a>
+                    }
+                </div>
+            </form>
+        </div>
+    </div>
+    <div class="d-flex justify-content-between align-items-center flex-wrap mt-4 mb-3">
+        <h2>Danh sách khóa học</h2>
+        <div class="d-flex flex-wrap gap-2">
+            <button id="deleteSelected" class="btn btn-danger mr-2" disabled>Xóa đã chọn</button>
+            <a asp-action="formThemCourse" class="btn btn-primary">Thêm khóa học</a>
+        </div>
+    </div>
+    <div class="table-responsive mb-4">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th><input type="checkbox" id="selectAll" /></th>
+                    <th>Tên Course</th>
+                    <th>Cấp độ</th>
+                    <th>Danh mục</th>
+                    <th>Gói cước</th>
+                    <th>Thao tác</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var course in Model)
+                {
+                    <tr>
+                        <td><input type="checkbox" name="selectIds" value="@course.CourseId" class="rowCheckbox" /></td>
+                        <td>@course.CourseName</td>
+                        <td>
+                            @{
+                                var level = "N/A";
+                                if (levels != null)
+                                {
+                                    var cat = levels.FirstOrDefault(c => c.LevelId == course.LevelId);
+                                    if (cat != null)
+                                    {
+                                        level = cat.LevelName;
+                                    }
+                                }
+                            }
+                            @level
+                        </td>
+                        <td>
+                            @{
+                                var catName = "N/A";
+                                if (categories != null)
+                                {
+                                    var cat = categories.FirstOrDefault(c => c.CategoryId == course.CategoryId);
+                                    if (cat != null)
+                                    {
+                                        catName = cat.CategoryName;
+                                    }
+                                }
+                            }
+                            @catName
+                        </td>
+                        <td>
+                            @{
+                                var pacName = "N/A";
+                                if (packages != null)
+                                {
+                                    var cat = packages.FirstOrDefault(c => c.PackageId == course.PackageId);
+                                    if (cat != null)
+                                    {
+                                        pacName = cat.PackageName;
+                                    }
+                                }
+                            }
+                            @pacName
+                        </td>
+                        <td>
+                            <a asp-action="formSuaCourse" asp-route-id="@course.CourseId" class="btn btn-sm btn-warning" title="Sửa">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                            <a asp-action="xoaCourse" asp-route-id="@course.CourseId" onclick="confirmDelete(event)" class="btn btn-sm btn-danger" title="Xóa">
+                                <i class="fas fa-trash"></i>
+                            </a>
+                            <a asp-action="viewQuestion" asp-route-id="@course.CourseId" class="btn btn-sm btn-primary" title="Xem câu hỏi">
+                                <i class="fas fa-eye"></i>
+                            </a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+    <partial name="_Paging" model="@paginate" />
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function() {
+            $('.select2').select2({
+                theme: 'bootstrap-5',
+                placeholder: function() {
+                    return $(this).data('placeholder') || 'Tìm kiếm...';
+                },
+                allowClear: true,
+                width: '100%',
+                minimumResultsForSearch: 1,
+                dropdownAutoWidth: true,
+                language: {
+                    noResults: function() { return "Không tìm thấy kết quả"; },
+                    searching: function() { return "Đang tìm kiếm..."; }
+                }
+            });
+
+            $('#categorySelect').select2({
+                ajax: {
+                    url: '@Url.Action("searchCategory", "Course")',
+                    dataType: 'json',
+                    delay: 250,
+                    data: function(params) {
+                        return { searchTerm: params.term, page: params.page || 1 };
+                    },
+                    processResults: function(data, params) {
+                        params.page = params.page || 1;
+                        return {
+                            results: data.items,
+                            pagination: { more: (params.page * 10) < data.totalCount }
+                        };
+                    },
+                    cache: true
+                }
+            });
+            $('#levelSelect').select2({
+                ajax: {
+                    url: '@Url.Action("searchLevel", "Course")',
+                    dataType: 'json',
+                    delay: 250,
+                    data: function(params) {
+                        return { searchTerm: params.term, page: params.page || 1 };
+                    },
+                    processResults: function(data, params) {
+                        params.page = params.page || 1;
+                        return {
+                            results: data.items,
+                            pagination: { more: (params.page * 10) < data.totalCount }
+                        };
+                    },
+                    cache: true
+                }
+            });
+            $('#packageSelect').select2({
+                ajax: {
+                    url: '@Url.Action("searchPackage", "Course")',
+                    dataType: 'json',
+                    delay: 250,
+                    data: function(params) {
+                        return { searchTerm: params.term, page: params.page || 1 };
+                    },
+                    processResults: function(data, params) {
+                        params.page = params.page || 1;
+                        return {
+                            results: data.items,
+                            pagination: { more: (params.page * 10) < data.totalCount }
+                        };
+                    },
+                    cache: true
+                }
+            });
+
+            $('#selectAll').change(function(){
+                $('.rowCheckbox').prop('checked', $(this).prop('checked'));
+                toggleDeleteButton();
+            });
+            $('.rowCheckbox').change(function () {
+                $('#selectAll').prop('checked', $('.rowCheckbox:checked').length === $('.rowCheckbox').length);
+                toggleDeleteButton();
+            });
+
+            function toggleDeleteButton() {
+                var checkedCount = $('.rowCheckbox:checked').length;
+                $('#deleteSelected').prop('disabled', checkedCount === 0);
+                $('#deleteSelected').text(checkedCount > 0 ? `Xóa (${checkedCount}) đã chọn` : 'Xóa đã chọn');
+            }
+
+            $('#deleteSelected').click(function (e) {
+                e.preventDefault();
+                confirmDeleteMultiple(e,function(){
+                    var selectedIds = $('.rowCheckbox:checked').map(function () {
+                        return $(this).val();
+                    }).get();
+
+                    $.ajax({
+                        url: '@Url.Action("DeleteMultiple", "Course", new { area = "Admin" })',
+                        type: 'POST',
+                        data: { selectedIds: selectedIds },
+                        success: function (response) {
+                            if (response.success) {
+                                location.reload();
+                            } else {
+                                alert('Xóa không thành công: ' + response.message);
+                            }
+                        },
+                        error: function () {
+                            alert('Đã xảy ra lỗi khi xóa.');
+                        }
+                    });
+                })
+            });
+        });
+    </script>
+}

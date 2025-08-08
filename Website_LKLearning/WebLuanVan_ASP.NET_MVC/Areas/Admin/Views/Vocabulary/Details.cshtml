@@ -1,0 +1,133 @@
+﻿@model WebLuanVan_ASP.NET_MVC.Areas.Admin.Models.CVocabulary
+@using WebLuanVan_ASP.NET_MVC.Areas.Admin.Models
+@{
+    ViewData["Title"] = "Chi tiết từ vựng";
+    Layout = "~/Areas/Admin/Views/Shared/_LayoutAdmin.cshtml";
+    var meanings = ViewBag.Meanings as List<CVocabularyMeaning>;
+}
+<link rel="stylesheet" href="~/AdminTL/assets/css/index.css">
+
+<div class="content-header mb-4">
+    <h1>Chi tiết từ vựng</h1>
+    <a asp-area="Admin" asp-controller="Vocabulary" asp-action="Index" class="btn btn-outline-secondary">
+        <i class="fas fa-arrow-left"></i> Quay lại danh sách
+    </a>
+</div>
+
+<div class="card mb-4">
+    <div class="card-header">
+        <h4>@Model.Word</h4>
+    </div>
+    <div class="card-body">
+        <dl class="row">
+            <dt class="col-sm-3">Phát âm</dt>
+            <dd class="col-sm-9">@Model.Pronunciation</dd>
+
+            <dt class="col-sm-3">Audio UK</dt>
+            <dd class="col-sm-9">
+                @if (!string.IsNullOrEmpty(Model.AudioUrlUk))
+                {
+                    <audio controls src="@Model.AudioUrlUk" style="height:24px;"></audio>
+                }
+                else
+                {
+                    <span class="text-muted">Không có</span>
+                }
+            </dd>
+
+            <dt class="col-sm-3">Audio US</dt>
+            <dd class="col-sm-9">
+                @if (!string.IsNullOrEmpty(Model.AudioUrlUs))
+                {
+                    <audio controls src="@Model.AudioUrlUs" style="height:24px;"></audio>
+                }
+                else
+                {
+                    <span class="text-muted">Không có</span>
+                }
+            </dd>
+
+            <dt class="col-sm-3">Ngày tạo</dt>
+            <dd class="col-sm-9">@Model.CreatedAt?.ToString("dd/MM/yyyy HH:mm")</dd>
+        </dl>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header">
+        <h5>Nghĩa của từ vựng</h5>
+    </div>
+    <div class="card-body">
+        @if (meanings != null && meanings.Any())
+        {
+            <div class="accordion" id="meaningsAccordion">
+                @for (int i = 0; i < meanings.Count; i++)
+                {
+                    var m = meanings[i];
+                    <div class="accordion-item mb-2">
+                        <h2 class="accordion-header" id="heading-@i">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-@i" aria-expanded="false" aria-controls="collapse-@i">
+                                <span class="fw-bold">@m.PartOfSpeech</span>
+                                <span class="ms-2 text-primary">@m.Meaning</span>
+                            </button>
+                        </h2>
+                        <div id="collapse-@i" class="accordion-collapse collapse" aria-labelledby="heading-@i" data-bs-parent="#meaningsAccordion">
+                            <div class="accordion-body">
+                                <div class="mb-2">
+                                    <span class="fw-bold">Nghĩa dịch:</span>
+                                    <span class="text-break">@m.TranslatedMeaning</span>
+                                </div>
+                                @if (!string.IsNullOrEmpty(m.ExampleSentence))
+                                {
+                                    <div class="mb-2">
+                                        <span class="fw-bold">Ví dụ:</span>
+                                        <span class="text-break">@m.ExampleSentence</span>
+                                    </div>
+                                }
+                                @if (!string.IsNullOrEmpty(m.TranslatedExampleSentence))
+                                {
+                                    <div class="mb-2">
+                                        <span class="fw-bold">Dịch ví dụ:</span>
+                                        <span class="text-break">@m.TranslatedExampleSentence</span>
+                                    </div>
+                                }
+                                @if (!string.IsNullOrEmpty(m.Synonyms))
+                                {
+                                    <div class="mb-2">
+                                        <span class="fw-bold">Đồng nghĩa:</span>
+                                        <span class="badge bg-success">@m.Synonyms</span>
+                                    </div>
+                                }
+                                @if (!string.IsNullOrEmpty(m.Antonyms))
+                                {
+                                    <div class="mb-2">
+                                        <span class="fw-bold">Trái nghĩa:</span>
+                                        <span class="badge bg-danger">@m.Antonyms</span>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+        else
+        {
+            <div class="text-muted">Không có nghĩa cho từ này.</div>
+        }
+    </div>
+</div>
+
+<style>
+    .accordion-button .text-primary {
+        white-space: normal;
+        word-break: break-word;
+        max-width: 70%;
+        display: inline-block;
+    }
+
+    .accordion-body .text-break {
+        white-space: pre-line;
+        word-break: break-word;
+    }
+</style>

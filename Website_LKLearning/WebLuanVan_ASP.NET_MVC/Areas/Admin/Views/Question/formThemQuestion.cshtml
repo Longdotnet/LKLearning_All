@@ -1,0 +1,568 @@
+﻿@using Newtonsoft.Json
+@using WebLuanVan_ASP.NET_MVC.Areas.Admin.Models
+@model CQuestion
+@{
+    ViewData["Title"] = "Add New Question";
+    Layout = "~/Areas/Admin/Views/Shared/_LayoutAdmin.cshtml";
+}
+@{
+
+}
+<div class="card shadow mb-4">
+    <div class="card-header py-3 d-flex justify-content-between align-items-center">
+        <h6 class="m-0 font-weight-bold text-primary">Thêm câu hỏi</h6>
+        <a asp-action="Index" class="btn btn-secondary btn-sm">Quay lại</a>
+    </div>
+    <div class="card-body">
+        <form asp-action="ThemQuestion" method="post" enctype="multipart/form-data">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+            <input asp-for="QuestionId" type="hidden" />
+            <input asp-for="CorrectAnswer" type="hidden" id="hiddenCorrectAnswer" />
+            <div class="form-row">
+                <div class="form-group col-md-6">
+                    <label asp-for="QuestionTypeId" class="control-label font-weight-bold"></label>
+                    <select asp-for="QuestionTypeId" class="form-control select2" id="questionTypeSelect" required
+                            asp-items="@(new SelectList(ViewBag.QuestionTypes, "QuestionTypeId", "TypeName"))">
+                        <option value="">lựa chọn</option>
+                    </select>
+                    <span asp-validation-for="QuestionTypeId" class="text-danger"></span>
+                </div> 
+            </div>
+            <div class="form-row">
+                <div class="form-group col-md-6">
+                    <label asp-for="QuestionLevelId" class="control-label font-weight-bold"></label>
+                    <select asp-for="QuestionLevelId" class="form-control select2" required
+                            asp-items="@(new SelectList(ViewBag.QuestionLevels, "QuestionLevelId", "QuestionName"))">
+                        <option value="">Chọn cấp độ</option>
+                    </select>
+                    <span asp-validation-for="QuestionLevelId" class="text-danger"></span>
+                </div>
+                <div class="form-group col-md-6">
+                    <label asp-for="ContentTypeId" class="control-label font-weight-bold"></label>
+                    <select asp-for="ContentTypeId" class="form-control select2" required
+                            asp-items="@(new SelectList(ViewBag.ContentTypes, "ContentTypeId", "TypeName"))">
+                        <option value="">Chọn chủ đề</option>
+                    </select>
+                    <span asp-validation-for="ContentTypeId" class="text-danger"></span>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="QuestionText" class="control-label font-weight-bold"></label>
+                <textarea asp-for="QuestionText" class="form-control summernote"  required></textarea>
+            </div>
+            <div class="form-group">
+                <label asp-for="QuestionDescription" class="control-label font-weight-bold"></label>
+                <textarea asp-for="QuestionDescription" class="form-control summernote" id="summernote-description"></textarea>
+                <div id="videoPreviewContainer" style="display:none; margin-top:10px;">
+                    <div id="videoPreview"></div>
+                    <p id="videoPreviewError" class="text-danger small mt-2" style="display:none;"></p>
+                </div>
+            </div>
+            <!-- Dynamic fields based on question type -->
+            <div id="questionTypeFields">
+                <!-- Multiple Choice -->
+                <div class="question-type-section" id="multipleChoiceSection" style="display: none;">
+                    <div class="card mb-4">
+                        <div class="card-header bg-primary text-white">
+                            <h6 class="m-0 font-weight-bold">Multiple Choice Options</h6>
+                        </div>
+                        <div class="card-body">
+                            <div id="answerOptionsContainer">
+                                @if (Model.AnswerOptionsList != null && Model.AnswerOptionsList.Count > 0)
+                                {
+                                    for (int i = 0; i < Model.AnswerOptionsList.Count; i++)
+                                    {
+                                        <div class="row mb-3 answer-option">
+                                            <div class="col-md-10">
+                                                <div class="input-group">
+                                                    <div class="input-group-prepend">
+                                                        <span class="input-group-text">Option @(i + 1)</span>
+                                                    </div>
+                                                    <input type="text" name="AnswerOptionsList[@i]" class="form-control"
+                                                           value="@Model.AnswerOptionsList[i]" />
+                                                </div>
+                                                <span asp-validation-for="AnswerOptionsList[@i]" class="text-danger"></span>
+                                            </div>
+                                            <div class="col-md-2">
+                                                <button type="button" class="btn btn-danger btn-block remove-answer-option">
+                                                    <i class="fas fa-trash-alt"></i> Remove
+                                                </button>
+                                            </div>
+                                        </div>
+                                    }
+                                }
+                            </div>
+                            <button type="button" id="btnAddAnswerOption" class="btn btn-success">
+                                <i class="fas fa-plus"></i> Thêm lựa chọn
+                            </button>
+
+                            <div class="form-group mt-3">
+                                <label asp-for="CorrectAnswer" class="control-label font-weight-bold"></label>
+                                <select asp-for="CorrectAnswer" class="form-control" id="correctAnswerSelect">
+                                    <option value="">Lựa chọn</option>
+                                    @if (Model.AnswerOptionsList != null)
+                                    {
+                                        foreach (var option in Model.AnswerOptionsList)
+                                        {
+                                            <option value="@option">@option</option>
+                                        }
+                                    }
+                                </select>
+                                <span asp-validation-for="CorrectAnswer" class="text-danger"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- True/False Section -->
+                <div class="question-type-section" id="trueFalseSection" style="display: none;">
+                    <div class="card mb-4">
+                        <div class="card-header bg-primary text-white">
+                            <h6 class="m-0 font-weight-bold">True/False Options</h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="form-group">
+                                <label asp-for="CorrectAnswer" class="control-label font-weight-bold"></label>
+                                <select asp-for="CorrectAnswer" class="form-control" id="trueFalseCorrectAnswer">
+                                    <option value="">Select correct answer</option>
+                                    <option value="true">True</option>
+                                    <option value="false">False</option>
+                                </select>
+                                <span asp-validation-for="CorrectAnswer" class="text-danger"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Fill in the Blank Section -->
+                <div class="question-type-section" id="fillBlankSection" style="display: none;">
+                    <div class="card mb-4">
+                        <div class="card-header bg-primary text-white">
+                            <h6 class="m-0 font-weight-bold">Fill in the Blank</h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="form-group">
+                                <label asp-for="CorrectAnswer" class="control-label font-weight-bold"></label>
+                                <input asp-for="CorrectAnswer" class="form-control" id="fillBlankCorrectAnswer"
+                                       placeholder="Enter the correct word/phrase" />
+                                <span asp-validation-for="CorrectAnswer" class="text-danger"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Listening Section -->
+                <div class="question-type-section" id="listeningSection" style="display: none;">
+                    <div class="card mb-4">
+                        <div class="card-header bg-primary text-white">
+                            <h6 class="m-0 font-weight-bold">Transcript Nghe</h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="form-group">
+                                <label asp-for="AudioUrl" class="control-label font-weight-bold"></label>
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text"><i class="fas fa-volume-up"></i></span>
+                                    </div>
+                                    <input asp-for="AudioUrl" class="form-control" id="audioUrlInput" placeholder="https://example.com/audio.mp3"  />
+                                    <div class="input-group-append">
+                                        <button type="button" id="btnAnalyzeAudio" class="btn btn-info">Phân tích Audio</button>
+                                    </div>
+                                </div>
+                                <span asp-validation-for="AudioUrl" class="text-danger"></span>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label font-weight-bold">Nội dung Transcript</label>
+                                <textarea name="AnswerOptions" class="form-control summernote" id="transcriptInput" rows="5" placeholder="Nhập hoặc chỉnh sửa nội dung transcript" >@(Model.AnswerOptions != null ? JsonConvert.DeserializeObject<dynamic>(Model.AnswerOptions)?.Text : "")</textarea>
+                                <span id="transcriptError" class="text-danger"></span>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label font-weight-bold">Transcript Preview</label>
+                                <textarea asp-for="TranscriptText" class="form-control" id="transcriptText" rows="5" readonly>@Model.TranscriptText</textarea>
+                            </div>
+                            <div class="form-group">
+                                <label asp-for="CorrectAnswer" class="control-label font-weight-bold"></label>
+                                <input asp-for="CorrectAnswer" class="form-control" id="listeningCorrectAnswer"
+                                       placeholder="Nhập đáp án đúng" />
+                                <span asp-validation-for="CorrectAnswer" class="text-danger"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Matching -->
+                <div class="question-type-section" id="matchingSection" style="display: none;">
+                    <div class="card mb-4">
+                        <div class="card-header bg-primary text-white">
+                            <h6 class="m-0 font-weight-bold">Matching Pairs</h6>
+                        </div>
+                        <div class="card-body">
+                            <button type="button" id="btnAddMatchingPair" class="btn btn-success">
+                                <i class="fas fa-plus"></i> Add Pair
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Common fields for all question types -->
+            <div class="card mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h6 class="m-0 font-weight-bold">Thông tin bổ sung</h6>
+                </div>
+                <div class="card-body">
+                    <div class="form-row">
+                        <div class="form-group col-md-6">
+                            <label asp-for="ImageUrl" class="control-label font-weight-bold"></label>
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text"><i class="fas fa-image"></i></span>
+                                </div>
+                                <input asp-for="ImageUrl" class="form-control" id="imageUrlInput" placeholder="https://example.com/image.jpg" />
+                            </div>
+                            <span asp-validation-for="ImageUrl" class="text-danger"></span>
+                            @Html.Partial("~/Areas/Admin/Views/Shared/_Preview.cshtml", "imageUrlInput")
+                        </div>
+
+                        <div class="form-group col-md-6">
+                            <label asp-for="AudioUrl" class="control-label font-weight-bold"></label>
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text"><i class="fas fa-volume-up"></i></span>
+                                </div>
+                                <input asp-for="AudioUrl" class="form-control" id="audioUrlInput" placeholder="https://example.com/audio.mp3" />
+                            </div>
+                            <span asp-validation-for="AudioUrl" class="text-danger"></span>
+                        </div>
+                        @Html.Partial("~/Areas/Admin/Views/Shared/_AudioPreview.cshtml", "audioUrlInput")
+
+                    </div>
+
+                    <div class="form-group">
+                        <label asp-for="Explanation" class="control-label font-weight-bold"></label>
+                        <textarea asp-for="Explanation" class="form-control summernote" id="summernote-explanation" rows="3" placeholder="Explanation for the correct answer"></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group text-right">
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-save"></i> Lưu
+                </button>
+                <button type="reset" class="btn btn-outline-secondary ml-2">
+                    <i class="fas fa-undo"></i> Đặt lại
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+    <style>
+        .select2-container .select2-selection--single {
+            height: 38px !important;
+       ස
+
+        .select2-container--default .select2-selection--single .select2-selection__arrow {
+            height: 36px !important;
+        }
+        .card-header {
+            padding: 0.75rem 1.25rem;
+        }
+        .question-type-section {
+            margin-bottom: 1.5rem;
+        }
+        .answer-option, .matching-pair {
+            align-items: center;
+        }
+    </style>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            // Initialize Select2
+            $('.select2').select2({
+                width: '100%'
+            });
+
+            // Initialize Summernote for QuestionText, TranscriptInput, and Explanation
+            $('#summernote-content').summernote({
+                height: 200,
+                toolbar: [
+                    ['style', ['style']],
+                    ['font', ['bold', 'italic', 'underline', 'clear']],
+                    ['para', ['ul', 'ol', 'paragraph']],
+                    ['insert', ['link', 'picture', 'video']],
+                    ['view', ['fullscreen', 'codeview', 'help']]
+                ]
+            });
+
+            $('#transcriptInput').summernote({
+                height: 200,
+                toolbar: [
+                    ['style', ['style']],
+                    ['font', ['bold', 'italic', 'underline', 'clear']],
+                    ['para', ['ul', 'ol', 'paragraph']],
+                    ['insert', ['link']],
+                    ['view', ['fullscreen', 'codeview', 'help']]
+                ]
+            });
+
+            $('#summernote-explanation').summernote({
+                height: 150,
+                toolbar: [
+                    ['style', ['style']],
+                    ['font', ['bold', 'italic', 'underline', 'clear']],
+                    ['para', ['ul', 'ol', 'paragraph']],
+                    ['insert', ['link']],
+                    ['view', ['fullscreen', 'codeview', 'help']]
+                ]
+            });
+
+            // Function to update hidden CorrectAnswer field
+            function updateCorrectAnswer(value) {
+                $('#hiddenCorrectAnswer').val(value);
+            }
+
+            // Question type change handler
+            $('#questionTypeSelect').change(function () {
+                const selectedType = $(this).val();
+
+                // Hide all sections first
+                $('.question-type-section').hide();
+
+                // Show the relevant section based on question type
+                switch(selectedType) {
+                    case '1': // Multiple Choice
+                        $('#multipleChoiceSection').show();
+                        updateCorrectAnswer($('#correctAnswerSelect').val());
+                        break;
+                    case '2': // True/False
+                        $('#trueFalseSection').show();
+                        updateCorrectAnswer($('#trueFalseCorrectAnswer').val());
+                        break;
+                    case '3': // Fill in the Blank
+                        $('#fillBlankSection').show();
+                        updateCorrectAnswer($('#fillBlankCorrectAnswer').val());
+                        break;
+                    case '6': // Listening
+                        $('#listeningSection').show();
+                        updateCorrectAnswer($('#listeningCorrectAnswer').val());
+                        break;
+                }
+            });
+
+            // Update CorrectAnswer when multiple choice options change
+            $('#correctAnswerSelect').change(function() {
+                updateCorrectAnswer($(this).val());
+            });
+
+            // Update CorrectAnswer when true/false option changes
+            $('#trueFalseCorrectAnswer').change(function() {
+                updateCorrectAnswer($(this).val());
+            });
+
+            // Update CorrectAnswer when fill in the blank input changes
+            $('#fillBlankCorrectAnswer').on('input', function() {
+                updateCorrectAnswer($(this).val());
+            });
+
+            // Update CorrectAnswer for listening
+            $('#listeningCorrectAnswer').on('input', function() {
+                updateCorrectAnswer($(this).val());
+            });
+
+            // Analyze audio
+            $('#btnAnalyzeAudio').click(function () {
+                const audioUrl = $('#audioUrlInput').val();
+                if (!audioUrl) {
+                    alert('Vui lòng nhập URL Audio');
+                    return;
+                }
+                $.post('/question/analyze-audio', { audioUrl }, function (response) {
+                    if (response.success) {
+                        $('#transcriptText').val(response.transcript || '');
+                        $('#transcriptError').text('');
+                    } else {
+                        $('#transcriptError').text('Lỗi: ' + response.message);
+                    }
+                });
+            });
+
+            // Add answer option for multiple choice
+            $('#btnAddAnswerOption').click(function () {
+                const optionCount = $('#answerOptionsContainer .answer-option').length;
+                const newOptionIndex = optionCount;
+                const newOptionHtml = `
+                    <div class="row mb-3 answer-option">
+                        <div class="col-md-10">
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text">Lựa chọn ${newOptionIndex + 1}</span>
+                                </div>
+                                <input type="text" name="AnswerOptionsList[${newOptionIndex}]"
+                                        class="form-control" placeholder="Nhập tên lựa chọn" />
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <button type="button" class="btn btn-danger btn-block remove-answer-option">
+                                <i class="fas fa-trash-alt"></i> Xóa
+                            </button>
+                        </div>
+                    </div>`;
+                $('#answerOptionsContainer').append(newOptionHtml);
+            });
+
+            // Remove answer option
+            $('#answerOptionsContainer').on('click', '.remove-answer-option', function () {
+                const removedOption = $(this).closest('.answer-option');
+                const optionText = removedOption.find('input').val();
+
+                // Remove the option
+                removedOption.remove();
+
+                // Rebuild the correct answer select
+                $('#correctAnswerSelect').find('option:not(:first)').remove();
+                $('input[name^="AnswerOptionsList"]').each(function() {
+                    const answerText = $(this).val();
+                    if (answerText) {
+                        $('#correctAnswerSelect').append(new Option(answerText, answerText));
+                    }
+                });
+
+                // Update hidden CorrectAnswer
+                updateCorrectAnswer($('#correctAnswerSelect').val());
+
+                // Reindex remaining options
+                $('#answerOptionsContainer .answer-option').each(function(index) {
+                    $(this).find('.input-group-text').text(`Option ${index + 1}`);
+                    $(this).find('input').attr('name', `AnswerOptionsList[${index}]`);
+                });
+            });
+
+            // Update correct answer options when answer options change
+            $('#answerOptionsContainer').on('change', 'input[name^="AnswerOptionsList"]', function() {
+                $('#correctAnswerSelect').find('option:not(:first)').remove();
+                $('input[name^="AnswerOptionsList"]').each(function() {
+                    const answerText = $(this).val();
+                    if (answerText) {
+                        $('#correctAnswerSelect').append(new Option(answerText, answerText));
+                    }
+                });
+                updateCorrectAnswer($('#correctAnswerSelect').val());
+            });
+
+            // Serialize transcript input to AnswerOptions before form submission
+            $('form').submit(function () {
+                const transcriptValue = $('#transcriptInput').summernote('code');
+                if (transcriptValue) {
+                    const answerOptionsJson = JSON.stringify({ Text: transcriptValue });
+                    $('<input>').attr({
+                        type: 'hidden',
+                        name: 'AnswerOptions',
+                        value: answerOptionsJson
+                    }).appendTo('form');
+                }
+            });
+            function isYouTubeUrl(url) {
+                return /^(https?:\/\/)?(www\.)?(youtube\.com|youtu\.be)\//i.test(url);
+            }
+           function isVimeoUrl(url) {
+            return /^https?:\/\/(player\.)?vimeo\.com\/video\/\d+/i.test(url);
+            }
+            function getVimeoId(url) {
+                var match = url.match(/vimeo\.com\/video\/(\d+)/i) || url.match(/player\.vimeo\.com\/video\/(\d+)/i);
+                return match ? match[1] : null;
+            }
+
+
+            function getYouTubeId(url) {
+                var regExp = /^.*(youtu\.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
+                var match = url.match(regExp);
+                return (match && match[2].length === 11) ? match[2] : null;
+            }
+            function isVideoFile(url) {
+                return /^https?:\/\/.+\.(mp4|webm|mov)$/i.test(url);
+            }
+
+            function showVideoPreview(url) {
+                var $container = $('#videoPreviewContainer');
+                var $preview = $('#videoPreview');
+                var $error = $('#videoPreviewError');
+                $preview.empty();
+                $error.hide();
+
+                if (isYouTubeUrl(url)) {
+                    var videoId = getYouTubeId(url);
+                    if (videoId) {
+                        $preview.html(`<iframe width="320" height="180" src="https://www.youtube.com/embed/${videoId}" frameborder="0" allowfullscreen></iframe>`);
+                        $container.show();
+                    } else {
+                        $error.text('Không nhận diện được video YouTube.').show();
+                        $container.show();
+                    }
+                } else if (isVimeoUrl(url)) {
+                    var vimeoId = getVimeoId(url);
+                    if (vimeoId) {
+                        $preview.html(`<iframe src="https://player.vimeo.com/video/${vimeoId}" width="320" height="180" frameborder="0" allow="autoplay; fullscreen" allowfullscreen></iframe>`);
+                        $container.show();
+                    } else {
+                        $error.text('Không nhận diện được video Vimeo.').show();
+                        $container.show();
+                    }
+                } else if (isVideoFile(url)) {
+                    var video = document.createElement('video');
+                    video.width = 320;
+                    video.height = 180;
+                    video.controls = true;
+                    var source = document.createElement('source');
+                    source.src = url;
+                    source.type = 'video/mp4';
+                    video.appendChild(source);
+                    video.onerror = function () {
+                        $preview.empty();
+                        $error.text('Không thể tải video. Vui lòng kiểm tra lại URL.').show();
+                    };
+                    $preview.html(video);
+                    $container.show();
+                } else {
+                    $container.hide();
+                }
+            }
+
+            // Theo dõi thay đổi nội dung QuestionDescription
+            $('#summernote-description').on('summernote.change', function(we, contents, $editable) {
+                var html = $('#summernote-description').summernote('code');
+                var url = null;
+
+                // Try to find <a href="...">
+                var $a = $('<div>' + html + '</div>').find('a[href^="http"]');
+                if ($a.length > 0) {
+                    url = $a.attr('href');
+                } else {
+                    // Try to find plain text URL in <p> or anywhere
+                    var text = $('<div>' + html + '</div>').text();
+                    var urlMatch = text.match(/https?:\/\/[^\s"]+/);
+                    if (urlMatch && urlMatch[0]) {
+                        url = urlMatch[0];
+                    }
+                }
+
+                if (url) {
+                    showVideoPreview(url);
+                } else {
+                    $('#videoPreviewContainer').hide();
+                }
+            });
+
+            // Hiển thị preview nếu có giá trị ban đầu
+            setTimeout(function() {
+                var text = $('#summernote-description').val();
+                var urlMatch = text && text.match(/https?:\/\/[^\s"]+/);
+                if (urlMatch && urlMatch[0]) {
+                    showVideoPreview(urlMatch[0]);
+                }
+            }, 500);
+     
+        });
+    </script>
+}

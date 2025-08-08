@@ -1,0 +1,412 @@
+﻿@using WebLuanVan_ASP.NET_MVC.Areas.Admin.Models;
+
+@{
+    ViewData["Title"] = "Dashboard";
+    Layout = "~/Areas/Admin/Views/Shared/_LayoutAdmin.cshtml";
+    var totalAmount = ViewBag.TotalAmountOrders ?? 0;
+    var totalCourses = ViewBag.TotalCourses ?? 0;
+    var totalPackages = ViewBag.TotalPackages ?? 0;
+    var totalUsers = ViewBag.TotalUsers ?? 0;
+    var recentLogins = ViewBag.RecentLogins as List<CUsers> ?? new();
+    var token = Context.Session.GetString("AuthToken");
+    var recentOrders = ViewBag.RecentOrders as List<COrders>;
+}
+
+<style>
+    .dashboard-card {
+        border-radius: 12px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+        min-height: 110px;
+        padding: 1.2rem 1.5rem;
+        margin-bottom: 1rem;
+        position: relative;
+    }
+
+        .dashboard-card .fs-2 {
+            font-size: 2rem;
+        }
+
+        .dashboard-card .update {
+            font-size: 0.9rem;
+            opacity: 0.7;
+        }
+
+    .dashboard-chart-card {
+        border-radius: 12px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+    }
+
+    .dashboard-table th, .dashboard-table td {
+        vertical-align: middle;
+    }
+
+    .dashboard-side-card {
+        border-radius: 12px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+        min-height: 320px;
+    }
+
+    .dashboard-card-link {
+        position: absolute;
+        bottom: 12px;
+        right: 18px;
+        background: rgba(44, 62, 80, 0.15);
+        border-radius: 50px;
+        padding: 4px 12px 4px 8px;
+        display: flex;
+        align-items: center;
+        color: #222;
+        text-decoration: none;
+        font-size: 1rem;
+        transition: background 0.2s;
+    }
+
+        .dashboard-card-link:hover {
+            background: rgba(44, 62, 80, 0.25);
+            color: #000;
+        }
+
+        .dashboard-card-link .fa-eye {
+            margin-right: 6px;
+            font-size: 1.1rem;
+        }
+
+    .online-user-card {
+        display: flex;
+        align-items: center;
+        background: #f8f9fa;
+        border-radius: 8px;
+        padding: 8px 12px;
+        margin-bottom: 8px;
+        box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+        transition: box-shadow 0.2s;
+    }
+
+    .online-user-card:hover {
+        box-shadow: 0 2px 8px rgba(44,62,80,0.10);
+    }
+
+    .online-user-avatar {
+        width: 32px;
+        height: 32px;
+        object-fit: cover;
+        border-radius: 50%;
+        margin-right: 10px;
+    }
+
+    .online-user-info {
+        flex: 1;
+    }
+
+    .online-user-name {
+        font-weight: 600;
+        color: #222;
+    }
+
+    .online-user-email {
+        font-size: 0.95rem;
+        color: #888;
+    }
+
+    .online-user-detail-btn {
+        background: none;
+        border: none;
+        color: #007bff;
+        font-size: 1.2rem;
+        margin-left: 8px;
+        cursor: pointer;
+        transition: color 0.2s;
+    }
+
+        .online-user-detail-btn:hover {
+            color: #0056b3;
+        }
+</style>
+<div class="container-fluid">
+    <!-- Statistic Cards -->
+    <div class="row mb-3">
+        <div class="col-md-3">
+            <div class="dashboard-card bg-warning text-white">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <div class="fs-2 fw-bold">@totalAmount.ToString("N0")</div>
+                        <div>Tổng thu nhập</div>
+                    </div>
+                    <i class="fas fa-coins fa-2x"></i>
+                </div>
+                <a asp-area="Admin" asp-controller="Transaction" asp-action="Index" class="dashboard-card-link">
+                    <i class="fas fa-eye"></i> Xem chi tiết
+                </a>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="dashboard-card bg-success text-white">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <div class="fs-2 fw-bold">@totalCourses</div>
+                        <div>Tổng khóa học</div>
+                    </div>
+                    <i class="fas fa-book fa-2x"></i>
+                </div>
+                <a asp-area="Admin" asp-controller="Course" asp-action="Index" class="dashboard-card-link">
+                    <i class="fas fa-eye"></i> Xem chi tiết
+                </a>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="dashboard-card bg-danger text-white">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <div class="fs-2 fw-bold">@ViewBag.TotalQuestions</div>
+                        <div>Tổng câu hỏi</div>
+                    </div>
+                    <i class="fas fa-question-circle fa-2x"></i>
+                </div>
+                <a asp-area="Admin" asp-controller="Question" asp-action="Index" class="dashboard-card-link">
+                    <i class="fas fa-eye"></i> Xem chi tiết
+                </a>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="dashboard-card bg-info text-white">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <div class="fs-2 fw-bold">@totalUsers</div>
+                        <div>Tổng học viên</div>
+                    </div>
+                    <i class="fas fa-user-graduate fa-2x"></i>
+                </div>
+                <a asp-area="Admin" asp-controller="User" asp-action="Index" class="dashboard-card-link">
+                    <i class="fas fa-eye"></i> Xem chi tiết
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Chart + Side Card -->
+    <div class="row mb-3">
+        <div class="col-md-9">
+            <div class="dashboard-chart-card bg-white p-4 mb-3" style="height:350px;">
+                <div class="mb-2 fw-bold">Sales Analytics</div>
+                <canvas id="revenueChart" width="800" height="300"></canvas>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="dashboard-side-card bg-white p-4 d-flex flex-column justify-content-between">
+                <div>
+                    <div class="text-center mb-2">
+                        <span class="fs-1 fw-bold text-primary">@ViewBag.TotalPackages</span>
+                        <div class="fw-bold">Số lượng gói cước</div>
+                        <div class="text-muted">Đang sử dụng</div>
+                    </div>
+                    <div class="d-flex justify-content-between mt-3 mb-3">
+                        <div>
+                            <div class="small text-muted">Gói phổ biến</div>
+                            <div>
+                                @{
+                                    var popularPackage = ViewBag.RecentOrders is IEnumerable<dynamic> ro && ro.Any()
+                                    ? ro.GroupBy(x => x.PackageName).OrderByDescending(g => g.Count()).First().Key
+                                    : "N/A";
+                                }
+                                @popularPackage
+                            </div>
+                        </div>
+                        <div>
+                            <div class="small text-muted">Tạo mới</div>
+                            <div>@DateTime.Now.ToString("dd/MM/yyyy")</div>
+                        </div>
+                    </div>
+                </div>
+                <a asp-area="Admin" asp-controller="Package" asp-action="Index" class="btn btn-primary w-100 mt-2">Quản lý gói cước</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Online Admins/Users -->
+    <div class="row mb-3">
+        <div class="col-md-4">
+            <div class="dashboard-side-card bg-white p-4">
+                <div class="mb-2 fw-bold">Tài khoản đang hoạt động</div>
+                <div>
+                    <div class="fw-bold text-success mb-1">Admins Online</div>
+                    <div id="onlineAdmins">
+                        <div class="text-muted">Đang tải...</div>
+                    </div>
+                    <div class="fw-bold text-primary mt-3 mb-1">Users Online</div>
+                    <div id="onlineUsers">
+                        <div class="text-muted">Đang tải...</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Payments & Recent Logins -->
+    <div class="row mb-3">
+        <div class="col-md-8">
+            <div class="dashboard-chart-card bg-white p-4">
+                <div class="mb-2 fw-bold">Thanh toán gần đây</div>
+                <table class="table dashboard-table">
+                    <thead>
+                        <tr>
+                            <th>OrderID</th>
+                            <th>Học viên</th>
+                            <th>Gói cước</th>
+                            <th>Ngày mua</th>
+                            <th>Số tiền</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var o in recentOrders)
+                        {
+                            <tr>
+                                <td>@o.OrderId</td>
+                                <td>@o.FullName</td>
+                                <td>@o.PackageName</td>
+                                <td>@o.CreatedAt.ToString("dd/MM/yyyy HH:mm")</td>
+                                <td class="fw-bold text-success">@o.Amount.ToString("N0")</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+                <div class="text-end">
+                    <a asp-area="Admin" asp-action="Index" asp-controller="Transaction" class="small text-primary">Xem tất cả giao dịch</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="dashboard-side-card bg-white p-4">
+                <div class="mb-2 fw-bold">Tài khoản đăng nhập gần đây</div>
+                <div>
+                    @foreach (var u in recentLogins)
+                    {
+                        <div class="d-flex align-items-center mb-3">
+                            <img src="~/AdminTL/assets/images/faces/face1.jpg" class="rounded-circle me-2" style="width:40px;height:40px;object-fit:cover;">
+                            <div>
+                                <div class="fw-bold">@u.Fullname</div>
+                                <div class="text-muted small">@u.Email</div>
+                                <div class="text-muted small">@(u.LastLoginDate?.ToString("dd/MM/yyyy HH:mm") ?? "-")</div>
+                            </div>
+                        </div>
+                    }
+                </div>
+                <div class="text-end">
+                    <a asp-area="Admin" asp-action="Index" asp-controller="User" class="small text-primary">Xem tất cả tài khoản</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/8.0.0/signalr.min.js"></script>
+
+    <script>
+        // Chart.js for revenue
+        var ctx = document.getElementById('revenueChart').getContext('2d');
+        var revenueData = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(ViewBag.RevenueByDay));
+        var labels = revenueData.map(x => {
+            var d = new Date(x.Date);
+            return d.toLocaleDateString('vi-VN', { weekday: 'short', day: '2-digit', month: '2-digit' });
+        });
+        var data = revenueData.map(x => x.Revenue);
+        var apiBaseUrl = '@ViewBag.ApiBaseUrl';
+
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Doanh thu (VNĐ)',
+                    data: data,
+                    borderColor: '#ff6384',
+                    backgroundColor: 'rgba(255,99,132,0.1)',
+                    fill: true,
+                    tension: 0.4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            callback: function(value) {
+                                return value.toLocaleString('vi-VN');
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
+        // SignalR + Online Users/Admins fetch
+        const token = '@(token?.Replace("'", "\\'"))';
+        const connectionDashboard = new signalR.HubConnectionBuilder()
+            .withUrl(apiBaseUrl.replace('/api/', '/chatHub'), {
+                accessTokenFactory: () => token
+            })
+            .build();
+        connectionDashboard.start().then(function () {
+            fetch(apiBaseUrl + 'Conversations/online-users-admins', {
+                method: 'GET',
+                headers: {
+                    'Authorization': 'Bearer ' + token
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                // Admins Online
+                const adminDiv = document.getElementById('onlineAdmins');
+                if (data.onlineAdmins && data.onlineAdmins.length > 0) {
+                    adminDiv.innerHTML = data.onlineAdmins.map(a =>
+                        `<div class="online-user-card">
+                            <img src="/AdminTL/assets/images/faces/face1.jpg" alt="profile" class="online-user-avatar" />
+                            <div class="online-user-info">
+                                <div class="online-user-name">${a.fullname}</div>
+                                <div class="online-user-email">${a.email ?? ''}</div>
+                            </div>
+                            <a href="/Admin/user/viewUserDetail/${a.userId}"
+                               class="online-user-detail-btn" title="Xem chi tiết">
+                                <i class="fas fa-eye"></i>
+                            </a>
+                        </div>`
+                    ).join('');
+                } else {
+                    adminDiv.innerHTML = '<div class="text-muted">Không có admin nào online.</div>';
+                }
+
+                const userDiv = document.getElementById('onlineUsers');
+                if (data.onlineUsers && data.onlineUsers.length > 0) {
+                    userDiv.innerHTML = data.onlineUsers.map(u =>
+                        `<div class="online-user-card">
+                            <img src="/AdminTL/assets/images/faces/face1.jpg" alt="profile" class="online-user-avatar" />
+                            <div class="online-user-info">
+                                <div class="online-user-name">${u.fullname}</div>
+                                <div class="online-user-email">${u.email ?? ''}</div>
+                            </div>
+                            <a href="/Admin/user/viewUserDetail/${u.userId}"
+                               class="online-user-detail-btn" title="Xem chi tiết">
+                                <i class="fas fa-eye"></i>
+                            </a>
+                        </div>`
+                    ).join('');
+                } else {
+                    userDiv.innerHTML = '<div class="text-muted">Không có user nào online.</div>';
+                }
+            })
+            .catch(function (err) {
+                document.getElementById('onlineAdmins').innerHTML = '<div class="text-danger">Lỗi tải dữ liệu admin online.</div>';
+                document.getElementById('onlineUsers').innerHTML = '<div class="text-danger">Lỗi tải dữ liệu user online.</div>';
+                console.error(err);
+            });
+        }).catch(function (err) {
+            document.getElementById('onlineAdmins').innerHTML = '<div class="text-danger">Không thể kết nối SignalR.</div>';
+            document.getElementById('onlineUsers').innerHTML = '<div class="text-danger">Không thể kết nối SignalR.</div>';
+            console.error(err);
+        });
+    </script>
+}

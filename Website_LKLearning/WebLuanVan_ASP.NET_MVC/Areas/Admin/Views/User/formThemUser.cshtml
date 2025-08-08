@@ -1,0 +1,100 @@
+﻿@using WebLuanVan_ASP.NET_MVC.Areas.Admin.Models
+@model CUsers
+
+@{
+    ViewData["Title"] = "Thêm người dùng";
+    Layout = "~/Areas/Admin/Views/Shared/_LayoutAdmin.cshtml";
+}
+@{
+    int currentRoleId = ViewBag.CurrentRole;
+	var roles = ViewBag.Roles  as List<CRole>;
+}
+<div class="container mt-4">
+    <h2 class="mb-4">Thêm người dùng mới</h2>
+
+    <form asp-action="ThemUser" method="post">
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+        <div class="row">
+            <!-- Cột trái -->
+            <div class="col-md-6">
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <label asp-for="Fullname" class="control-label"></label>
+                            <input asp-for="Fullname" class="form-control" />
+                            <span asp-validation-for="Fullname" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Email" class="control-label"></label>
+                            <input asp-for="Email" type="email" class="form-control" />
+                            <span asp-validation-for="Email" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Password" class="control-label"></label>
+                            <input asp-for="Password" type="password" class="form-control" />
+                            <span asp-validation-for="Password" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Phone" class="control-label"></label>
+                            <input asp-for="Phone" class="form-control" />
+                            <span asp-validation-for="Phone" class="text-danger"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Cột phải -->
+            <div class="col-md-6">
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <label asp-for="Age" class="control-label"></label>
+                            <input asp-for="Age" type="number" class="form-control" min="1" />
+                            <span asp-validation-for="Age" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Gender" class="control-label"></label>
+                            <select asp-for="Gender" class="form-select">
+                                <option value="">-- Chọn giới tính --</option>
+                                <option value="true">Nam</option>
+                                <option value="false">Nữ</option>
+                            </select>
+                            <span asp-validation-for="Gender" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="DateofBirth" class="control-label"></label>
+                            <input asp-for="DateofBirth" type="date" class="form-control" />
+                            <span asp-validation-for="DateofBirth" class="text-danger"></span>
+                        </div>
+
+
+                        <div class="mb-3">
+                            <label asp-for="RoleId" class="form-label required"></label>
+                            <select asp-for="RoleId" class="form-select select2-role" required>
+                                <option value="">-- Chọn vai trò --</option>
+                                @foreach (var role in roles)
+                                {
+                                    <option value="@role.RoleId" selected="@(currentRoleId == role.RoleId)">@role.RoleName</option>
+                                }
+                            </select>
+                            <span asp-validation-for="RoleId" class="text-danger small"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Submit Button -->
+        <div class="text-center mt-4">
+            <button type="submit" class="btn btn-primary">Thêm người dùng</button>
+            <a asp-action="Index" class="btn btn-secondary ms-2">Quay lại danh sách</a>
+        </div>
+    </form>
+</div>
+

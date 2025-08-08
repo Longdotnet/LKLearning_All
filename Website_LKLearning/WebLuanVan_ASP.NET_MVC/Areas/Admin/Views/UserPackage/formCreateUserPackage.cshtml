@@ -1,0 +1,201 @@
+﻿@using WebLuanVan_ASP.NET_MVC.Areas.Admin.Models
+@model CUserPackage
+@{
+    ViewData["Title"] = "Thêm đăng ký gói cước";
+    Layout = "~/Areas/Admin/Views/Shared/_LayoutAdmin.cshtml";
+    var users = ViewBag.Users as List<CUsers>;
+    var packages = ViewBag.Packages as List<CPackage>;
+    var userOwnPackages = ViewBag.UserOwnPackages as List<CUserPackage>;
+    int currentUserId = ViewBag.CurrentUserId;
+    int currentPackageId = ViewBag.CurrentPackageId;
+
+}
+
+<div class="container mt-4">
+    <h2 class="mb-4">Thêm đăng ký gói cước</h2>
+
+    <form asp-action="CreateUserPackage" method="post">
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+        <div class="row">
+            <!-- Cột trái -->
+            <div class="col-md-6">
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <!-- Dropdown cho User -->
+                        <div class="mb-3">
+                            <label asp-for="UserId" class="control-label">Người dùng</label>
+                            <select id="userSelect" name="UserId" class="form-select select2" required>
+                                <option value="">-- Chọn người dùng --</option>
+                                @foreach (var user in users)
+                                {
+                                    <option value="@user.UserId" selected="@(currentUserId == user.UserId)">
+                                        @user.Fullname (@user.Email)
+                                    </option>
+                                }
+                            </select>
+                            <span asp-validation-for="UserId" class="text-danger"></span>
+                        </div>
+
+                        <!-- Dropdown cho Package -->
+                        <div class="mb-3">
+                            <label asp-for="PackageId" class="control-label">Gói cước</label>
+                            <select id="packageSelect" name="PackageId" class="form-select select2" required>
+                                <option value="">-- Chọn gói cước --</option>
+                                @foreach (var package in packages)
+                                {
+                                    <option value="@package.PackageId" selected="@(currentPackageId == package.PackageId)">
+                                        @package.PackageName
+                                    </option>
+                                }
+                            </select>
+                            <span asp-validation-for="PackageId" class="text-danger"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <!-- User Detail -->
+                <div id="userDetailContainer">
+                    <partial name="_UserDetail" model="@ViewBag.SelectedUser" />
+                   
+
+                </div>
+
+                <!-- Package Detail -->
+                <div id="packageDetailContainer">
+                    <partial name="_PackageDetail" model="@ViewBag.SelectedPackage" />
+                </div>
+            </div>
+        </div>
+
+        <!-- Submit Button -->
+        <div class="text-center mt-4">
+            <button type="submit" class="btn btn-primary">Thêm</button>
+            <a asp-action="Index" class="btn btn-secondary ms-2">Quay lại</a>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+  
+
+    <script>
+        $(document).ready(function () {
+            // Khởi tạo Select2
+            $('.select2').select2({
+                theme: 'bootstrap-5',
+                placeholder: 'Tìm kiếm...',
+                allowClear: true,
+                width: '100%',
+                minimumResultsForSearch: 1,
+                dropdownAutoWidth: true,
+                language: {
+                    noResults: function () { return "Không tìm thấy kết quả"; },
+                    searching: function () { return "Đang tìm kiếm..."; }
+                }
+            });
+
+            // Lấy token từ ViewBag
+            const authToken = '@Html.Raw(ViewBag.AuthToken)';
+            console.log('AuthToken:', authToken);
+
+            // Hàm loadDetails cải tiến
+            function loadDetails(containerId, actionName, id, errorMessage) {
+                if (!id) {
+                    $(`#${containerId}`).html(`<div class="alert alert-info">
+                        <i class="fas fa-info-circle me-2"></i>${errorMessage}
+                    </div>`);
+                    return;
+                }
+
+                if (!authToken) {
+                    $(`#${containerId}`).html('<div class="alert alert-danger">Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.</div>');
+                    return;
+                }
+
+                $(`#${containerId}`).html('<div class="text-center"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">Đang tải...</span></div></div>');
+
+                const url = `@Url.Action("__action__", "UserPackage", new { area = "Admin" })`.replace('__action__', actionName) + `/${id}`;
+                console.log('Request URL:', url);
+
+                $.ajax({
+                    url: url,
+                    type: 'GET',
+                  
+                    success: function (data) {
+                        if (data) {
+                            $(`#${containerId}`).html(data);
+                        } else {
+                            $(`#${containerId}`).html(`<div class="alert alert-warning">Không có dữ liệu</div>`);
+                        }
+                    },
+                    error: function (xhr) {
+                        console.error('AJAX Error:', xhr.responseText);
+                        $(`#${containerId}`).html(`<div class="alert alert-danger">${errorMessage}</div>`);
+                    }
+                });
+            }
+
+            // Xử lý chọn người dùng
+            $('#userSelect').on('select2:select', function (e) {
+                var userId = e.params.data.id; // 
+                loadDetails(
+                    'userDetailContainer',
+                    'GetUserDetail',
+                    userId,
+                    'Lỗi khi tải thông tin người dùng'
+                );
+            });
+
+            // Xử lý chọn gói cước
+            $('#packageSelect').on('select2:select', function (e) {
+                var packageId = e.params.data.id;
+                loadDetails(
+                    'packageDetailContainer',
+                    'GetPackageDetail',
+                    packageId,
+                    'Lỗi khi tải thông tin gói cước'
+                );
+            });
+
+            // Xử lý xóa lựa chọn
+            $('#userSelect').on('select2:clear', function () {
+                $('#userDetailContainer').html(`<div class="alert alert-info">
+                    <i class="fas fa-info-circle me-2"></i>Chọn một người dùng để xem thông tin chi tiết.
+                </div>`);
+            });
+
+            $('#packageSelect').on('select2:clear', function () {
+                $('#packageDetailContainer').html(`<div class="alert alert-info">
+                    <i class="fas fa-info-circle me-2"></i>Chọn một gói cước để xem thông tin chi tiết.
+                </div>`);
+            });
+
+            // Tải chi tiết cho lựa chọn ban đầu
+            const selectedUserId = '@currentUserId';
+            if (selectedUserId && authToken) {
+                loadDetails(
+                    'userDetailContainer',
+                    'GetUserDetail',
+                    selectedUserId,
+                    'Lỗi khi tải thông tin người dùng'
+                );
+            }
+
+            const selectedPackageId = '@currentPackageId';
+            if (selectedPackageId && authToken) {
+                loadDetails(
+                    'packageDetailContainer',
+                    'GetPackageDetail',
+                    selectedPackageId,
+                    'Lỗi khi tải thông tin gói cước'
+                );
+            }
+
+            // Validation form
+           
+        });
+    </script>
+}

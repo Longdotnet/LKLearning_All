@@ -1,0 +1,312 @@
+﻿@using WebLuanVan_ASP.NET_MVC.Areas.Admin.Models;
+@{
+    // Lấy thông tin user đang đăng nhập để hiển thị trên giao diện
+    var userProfile = ViewBag.UserProfile as WebLuanVan_ASP.NET_MVC.Areas.UpdateProfile.Models.UserProfile;
+    var displayName = userProfile?.Fullname ?? "Guest";
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- Meta tags và các file css, plugin -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Admin Dashboard</title>
+    <link rel="stylesheet" href="~/AdminTL/assets/vendors/mdi/css/materialdesignicons.min.css">
+    <link rel="stylesheet" href="~/AdminTL/assets/vendors/css/vendor.bundle.base.css">
+    <link rel="stylesheet" href="~/AdminTL/assets/css/style.css">
+
+    <link rel="shortcut icon" href="~/AdminTL/assets/images/favicon.ico" />
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/summernote@0.9.0/dist/summernote-lite.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11.22.0/dist/sweetalert2.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" rel="stylesheet" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet" />
+
+    @RenderSection("Styles", required: false)
+</head>
+
+<body>
+    <div class="container-scroller">
+        <!-- =================== NAVBAR =================== -->
+        <nav class="navbar default-layout-navbar col-lg-12 col-12 p-0 fixed-top d-flex flex-row">
+            <!-- Logo và tên user -->
+            <div class="text-center navbar-brand-wrapper d-flex align-items-center justify-content-center">
+                <a class="navbar-brand brand-logo" asp-area="Admin" asp-controller="Dashboard" asp-action="Index"><img src="~/AdminTL/assets/images/logo1.gif" alt="logo" /></a>
+                <a class="navbar-brand brand-logo-mini" href="~/index.html"><img src="~/AdminTL/assets/images/logo-mini.svg" alt="logo" /></a>
+            </div>
+            <div class="navbar-menu-wrapper d-flex align-items-stretch">
+                <!-- Tìm kiếm -->
+                <div class="search-field d-none d-md-block">
+                    <form class="d-flex align-items-center h-100" action="#">
+                        <div class="input-group">
+                            <div class="input-group-prepend bg-transparent">
+                                <i class="input-group-text border-0 mdi mdi-magnify"></i>
+                            </div>
+                            <input type="text" class="form-control bg-transparent border-0" placeholder="Search projects">
+                        </div>
+                    </form>
+                </div>
+                <!-- Menu phải: profile, thông báo, logout -->
+                <ul class="navbar-nav navbar-nav-right">
+                    <!-- Profile dropdown hiện đại -->
+                    <!-- Profile actions as direct icons -->
+                    <li class="nav-item d-flex align-items-center">
+                        <span class="fw-bold me-2">@displayName</span>
+                        <a class="nav-link" asp-area="UpdateProfile" asp-controller="UpdateProfile" asp-action="Index" title="Cập nhật thông tin">
+                            <i class="mdi mdi-cached text-success fs-5"></i>
+                        </a>
+                        <a class="nav-link" asp-area="Admin" asp-controller="Dashboard" asp-action="Logout" title="Đăng xuất">
+                            <i class="mdi mdi-logout text-primary fs-5"></i>
+                        </a>
+                    </li>
+
+
+
+                    <!-- Các icon khác: fullscreen, message, notification -->
+                    <li class="nav-item d-none d-lg-block full-screen-link">
+                        <a class="nav-link"><i class="mdi mdi-fullscreen" id="fullscreen-button"></i></a>
+                    </li>
+                    <!-- ... Các dropdown message, notification giữ nguyên ... -->
+                </ul>
+                <button class="navbar-toggler navbar-toggler-right d-lg-none align-self-center" type="button" data-toggle="offcanvas">
+                    <span class="mdi mdi-menu"></span>
+                </button>
+            </div>
+        </nav>
+        <!-- =================== SIDEBAR =================== -->
+        <div class="container-fluid page-body-wrapper">
+            <nav class="sidebar sidebar-offcanvas" id="sidebar">
+                <ul class="nav">
+                    <!-- Thông tin user -->
+                    <li class="nav-item nav-profile">
+                        <a href="#" class="nav-link">
+                            <div class="nav-profile-image">
+                                <img src="~/AdminTL/assets/images/faces/face1.jpg" alt="profile">
+                                <span class="login-status online"></span>
+                            </div>
+                            <div class="nav-profile-text d-flex flex-column">
+                                <span class="font-weight-bold mb-2">@displayName</span>
+                                <span class="text-secondary text-small">Admin</span>
+                            </div>
+                            <i class="mdi mdi-bookmark-check text-success nav-profile-badge"></i>
+                        </a>
+                    </li>
+                    <!-- Menu sidebar chính -->
+                    <li class="nav-item">
+                        <a class="nav-link" asp-area="Admin" asp-action="Index" asp-controller="Dashboard">
+                            <span class="menu-title">Trang chủ</span>
+                            <i class="bi bi-house"></i>
+                        </a>
+                    </li>
+                    <!-- Khóa học -->
+                    <li class="nav-item">
+                        <a class="nav-link" data-bs-toggle="collapse" href="#ui-basic1" aria-expanded="false" aria-controls="ui-basic1">
+                            <span class="menu-title">Khóa học</span>
+                            <i class="menu-arrow"></i>
+                            <i class="mdi mdi-crosshairs-gps menu-icon"></i>
+                        </a>
+                        <div class="collapse" id="ui-basic1">
+                            <ul class="nav flex-column sub-menu">
+                                <li class="nav-item">
+                                    <a class="nav-link" data-bs-toggle="collapse" href="#course-type-menu" aria-expanded="false" aria-controls="course-type-menu">
+                                        <span class="menu-title">Quản lý khóa học</span>
+                                        <i class="menu-arrow"></i>
+                                    </a>
+                                    <div class="collapse" id="course-type-menu">
+                                        <ul class="nav flex-column sub-menu">
+                                            <li class="nav-item"><a class="nav-link" asp-area="Admin" asp-action="Index" asp-controller="Course">Khóa học</a></li>
+                                            <li class="nav-item"><a class="nav-link" asp-area="Admin" asp-action="Index" asp-controller="Category">Danh mục</a></li>
+                                            <li class="nav-item"><a class="nav-link" asp-area="Admin" asp-action="Index" asp-controller="Level">Cấp độ</a></li>
+                                        </ul>
+                                    </div>
+                                </li>
+                            </ul>
+                        </div>
+                    </li>
+                    <!-- Bài học và câu hỏi -->
+                    <li class="nav-item">
+                        <a class="nav-link" data-bs-toggle="collapse" href="#ui-basic3" aria-expanded="false" aria-controls="ui-basic3">
+                            <span class="menu-title">Bài học và câu hỏi</span>
+                            <i class="menu-arrow"></i>
+                            <i class="mdi mdi-crosshairs-gps menu-icon"></i>
+                        </a>
+                        <div class="collapse" id="ui-basic3">
+                            <ul class="nav flex-column sub-menu">
+                                <li class="nav-item"><a class="nav-link" asp-area="Admin" asp-action="Index" asp-controller="Lesson">Quản lý bài học</a></li>
+                                <li class="nav-item">
+                                    <a class="nav-link" data-bs-toggle="collapse" href="#question-type-menu" aria-expanded="false" aria-controls="question-type-menu">
+                                        <span class="menu-title">Quản lý câu hỏi</span>
+                                        <i class="menu-arrow"></i>
+                                        <i class="mdi mdi-comment-question-outline menu-icon"></i>
+                                    </a>
+                                    <div class="collapse" id="question-type-menu">
+                                        <ul class="nav flex-column sub-menu">
+                                            <li class="nav-item"><a class="nav-link" asp-area="Admin" asp-action="Index" asp-controller="Question">Tất cả câu hỏi</a></li>
+                                            <li class="nav-item"><a class="nav-link" asp-area="Admin" asp-action="Index" asp-controller="QuestionLevel">Cấp độ câu hỏi</a></li>
+                                            <li class="nav-item"><a class="nav-link" asp-area="Admin" asp-action="Index" asp-controller="QuestionType">Loại câu hỏi</a></li>
+                                            <li class="nav-item"><a class="nav-link" asp-area="Admin" asp-action="Index" asp-controller="ContentType">Chủ đề câu hỏi</a></li>
+                                        </ul>
+                                    </div>
+                                </li>
+                            </ul>
+                        </div>
+                    </li>
+                    <!-- Tài khoản -->
+                    <li class="nav-item">
+                        <a class="nav-link" data-bs-toggle="collapse" href="#ui-basic" aria-expanded="false" aria-controls="ui-basic">
+                            <span class="menu-title">Tài khoản</span>
+                            <i class="menu-arrow"></i>
+                            <i class="mdi mdi-crosshairs-gps menu-icon"></i>
+                        </a>
+                        <div class="collapse" id="ui-basic">
+                            <ul class="nav flex-column sub-menu">
+                                <li class="nav-item"><a class="nav-link" asp-area="Admin" asp-action="Index" asp-controller="User">Quản lý tài khoản</a></li>
+                                <li class="nav-item"><a class="nav-link" asp-area="Admin" asp-action="Index" asp-controller="UserPackage">Người dùng theo gói</a></li>
+                                <li class="nav-item"><a class="nav-link" asp-area="Admin" asp-action="Index" asp-controller="Package">Danh sách gói cước</a></li>
+                            </ul>
+                        </div>
+                    </li>
+                    <!-- Các menu sidebar khác -->
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" data-bs-toggle="collapse" href="#transaction-type-menu" aria-expanded="false" aria-controls="transaction-type-menu">
+                            <span class="menu-title">Giao dịch</span>
+                            <i class="menu-arrow"></i>
+                            <i class="mdi mdi-comment-question-outline menu-icon"></i>
+                        </a>
+                        <div class="collapse" id="transaction-type-menu">
+                            <ul class="nav flex-column sub-menu">
+                             <li class="nav-item"><a class="nav-link" asp-area="Admin" asp-action="Index" asp-controller="Transaction"><span class="menu-title">Lịch sử giao dịch</span></a></li>
+                                <li class="nav-item"><a class="nav-link" asp-area="Admin" asp-action="Index" asp-controller="PaymentMethod"><span class="menu-title">Loại thanh toán</span></a></li>
+                            </ul>
+                        </div>
+                    </li>
+
+                    <li class="nav-item">
+                        <a class="nav-link" data-bs-toggle="collapse" href="#certificate-type-menu" aria-expanded="false" aria-controls="certificate-type-menu">
+                            <span class="menu-title">Chứng chi</span>
+                            <i class="menu-arrow"></i>
+                            <i class="mdi mdi-comment-question-outline menu-icon"></i>
+                        </a>
+                        <div class="collapse" id="certificate-type-menu">
+                            <ul class="nav flex-column sub-menu">
+                                <li class="nav-item"><a class="nav-link" asp-area="Admin" asp-action="Index" asp-controller="Certificate"><span class="menu-title">Chứng chỉ</span></a></li>
+                                <li class="nav-item"><a class="nav-link" asp-area="Admin" asp-action="Index" asp-controller="CertificateType"><span class="menu-title">Loại chứng chỉ</span></a></li>
+                            </ul>
+                        </div>
+                    </li>
+                    <li class="nav-item"><a class="nav-link" asp-area="Admin" asp-action="Index" asp-controller="ExamSet"><span class="menu-title">Bộ đề khóa học</span></a></li>
+
+                    <li class="nav-item"><a class="nav-link" asp-area="Admin" asp-action="Index" asp-controller="Review"><span class="menu-title">Đánh giá</span><i class="bi bi-yelp"></i></a></li>
+                    <li class="nav-item"><a class="nav-link" asp-area="Admin" asp-action="Index" asp-controller="Report"><span class="menu-title">Góp ý</span><i class="bi bi-yelp"></i></a></li>
+                    <!--Quản lý Banner-->
+                    <li class="nav-item"><a class="nav-link" asp-area="Admin" asp-action="Index" asp-controller="Banner"><span class="menu-title">Banner</span><i class="bi bi-yelp"></i></a></li>
+
+                    <!-- Từ vựng (Vocabulary) -->
+                    <li class="nav-item">
+                        <a class="nav-link" data-bs-toggle="collapse" href="#vocabulary-type-menu" aria-expanded="false" aria-controls="vocabulary-type-menu">
+                            <span class="menu-title">Từ vựng</span>
+                            <i class="menu-arrow"></i>
+                            <i class="mdi mdi-comment-question-outline menu-icon"></i>
+                        </a>
+                        <div class="collapse" id="vocabulary-type-menu">
+                            <ul class="nav flex-column sub-menu">
+                                <li class="nav-item"><a class="nav-link" asp-area="Admin" asp-action="Index" asp-controller="Vocabulary">Tất cả từ vựng</a></li>
+                                <li class="nav-item"><a class="nav-link" asp-area="Admin" asp-action="CategoryMappings" asp-controller="Vocabulary">Nghĩa từ vựng</a></li>
+                                <li class="nav-item"><a class="nav-link" asp-area="Admin" asp-action="Categories" asp-controller="Vocabulary">Danh mục từ vựng</a></li>
+                            </ul>
+                        </div>
+                    </li>
+                    <!--Nhắn tin-->
+                    <li class="nav-item"><a class="nav-link" asp-area="Admin" asp-action="ChatUsers" asp-controller="Chat"><span class="menu-title">Nhắn tin</span><i class="bi bi-yelp"></i></a></li>
+
+                </ul>
+            </nav>
+            <!-- =================== MAIN CONTENT =================== -->
+            <div class="main-panel">
+                <div class="content-wrapper">
+                    <!-- Thông báo hệ thống -->
+                    @Html.Partial("~/Areas/Admin/Views/Shared/_Notification.cshtml")
+                    <!-- Nội dung động của từng trang -->
+                    @RenderBody()
+                </div>
+                <!-- =================== FOOTER =================== -->
+                <footer class="footer">
+                    <div class="container-fluid d-flex justify-content-between">
+                        <span class="text-muted d-block text-center text-sm-start d-sm-inline-block">Võ Thanh Trường Long - DH52111246</span>
+                        <span class="float-none float-sm-end mt-1 mt-sm-0 text-end">Phạm Nguyễn Anh Khoa - DH52111146</span>
+                    </div>
+                </footer>
+            </div>
+        </div>
+    </div>
+    <!-- =================== JS & PLUGINS =================== -->
+    <script src="~/AdminTL/assets/vendors/js/vendor.bundle.base.js"></script>
+    <script src="~/AdminTL/assets/js/off-canvas.js"></script>
+    <script src="~/AdminTL/assets/js/hoverable-collapse.js"></script>
+    <script src="~/AdminTL/assets/js/misc.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.22.0/dist/sweetalert2.all.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/summernote@0.9.0/dist/summernote-lite.min.js"></script>
+
+    <!-- Summernote Editor cấu hình -->
+    <script>
+        $('#summernote-content').summernote({
+            placeholder: 'Nhập nội dung...',
+            tabsize: 2,
+            height: 120,
+            toolbar: [
+                ['style', ['style']],
+                ['font', ['bold', 'underline', 'clear']],
+                ['color', ['color']],
+                ['para', ['ul', 'ol', 'paragraph']]
+            ]
+        });
+        $('#summernote-description').summernote({
+            placeholder: 'Nhập mô tả...',
+            tabsize: 2,
+            height: 120,
+            toolbar: [
+                ['style', ['style']],
+                ['font', ['bold', 'underline', 'clear']],
+                ['color', ['color']],
+                ['para', ['ul', 'ol', 'paragraph']]
+            ]
+        });
+    </script>
+    <!-- Thông báo xóa -->
+    @Html.Partial("~/Areas/Admin/Views/Shared/_DeleteConfirmation.cshtml")
+    <script>
+        $(function(){
+            var message= '@TempData["success"]';
+            if(message!=''){
+                Swal.fire(message);
+            }
+            var errorMessage1 = '@TempData["error"]';
+            if(errorMessage1 != '') {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Oops...'
+                });
+            }
+        });
+      
+    </script>
+    @RenderSection("Scripts", required: false)
+</body>
+<!-- =================== CUSTOM STYLE =================== -->
+<style>
+    .img-responsive {
+        width: 270px;
+        height: 170px;
+        object-fit: cover;
+    }
+</style>
+</html>

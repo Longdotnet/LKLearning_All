@@ -1,0 +1,122 @@
+﻿@model WebLuanVan_ASP.NET_MVC.Areas.Admin.Models.CCourse
+@{
+    ViewData["Title"] = "Chọn khóa học";
+    Layout = "~/Areas/Admin/Views/Shared/_LayoutAdmin.cshtml";
+    // lessonIds=1,2,3 on example : localhost:7159/lesson/select-course?lessonIds=1,2,3
+    // LẤY 1,2,3
+    var lessonIds = Context.Request.Query["lessonIds"].ToString();
+}
+
+<div class="content-header">
+    <h1>Thêm bài học vào khóa học</h1>
+</div>
+
+<div class="card">
+    <div class="card-header">
+        <h5>Chọn khóa học</h5>
+    </div>
+    <div class="card-body">
+        <form asp-action="InsertMultipleToCourse" method="post">
+            <input type="hidden" name="lessonIds" value="@lessonIds" />
+
+            <div class="row mb-3">
+                <div class="col-md-12">
+                    <label class="form-label">Tìm kiếm khóa học</label>
+                    <select id="courseSelect" name="courseId" class="form-select select2" required>
+                        <option value="">-- Chọn khóa học --</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="row mb-3">
+                <div class="col-md-12">
+                    <div class="card">
+                        <div class="card-header">
+                            <h6>Thông tin khóa học</h6>
+                        </div>
+                        <div class="card-body" id="courseInfoContainer">
+                            <p class="text-muted">Vui lòng chọn khóa học từ danh sách</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-12">
+                    <button type="submit" class="btn btn-primary">Xác nhận thêm</button>
+                    <a asp-action="Index" class="btn btn-secondary">Quay lại</a>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function() {
+            // Cấu hình Select2 cho tìm kiếm khóa học
+            $('#courseSelect').select2({
+                ajax: {
+                    url: '@Url.Action("SearchCourse", "Lesson")',
+                    dataType: 'json',
+                    delay: 250,
+                    data: function(params) {
+                        return {
+                            searchTerm: params.term
+                        };
+                    },
+                    processResults: function(data) {
+                        return {
+                            results: data.items.map(function(course) {
+                                return {
+                                    id: course.id,
+                                    text: course.text,
+                                    description: course.description,
+                                    duration: course.duration
+                                };
+                            })
+                        };
+                    },
+                    cache: true
+                },
+                templateResult: formatCourse,
+                templateSelection: formatCourseSelection
+            });
+
+            // Khi chọn khóa học
+            $('#courseSelect').on('select2:select', function(e) {
+                var data = e.params.data;
+
+                // Hiển thị thông tin khóa học
+                var html = `
+                    <div class="course-info">
+                        <h5>${data.text}</h5>
+                        <p><strong>Mô tả:</strong> ${data.description || 'Không có mô tả'}</p>
+                        <p><strong>Thời hạn:</strong> ${data.duration} tháng</p>
+                    </div>
+                `;
+
+                $('#courseInfoContainer').html(html);
+            });
+
+            // Hàm định dạng hiển thị khóa học trong dropdown
+            function formatCourse(course) {
+                if (!course.id) return course.text;
+
+                var $container = $(
+                    `<div class="course-item">
+                        <strong>${course.text}</strong>
+                    </div>`
+                );
+
+                return $container;
+            }
+
+            // Hàm định dạng khi đã chọn
+            function formatCourseSelection(course) {
+                if (!course.id) return course.text;
+                return course.text;
+            }
+        });
+    </script>
+}

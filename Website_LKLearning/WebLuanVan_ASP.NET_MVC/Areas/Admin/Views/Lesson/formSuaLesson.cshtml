@@ -1,0 +1,263 @@
+﻿@model WebLuanVan_ASP.NET_MVC.Areas.Admin.Models.CLesson
+
+@{
+    ViewData["Title"] = "Edit Lesson";
+    Layout = "~/Areas/Admin/Views/Shared/_LayoutAdmin.cshtml";
+}
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-lg-8 mx-auto">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Thông tin bài học</h5>
+             
+
+                    <form asp-action="SuaLesson" class="needs-validation" novalidate method="post" asp-route-id="@Model.LessonId">
+                        <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+
+                        <input asp-for="LessonId" type="hidden" />
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+
+                                </div>
+                            </div>
+
+                           
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="LessonTitle" class="control-label"></label>
+                            <input asp-for="LessonTitle" class="form-control" placeholder="Nhập tiêu đề bài học" required />
+                            <span asp-validation-for="LessonTitle" class="invalid-feedback"></span>
+                        </div>
+                        <div class="mb-3">
+                            <label asp-for="Duration" class="control-label"></label>
+                            <input asp-for="Duration" class="form-control" type="date"  />
+                       
+                        </div>
+
+                        <div class="form-group">
+                            <label asp-for="LessonDescription" class="control-label font-weight-bold"></label>
+                            <textarea asp-for="LessonDescription" class="form-control summernote" id="summernote-description"></textarea>
+                            <div id="videoPreviewContainer" style="display:none; margin-top:10px;">
+                                <div id="videoPreview"></div>
+                                <p id="videoPreviewError" class="text-danger small mt-2" style="display:none;"></p>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="LessonContent" class="control-label"></label>
+                            <textarea asp-for="LessonContent" class="form-control" rows="10"></textarea>
+                            <span asp-validation-for="LessonContent" class="invalid-feedback"></span>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="UrlImageLesson" class="form-label">Ảnh bài học (URL) <span class="text-danger">*</span></label>
+                            <input asp-for="UrlImageLesson" class="form-control" id="BannerImageUrl" required placeholder="Nhập URL ảnh bài học" />
+                            <span asp-validation-for="UrlImageLesson" class="text-danger"></span>
+                            <div id="bannerImagePreviewContainer" style="display:none;" class="mt-2">
+                                <img id="bannerImagePreview" src="#" alt="Banner Preview" style="max-width:300px;max-height:200px;" />
+                                <p id="bannerImageError" class="text-danger small mt-2" style="display:none;"></p>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="DurationMinute" class="control-label"> </label>
+                            <input asp-for="DurationMinute" class="form-control" required placeholder="Nhập thời gian hoàn thành dự kiến (phút)" />
+                            <span asp-validation-for="DurationMinute" class="text-danger"></span>
+
+                        </div>
+                        <div class="mb-3 control-check form-switch">
+                            <input class="form-check-input" type="checkbox" asp-for="IsActivate" />
+                            <label class="form-check-label" asp-for="IsActivate">Trạng thái</label>
+                        </div>
+
+                        <div class="d-flex justify-content-between mt-4">
+                            <a asp-action="Index" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left me-1"></i> Quay lại
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save me-1"></i> Lưu bài học
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+
+@section Scripts {
+
+
+  
+
+    <script>
+        $(document).ready(function() {
+            // Initialize select2
+            $('.form-select').select2({
+                placeholder: "Select a course",
+                allowClear: true
+            });
+             $('#BannerImageUrl').on('input', function () {
+                var url = $(this).val();
+                var $container = $('#bannerImagePreviewContainer');
+                var $img = $('#bannerImagePreview');
+                var $error = $('#bannerImageError');
+
+                if (url) {
+                    if (/^https?:\/\/.+(\.(jpg|jpeg|png|gif|webp))$/i.test(url)) {
+                        $img.attr('src', url)
+                            .on('load', function () {
+                                $container.show();
+                                $error.hide();
+                            })
+                            .on('error', function () {
+                                $container.show();
+                                $error.text('Không thể tải ảnh. Vui lòng kiểm tra lại URL.').show();
+                                $img.attr('src', '#');
+                            });
+                    } else {
+                        $container.show();
+                        $error.text('URL không hợp lệ. Phải bắt đầu bằng http:// hoặc https://').show();
+                        $img.attr('src', '#');
+                    }
+                } else {
+                    $container.hide();
+                }
+            });
+
+            // Hiển thị preview nếu có giá trị ban đầu
+            var initialUrl = $('#BannerImageUrl').val();
+            if (initialUrl) {
+                $('#BannerImageUrl').trigger('input');
+            }
+
+            $('form').on('submit', function () {
+                $('#btnSaveText').addClass('d-none');
+                $('#btnSaveLoading').removeClass('d-none');
+            });
+            function isYouTubeUrl(url) {
+                return /^(https?:\/\/)?(www\.)?(youtube\.com|youtu\.be)\//i.test(url);
+            }
+           function isVimeoUrl(url) {
+            return /^https?:\/\/(player\.)?vimeo\.com\/video\/\d+/i.test(url);
+            }
+            function getVimeoId(url) {
+                var match = url.match(/vimeo\.com\/video\/(\d+)/i) || url.match(/player\.vimeo\.com\/video\/(\d+)/i);
+                return match ? match[1] : null;
+            }
+
+
+            function getYouTubeId(url) {
+                var regExp = /^.*(youtu\.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
+                var match = url.match(regExp);
+                return (match && match[2].length === 11) ? match[2] : null;
+            }
+            function isVideoFile(url) {
+                return /^https?:\/\/.+\.(mp4|webm|mov)$/i.test(url);
+            }
+
+            function showVideoPreview(url) {
+                var $container = $('#videoPreviewContainer');
+                var $preview = $('#videoPreview');
+                var $error = $('#videoPreviewError');
+                $preview.empty();
+                $error.hide();
+
+                if (isYouTubeUrl(url)) {
+                    var videoId = getYouTubeId(url);
+                    if (videoId) {
+                        $preview.html(`<iframe width="320" height="180" src="https://www.youtube.com/embed/${videoId}" frameborder="0" allowfullscreen></iframe>`);
+                        $container.show();
+                    } else {
+                        $error.text('Không nhận diện được video YouTube.').show();
+                        $container.show();
+                    }
+                } else if (isVimeoUrl(url)) {
+                    var vimeoId = getVimeoId(url);
+                    if (vimeoId) {
+                        $preview.html(`<iframe src="https://player.vimeo.com/video/${vimeoId}" width="320" height="180" frameborder="0" allow="autoplay; fullscreen" allowfullscreen></iframe>`);
+                        $container.show();
+                    } else {
+                        $error.text('Không nhận diện được video Vimeo.').show();
+                        $container.show();
+                    }
+                } else if (isVideoFile(url)) {
+                    var video = document.createElement('video');
+                    video.width = 320;
+                    video.height = 180;
+                    video.controls = true;
+                    var source = document.createElement('source');
+                    source.src = url;
+                    source.type = 'video/mp4';
+                    video.appendChild(source);
+                    video.onerror = function () {
+                        $preview.empty();
+                        $error.text('Không thể tải video. Vui lòng kiểm tra lại URL.').show();
+                    };
+                    $preview.html(video);
+                    $container.show();
+                } else {
+                    $container.hide();
+                }
+            }
+
+            // Theo dõi thay đổi nội dung QuestionDescription
+            $('#summernote-description').on('summernote.change', function(we, contents, $editable) {
+                var html = $('#summernote-description').summernote('code');
+                var url = null;
+
+                // Try to find <a href="...">
+                var $a = $('<div>' + html + '</div>').find('a[href^="http"]');
+                if ($a.length > 0) {
+                    url = $a.attr('href');
+                } else {
+                    // Try to find plain text URL in <p> or anywhere
+                    var text = $('<div>' + html + '</div>').text();
+                    var urlMatch = text.match(/https?:\/\/[^\s"]+/);
+                    if (urlMatch && urlMatch[0]) {
+                        url = urlMatch[0];
+                    }
+                }
+
+                if (url) {
+                    showVideoPreview(url);
+                } else {
+                    $('#videoPreviewContainer').hide();
+                }
+            });
+
+            // Hiển thị preview nếu có giá trị ban đầu
+            setTimeout(function() {
+                var text = $('#summernote-description').val();
+                var urlMatch = text && text.match(/https?:\/\/[^\s"]+/);
+                if (urlMatch && urlMatch[0]) {
+                    showVideoPreview(urlMatch[0]);
+                }
+            }, 500);
+            // Enable Bootstrap 5 validation
+            // kiểm tra nhập vào hợp lệ không
+            (function () {
+                'use strict'
+                var forms = document.querySelectorAll('.needs-validation')
+                Array.prototype.slice.call(forms)
+                    .forEach(function (form) {
+                        form.addEventListener('submit', function (event) {
+                            if (!form.checkValidity()) {
+                                event.preventDefault()
+                                event.stopPropagation()
+                            }
+                            form.classList.add('was-validated')
+                        }, false)
+                    })
+            })()
+        });
+    </script>
+}

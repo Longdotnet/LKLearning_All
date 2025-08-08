@@ -1,0 +1,93 @@
+﻿@model WebLuanVan_ASP.NET_MVC.Areas.Admin.Models.CVocabulary
+
+@{
+    ViewData["Title"] = "Chỉnh sửa từ vựng";
+    Layout = "~/Areas/Admin/Views/Shared/_LayoutAdmin.cshtml";
+}
+
+<div class="container py-4">
+    <h2 class="mb-4">Chỉnh sửa từ vựng</h2>
+    <form asp-area="Admin" asp-controller="Vocabulary" asp-action="EditVocabulary" asp-route-id="@Model.VocabularyId" method="post" id="vocabForm" class="needs-validation" novalidate>
+        <script id="MeaningsJsonServer" type="application/json">
+            @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(Model.Meanings))
+        </script>
+        <input type="hidden" id="MeaningsJson" name="MeaningsJson" />
+        <input type="hidden" name="VocabularyId" value="@Model.VocabularyId" />
+
+        <div class="row g-3">
+            <div class="col-md-6">
+                <label for="Word" class="form-label">Từ vựng <span class="text-danger">*</span></label>
+                <input type="text" class="form-control" id="Word" name="Word" required autocomplete="off" placeholder="Nhập từ vựng..." value="@Model.Word" />
+                <div class="invalid-feedback">Vui lòng nhập từ vựng.</div>
+            </div>
+            <div class="col-md-6">
+                <label for="Pronunciation" class="form-label">Phát âm</label>
+                <input type="text" class="form-control" id="Pronunciation" name="Pronunciation" placeholder="Nhập phát âm (nếu có)" value="@Model.Pronunciation" />
+            </div>
+            <div class="col-md-6">
+                <label for="AudioUrlUk" class="form-label">Audio UK</label>
+                <div class="input-group">
+                    <input type="text" class="form-control" id="AudioUrlUk" name="AudioUrlUk" placeholder="URL audio UK" value="@Model.AudioUrlUk" />
+                    <button type="button" class="btn btn-outline-primary" id="playAudioUk" title="Nghe thử UK">
+                        <i class="fas fa-volume-up"></i>
+                    </button>
+                </div>
+                <audio id="audioUk" style="display:none;" src="@Model.AudioUrlUk"></audio>
+            </div>
+            <div class="col-md-6">
+                <label for="AudioUrlUs" class="form-label">Audio US</label>
+                <div class="input-group">
+                    <input type="text" class="form-control" id="AudioUrlUs" name="AudioUrlUs" placeholder="URL audio US" value="@Model.AudioUrlUs" />
+                    <button type="button" class="btn btn-outline-primary" id="playAudioUs" title="Nghe thử US">
+                        <i class="fas fa-volume-up"></i>
+                    </button>
+                </div>
+                <audio id="audioUs" style="display:none;" src="@Model.AudioUrlUs"></audio>
+            </div>
+        </div>
+        <hr />
+        <div class="mb-3">
+            <label class="form-label">Nghĩa của từ vựng (có thể chỉnh sửa trước khi lưu)</label>
+            <div id="meaningsEditor"></div>
+          
+            <div id="relatedError" class="text-danger mt-2" style="display:none;"></div>
+        </div>
+        <div class="mt-4">
+            <button type="submit" class="btn btn-primary px-4">Lưu thay đổi</button>
+            <a asp-area="Admin" asp-controller="Vocabulary" asp-action="Index" class="btn btn-secondary ms-2">Quay lại</a>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    <script src="~/AdminTL/assets/js/vocabulary-meanings.js"></script>
+    <script>
+        // Khởi tạo meanings từ JSON
+        var rawJson = document.getElementById("MeaningsJsonServer").textContent.trim();
+        var meanings = [];
+        try { meanings = JSON.parse(rawJson); } catch { meanings = []; }
+
+        $(document).ready(function () {
+            renderMeaningsEditor(meanings);
+        });
+    </script>
+}
+
+<style>
+    #meaningsEditor {
+        min-height: 40px;
+        transition: all 0.3s;
+    }
+
+    .accordion-button .text-primary {
+        white-space: normal;
+        word-break: break-word;
+        max-width: 70%;
+        display: inline-block;
+    }
+
+    .accordion-body .text-break {
+        white-space: pre-line;
+        word-break: break-word;
+    }
+</style>

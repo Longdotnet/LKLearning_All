@@ -1,0 +1,158 @@
+﻿@model IEnumerable<WebLuanVan_ASP.NET_MVC.Areas.Admin.Models.CExamSet>
+@using WebLuanVan_ASP.NET_MVC.Areas.Admin.Models
+@{
+    ViewData["Title"] = "Quản lý bộ đề";
+    Layout = "~/Areas/Admin/Views/Shared/_LayoutAdmin.cshtml";
+    var courses = ViewBag.Courses as List<CCourse>;
+    var currentCourse = ViewBag.CurrentCourse;
+    Paginate paginate = ViewBag.Paginate ?? new Paginate();
+    int pageNo = paginate.CurrentPage;
+}
+
+<link rel="stylesheet" href="~/AdminTL/assets/css/index.css">
+
+<div class="container-fluid px-2 px-md-4">
+    <div class="content-header">
+        <h1>Quản lý bộ đề</h1>
+    </div>
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5>Bộ lọc</h5>
+        </div>
+        <div class="card-body">
+            <form method="get" class="row g-3">
+                <div class="col-12 col-md-4">
+                    <label class="form-label">Khóa học</label>
+                    <select name="courseId" class="form-select select2">
+                        <option value="">-- Tất cả khóa học --</option>
+                        @if (courses != null)
+                        {
+                            foreach (var c in courses)
+                            {
+                                <option value="@c.CourseId" selected="@(currentCourse == c.CourseId)">
+                                    @c.CourseName
+                                </option>
+                            }
+                        }
+                    </select>
+                </div>
+                <div class="col-12 col-md-2 d-flex align-items-end">
+                    <button type="submit" class="btn btn-primary w-100 w-md-auto">Lọc</button>
+                    @if (currentCourse != null)
+                    {
+                        <a asp-area="Admin" asp-action="Index" asp-controller="ExamSet" class="btn btn-outline-secondary ms-2 w-100 w-md-auto">Xóa lọc</a>
+                    }
+                </div>
+            </form>
+        </div>
+    </div>
+    <div class="d-flex justify-content-between align-items-center flex-wrap mt-4 mb-3">
+        <h2>Danh sách bộ đề</h2>
+        <div class="d-flex flex-wrap gap-2">
+            <button id="deleteSelected" class="btn btn-danger mr-2" disabled>Xóa đã chọn</button>
+            <a asp-action="formThemExamSet" class="btn btn-primary">Thêm bộ đề</a>
+        </div>
+    </div>
+    <div class="table-responsive mb-4">
+        <table class="table table-striped align-middle">
+            <thead>
+                <tr>
+                    <th><input type="checkbox" id="selectAll" /></th>
+                    <th>Tên bộ đề</th>
+                    <th>Khóa học</th>
+                    <th>Điểm đạt</th>
+                    <th>Thời gian (phút)</th>
+                    <th>Ngày tạo</th>
+                    <th>Thao tác</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (Model != null && Model.Any())
+                {
+                    foreach (var exam in Model)
+                    {
+                        <tr>
+                            <td><input type="checkbox" name="selectIds" value="@exam.ExamSetId" class="rowCheckbox" /></td>
+                            <td>@exam.Name</td>
+                            <td>@exam.CourseName</td>
+                            <td>@(exam.PassingScore?.ToString("0.##") ?? "-")</td>
+                            <td>@((exam.TimeLimitSec.HasValue ? (exam.TimeLimitSec.Value / 60).ToString() : "-"))</td>
+                            <td>@exam.CreatedDate.ToString("dd/MM/yyyy HH:mm")</td>
+                            <td>
+                                <a asp-action="formSuaExamSet" asp-route-id="@exam.ExamSetId" class="btn btn-sm btn-warning" title="Sửa">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                <a asp-action="xoaExamSet" asp-route-id="@exam.ExamSetId" onclick="confirmDelete(event)" class="btn btn-sm btn-danger" title="Xóa">
+                                    <i class="fas fa-trash"></i>
+                                </a>
+                                <a asp-action="viewDetail" asp-route-id="@exam.ExamSetId" class="btn btn-sm btn-primary" title="Xem câu hỏi">
+                                    <i class="fas fa-eye"></i>
+                                </a>
+                            </td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="7" class="text-center text-muted">Không có bộ đề nào.</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+    <partial name="_Paging" model="@paginate" />
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            $('.select2').select2({
+                theme: 'bootstrap-5',
+                placeholder: 'Tìm kiếm...',
+                allowClear: true,
+                width: '100%'
+            });
+
+            $('#selectAll').change(function () {
+                $('.rowCheckbox').prop('checked', $(this).prop('checked'));
+                toggleDeleteButton();
+            });
+            $('.rowCheckbox').change(function () {
+                $('#selectAll').prop('checked', $('.rowCheckbox:checked').length === $('.rowCheckbox').length);
+                toggleDeleteButton();
+            });
+
+            function toggleDeleteButton() {
+                var checkedCount = $('.rowCheckbox:checked').length;
+                $('#deleteSelected').prop('disabled', checkedCount === 0);
+                $('#deleteSelected').text(checkedCount > 0 ? `Xóa (${checkedCount}) đã chọn` : 'Xóa đã chọn');
+            }
+
+            $('#deleteSelected').click(function (e) {
+                e.preventDefault();
+                confirmDeleteMultiple(e, function () {
+                    var selectedIds = $('.rowCheckbox:checked').map(function () {
+                        return $(this).val();
+                    }).get();
+
+                    $.ajax({
+                        url: '@Url.Action("DeleteMultiple", "ExamSet", new { area = "Admin" })',
+                        type: 'POST',
+                        data: { selectedIds: selectedIds },
+                        success: function (response) {
+                            if (response.success) {
+                                location.reload();
+                            } else {
+                                toastr.error(response.message || 'Xóa không thành công');
+                            }
+                        },
+                        error: function () {
+                            toastr.error('Đã xảy ra lỗi khi xóa.');
+                        }
+                    });
+                });
+            });
+        });
+    </script>
+}

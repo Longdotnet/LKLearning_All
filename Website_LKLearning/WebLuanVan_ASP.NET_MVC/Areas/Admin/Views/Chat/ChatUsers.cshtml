@@ -1,0 +1,122 @@
+﻿@model IEnumerable<dynamic>
+@{
+    ViewData["Title"] = "Danh sách trò chuyện";
+    Layout = "~/Areas/Admin/Views/Shared/_LayoutAdmin.cshtml";
+}
+<link rel="stylesheet" href="~/AdminTL/assets/css/index.css">
+
+<style>
+    .chat-sidebar {
+        width: 340px;
+        background: #f4f6fb;
+        border-radius: 18px;
+        padding: 18px 0 0 0;
+        height: 90vh;
+        box-shadow: 0 8px 32px rgba(0,0,0,0.10);
+        display: flex;
+        flex-direction: column;
+    }
+
+    .chat-search {
+        padding: 0 18px 12px 18px;
+    }
+
+        .chat-search input {
+            width: 100%;
+            border-radius: 12px;
+            border: none;
+            padding: 10px 14px;
+            background: #e9eaf3;
+            font-size: 15px;
+            outline: none;
+            margin-bottom: 8px;
+        }
+
+    .user-list {
+        flex: 1;
+        overflow-y: auto;
+        padding: 0 8px 8px 8px;
+    }
+
+    .user-item {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        padding: 12px 10px;
+        border-radius: 12px;
+        margin-bottom: 4px;
+        background: #fff;
+        cursor: pointer;
+        transition: background 0.2s;
+        text-decoration: none;
+        color: #222;
+    }
+
+        .user-item:hover {
+            background: #e9eaf3;
+        }
+
+    .user-avatar {
+        width: 44px;
+        height: 44px;
+        border-radius: 50%;
+        background: #d2f8d2;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        font-size: 20px;
+        color: #0078d7;
+    }
+
+    .user-info {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .user-name {
+        font-weight: 600;
+        font-size: 16px;
+    }
+
+    .user-lastmsg {
+        font-size: 13px;
+        color: #888;
+    }
+</style>
+
+<div class="chat-sidebar">
+    <div class="chat-search">
+        <input type="text" id="searchUser" placeholder="Search..." onkeyup="filterUsers()" />
+    </div>
+    <div class="user-list" id="userList">
+        @foreach (var user in Model)
+        {
+            <a class="user-item" href="@Url.Action("ChatWithUser", "Chat", new { area = "Admin", userId = user.UserId })">
+                <div class="user-avatar">
+                    @user.Fullname.Substring(0, 1).ToUpper()
+                </div>
+                <div class="user-info">
+                    <span class="user-name">@user.Fullname</span>
+                    <span class="user-lastmsg">Bấm để xem trò chuyện</span>
+                </div>
+            </a>
+        }
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function filterUsers() {
+            var input = document.getElementById("searchUser");
+            var filter = input.value.toLowerCase();
+            var userList = document.getElementById("userList");
+            var items = userList.getElementsByClassName("user-item");
+            for (var i = 0; i < items.length; i++) {
+                var name = items[i].querySelector(".user-name").textContent.toLowerCase();
+                items[i].style.display = name.includes(filter) ? "" : "none";
+            }
+        }
+    </script>
+}

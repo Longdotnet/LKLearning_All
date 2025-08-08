@@ -1,0 +1,91 @@
+﻿@{
+    ViewData["Title"] = "Nhập mã OTP";
+    Layout = "~/Areas/Login/Views/Shared/_LayoutLogin.cshtml";
+    var contact = ViewBag.Contact as string ?? "";
+    var method = ViewBag.Method as string ?? "";
+}
+
+<div class="text-center mb-4">
+    <h4>Xác thực OTP</h4>
+    <p>Nhập mã OTP đã gửi tới <strong>@contact</strong> qua <strong>@method</strong>.</p>
+</div>
+<form id="otpForm" method="post" asp-action="VerifyOtp" asp-controlle   r="ForgotPassword">
+    <input type="hidden" name="Contact" value="@contact" />
+    <input type="hidden" name="Method" value="@method" />
+    <div class="mb-3">
+        <label for="inputOtp" class="form-label">Mã OTP</label>
+        <input type="text" class="form-control" id="inputOtp" name="Otp" maxlength="6" placeholder="Nhập mã OTP" required />
+        <span class="text-danger" id="otpError"></span>
+    </div>
+    <button type="submit" class="btn btn-primary w-100 py-2 fs-4 mb-4">Xác nhận OTP</button>
+</form>
+<div class="text-center">
+    <button id="resendBtn" class="btn btn-link" type="button" disabled>Gửi lại mã OTP (<span id="timer">30</span>s)</button>
+</div>
+
+@section Scripts {
+    <script>
+        // Enable resend after 30s
+        let timer = 30;
+        const timerSpan = document.getElementById('timer');
+        const resendBtn = document.getElementById('resendBtn');
+        const contact = "@contact";
+        const method = "@method";
+
+        const interval = setInterval(function () {
+            timer--;
+            timerSpan.textContent = timer;
+            if (timer <= 0) {
+                clearInterval(interval);
+                resendBtn.disabled = false;
+                resendBtn.textContent = "Gửi lại mã OTP";
+            }
+        }, 1000);
+
+        resendBtn.addEventListener('click', function () {
+            resendBtn.disabled = true;
+            resendBtn.textContent = "Đang gửi lại...";
+            // AJAX resend OTP
+            $.ajax({
+                url: '@Url.Action("ForgotPassword", "ForgotPassword")',
+                type: 'POST',
+                data: { Contact: contact, Method: method },
+                success: function (msg) {
+                    resendBtn.textContent = "Đã gửi lại mã OTP!";
+                    setTimeout(function () {
+                        timer = 30;
+                        timerSpan.textContent = timer;
+                        resendBtn.textContent = "Gửi lại mã OTP (" + timer + "s)";
+                        resendBtn.disabled = true;
+                        // Restart timer
+                        const newInterval = setInterval(function () {
+                            timer--;
+                            timerSpan.textContent = timer;
+                            if (timer <= 0) {
+                                clearInterval(newInterval);
+                                resendBtn.disabled = false;
+                                resendBtn.textContent = "Gửi lại mã OTP";
+                            }
+                        }, 1000);
+                    }, 2000);
+                },
+                error: function () {
+                    resendBtn.textContent = "Lỗi gửi lại OTP!";
+                    resendBtn.disabled = false;
+                }
+            });
+        });
+
+        // Simple OTP validation
+        document.getElementById('otpForm').addEventListener('submit', function (e) {
+            var otpInput = document.getElementById('inputOtp');
+            var errorSpan = document.getElementById('otpError');
+            var value = otpInput.value.trim();
+            errorSpan.textContent = '';
+            if (!/^\d{6}$/.test(value)) {
+                errorSpan.textContent = 'Mã OTP phải gồm 6 chữ số.';
+                e.preventDefault();
+            }
+        });
+    </script>
+}

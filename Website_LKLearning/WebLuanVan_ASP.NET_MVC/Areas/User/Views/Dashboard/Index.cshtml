@@ -1,0 +1,23 @@
+﻿@{
+    ViewData["Title"] = "Index";
+    Layout = "~/Areas/User/Views/Shared/_LayoutUser.cshtml";
+    var token = Context.Session.GetString("AuthToken");
+
+}
+
+@section Scripts {
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/8.0.0/signalr.min.js"></script>
+    <script>
+        // SignalR + Online Users/Admins fetch
+        const token = '@(token?.Replace("'", "\\'"))';
+        const apiBaseUrl = '@ViewBag.ApiBaseUrl';
+        const connection = new signalR.HubConnectionBuilder()
+            .withUrl(apiBaseUrl.replace('/api/', '/chatHub'), {
+                accessTokenFactory: () => token
+            })
+            .build();
+        connection.start().then(() => {
+        }).catch(err => console.error(err));
+    </script>
+}
+

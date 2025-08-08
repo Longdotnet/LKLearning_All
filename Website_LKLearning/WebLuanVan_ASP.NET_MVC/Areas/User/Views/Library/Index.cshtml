@@ -1,0 +1,192 @@
+﻿@model List<WebLuanVan_ASP.NET_MVC.Areas.Admin.Models.CQuestion>
+@using WebLuanVan_ASP.NET_MVC.Areas.Admin.Models
+@{
+    ViewData["Title"] = "Thư viện nghe";
+    Layout = "~/Areas/User/Views/Shared/_LayoutKhung.cshtml";
+    // hàm này tác dụng gì T runcate html safe giúp loại bỏ các thẻ HTML như <p> </p> , rồi giới hạn nó kiểu Subtring đó
+    Func<string, int, string> TruncateHtmlSafe = (html, maxLength) =>
+         {
+     var plainText = System.Text.RegularExpressions.Regex.Replace(html, "<.*?>", string.Empty);
+     return plainText.Length > maxLength ? plainText.Substring(0, maxLength) + "..." : plainText;
+         };
+}
+@section Styles {
+    <style>
+        .library-section {
+            background: #f7fafd;
+            padding: 2.5rem 0 2rem 0;
+        }
+
+        .library-title {
+            font-size: 2.3rem;
+            font-weight: 700;
+            color: #1976d2;
+            margin-bottom: 0.5rem;
+        }
+
+        .library-desc {
+            font-size: 1.15rem;
+            color: #555;
+        }
+
+        .library-search-bar {
+            max-width: 500px;
+            margin: 0 auto 2rem auto;
+        }
+
+        .library-card {
+            border-radius: 18px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.07);
+            border: none;
+            background: #fff;
+            overflow: hidden;
+            transition: box-shadow 0.2s;
+            margin-bottom: 2rem;
+        }
+
+            .library-card:hover {
+                box-shadow: 0 4px 24px rgba(25, 118, 210, 0.12);
+            }
+
+        .library-card-img {
+            width: 100%;
+            height: 180px;
+            object-fit: cover;
+            border-radius: 18px 18px 0 0;
+            background: #e3eafc;
+            display: block;
+        }
+
+        .library-card-title {
+            font-size: 1.15rem;
+            font-weight: 600;
+            color: #1976d2;
+            margin-bottom: 0.5rem;
+            min-height: 48px;
+        }
+
+        .library-card-summary {
+            font-size: 1rem;
+            color: #444;
+            min-height: 32px;
+        }
+
+        .library-card-footer {
+            background: none;
+            border-top: none;
+            padding-bottom: 1rem;
+        }
+
+        .library-pagination .pagination {
+            border-radius: 12px;
+            box-shadow: 0 1px 6px rgba(25, 118, 210, 0.07);
+        }
+     
+    </style>
+}
+
+<div class="container-fluid library-section">
+    <div class="container">
+        <!-- Header -->
+        <div class="text-center mb-5">
+            <div class="library-title">Thư viện nghe</div>
+            <div class="library-desc">Khám phá các bài nghe để cải thiện kỹ năng của bạn.</div>
+        </div>
+
+        <!-- Search Bar -->
+        <div class="library-search-bar mb-4">
+            <div class="input-group shadow-sm rounded-pill">
+                <input type="text" id="searchInput" class="form-control border-0 rounded-pill" placeholder="Tìm bài nghe theo tiêu đề..." aria-label="Search">
+                <button class="btn btn-primary rounded-pill px-4" type="button" id="searchButton">
+                    <i class="fas fa-search"></i> Tìm kiếm
+                </button>
+            </div>
+        </div>
+
+        <!-- Listening Questions Grid -->
+        <div class="row g-4">
+            @foreach (var question in Model)
+            {
+                var imgSrc = !string.IsNullOrEmpty(question.ImageUrl)
+                ? Url.Content(question.ImageUrl)
+                : "~/UserTemplate/img/training-1.jpg";
+                <div class="col-12 col-sm-6 col-lg-4 ">
+                    <div class="card library-card flex-fill">
+                        <img src="@imgSrc" alt="Audio Preview" class="library-card-img" />
+                        <div class="card-body pb-2">
+                            <div class="library-card-title">@Html.Raw(question.QuestionText)</div>
+                            <div class="library-card-summary">
+                                @TruncateHtmlSafe(question.AnswerOptions, 120)
+                            </div>
+                        </div>
+                        <div class="card-footer library-card-footer text-center">
+                            <a asp-area="User" asp-controller="Library" asp-action="Detail" asp-route-id="@question.QuestionId" class="btn btn-outline-primary rounded-pill w-75">
+                                <i class="fas fa-headphones"></i> Xem chi tiết
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+
+        <!-- No Results Message -->
+        @if (!Model.Any())
+        {
+            <div class="text-center py-5">
+                <p class="text-muted">Không có bài nghe nào được tìm thấy.</p>
+            </div>
+        }
+
+        <!-- Pagination -->
+        @{
+            var paginate = ViewBag.Paginate as Paginate;
+            if (paginate != null && paginate.TotalPages > 1)
+            {
+                <nav aria-label="Page navigation" class="library-pagination mt-4">
+                    <ul class="pagination justify-content-center">
+                        <li class="page-item @(paginate.CurrentPage == 1 ? "disabled" : "")">
+                            <a class="page-link" href="@Url.Action("Index", new { page = paginate.CurrentPage - 1 })" aria-label="Previous">
+                                <span aria-hidden="true">«</span>
+                            </a>
+                        </li>
+                        @for (int i = 1; i <= paginate.TotalPages; i++)
+                        {
+                            <li class="page-item @(i == paginate.CurrentPage ? "active" : "")">
+                                <a class="page-link" href="@Url.Action("Index", new { page = i })">@i</a>
+                            </li>
+                        }
+                        <li class="page-item @(paginate.CurrentPage == paginate.TotalPages ? "disabled" : "")">
+                            <a class="page-link" href="@Url.Action("Index", new { page = paginate.CurrentPage + 1 })" aria-label="Next">
+                                <span aria-hidden="true">»</span>
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
+            }
+        }
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            $('#searchButton').on('click', function () {
+                var searchTerm = $('#searchInput').val().toLowerCase();
+                $('.library-card').each(function () {
+                    var title = $(this).find('.library-card-title').text().toLowerCase();
+                    if (title.includes(searchTerm)) {
+                        $(this).closest('.col-12, .col-sm-6, .col-lg-4').show();
+                    } else {
+                        $(this).closest('.col-12, .col-sm-6, .col-lg-4').hide();
+                    }
+                });
+            });
+
+            $('#searchInput').on('keypress', function (e) {
+                if (e.which === 13) {
+                    $('#searchButton').click();
+                }
+            });
+        });
+    </script>
+}

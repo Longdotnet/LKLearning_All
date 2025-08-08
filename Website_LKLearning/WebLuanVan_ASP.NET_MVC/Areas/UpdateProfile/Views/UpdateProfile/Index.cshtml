@@ -1,0 +1,209 @@
+﻿@model WebLuanVan_ASP.NET_MVC.Areas.UpdateProfile.Models.UserProfile
+
+@{
+    ViewData["Title"] = "Cập nhật thông tin cá nhân";
+    if (User.IsInRole("Admin"))
+    {
+        Layout = "~/Areas/Admin/Views/Shared/_LayoutAdmin.cshtml";
+    }
+    else
+    {
+        Layout = "~/Areas/User/Views/Shared/_LayoutKhung.cshtml";
+    }
+}
+<link rel="stylesheet" href="~/AdminTL/assets/css/index.css">
+
+<div class="container-fluid py-5 profile-update-container">
+    <div class="row justify-content-center">
+        <div class="col-xl-8 col-lg-10">
+            <div class="card shadow-sm border-0">
+                <div class="card-header ">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h3 class="mb-0"><i class="fas fa-user-edit me-2"></i>Cập nhật thông tin cá nhân</h3>
+                    </div>
+                </div>
+
+                <div class="card-body">
+                    @if (TempData["SuccessMessage"] != null)
+                    {
+                        <div class="alert alert-success" role="alert">
+                            <i class="fas fa-check-circle me-2"></i>@TempData["SuccessMessage"]
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    }
+                    @if (TempData["ErrorMessage"] != null)
+                    {
+                        <div class="alert alert-danger" role="alert">
+                            <i class="fas fa-exclamation-circle me-2"></i>@TempData["ErrorMessage"]
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    }
+
+                    <form asp-action="Index" method="post">
+                        <div class="row g-4">
+                            <!-- Personal Information Section -->
+                            <div class="col-md-6">
+                                <div class="mb-5">
+                                    <label asp-for="Fullname">Họ và tên</label>
+                                    <input asp-for="Fullname" class="form-control" placeholder="Họ và tên" value="@Model.Fullname" required />
+                                    <span asp-validation-for="Fullname" class="invalid-feedback"></span>
+                                </div>
+
+                                <div class="mb-5">
+                                    <label asp-for="Email">Email</label>
+                                    <input asp-for="Email" class="form-control" value="@Model.Email" readonly />
+                                </div>
+
+                                <div class="mb-5">
+                                    <label asp-for="Phone">Số điện thoại</label>
+                                    <input asp-for="Phone" class="form-control" placeholder="Số điện thoại" value="@Model.Phone" />
+                                    <span asp-validation-for="Phone" class="invalid-feedback"></span>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="mb-5">
+                                    <label asp-for="Age">Tuổi</label>
+                                    <input asp-for="Age" class="form-control" placeholder="Tuổi" value="@Model.Age" min="1" max="120" />
+                                    <span asp-validation-for="Age" class="invalid-feedback"></span>
+                                </div>
+
+                                <div class="mb-5">
+                                    <label asp-for="Gender">Giới tính</label>
+                                    <select asp-for="Gender" class="form-select">
+                                        <option value="true">Nam</option>
+                                        <option value="false">Nữ</option>
+                                    </select>
+                                </div>
+
+                                <div class="mb-5">
+                                    <label asp-for="DateofBirth">Ngày sinh</label>
+                                    <input asp-for="DateofBirth" class="form-control" type="date" value="@Model.DateofBirth?.ToString("yyyy-MM-dd")" />
+                                </div>
+                                <div class="mb-5">
+                                    <label asp-for="LastLoginDate">Lần đăng nhập cuối</label>
+                                    <input asp-for="LastLoginDate" class="form-control" type="date" readonly value="@Model.LastLoginDate?.ToString("yyyy-MM-dd")" />
+                                </div>
+                            </div>
+                         
+
+                            <!-- Action Buttons -->
+                            <div class="col-12 mt-4">
+                                <div class="d-flex justify-content-end gap-3 btn-spacing">
+                                    <a asp-action="Delete" asp-controller="UpdateProfile" asp-area="UpdateProfile" onclick="confirmDelete(event)" class=" btn btn-danger ">
+                                        <i class="fas fa-save me-2"></i>Xóa tài khoản
+                                    </a>
+                                    <a asp-action="ChangePassword" asp-controller="UpdateProfile"
+                                       class="btn btn-warning text-white">
+                                        <i class="fas fa-key me-2"></i>Đổi mật khẩu
+                                    </a>
+                                    <button type="reset" class="btn btn-outline-secondary px-4">
+                                        <i class="fas fa-undo me-2"></i>Đặt lại
+                                    </button>
+
+                                    <button type="submit" class="btn btn-primary px-4">
+                                        <i class="fas fa-save me-2"></i>Lưu thay đổi
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Styles {
+    <style>
+        /* Tăng khoảng cách giữa các phần tử */
+        .profile-update-container {
+            background-color: #f8f9fa;
+            min-height: calc(100vh - 56px);
+            padding: 20px;
+        }
+
+        .card {
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .card-header {
+            border-radius: 0 !important;
+            padding: 1.5rem;
+        }
+
+            /* Điều chỉnh khoảng cách, kích thước và độ đậm của tiêu đề */
+            .card-header h3 {
+                margin-bottom: 0.5rem;
+                font-size: 1.75rem;
+                font-weight: 600;
+                letter-spacing: 0.6px;
+            }
+
+        /* Tăng khoảng cách giữa các chữ và dòng cho label */
+        .form-floating > label {
+            padding: 1rem 0.75rem;
+            line-height: 1.6;
+            letter-spacing: 0.4px;
+            font-weight: 500;
+        }
+
+        /* Điều chỉnh khoảng cách, kích thước cho các input */
+        .form-control {
+            padding: 1rem 0.75rem;
+            font-size: 1rem;
+            line-height: 1.6;
+        }
+
+        /* Tăng khoảng trống cho phần thông tin hệ thống */
+        .system-info {
+            background-color: #f8f9fa;
+            border-left: 4px solid #0d6efd;
+            padding: 15px;
+            margin-top: 1rem;
+        }
+
+        .invalid-feedback {
+            display: block;
+        }
+
+        .btn-primary {
+            transition: all 0.3s ease;
+        }
+
+            .btn-primary:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            }
+
+        .btn-spacing {
+            margin-right: 10px;
+        }
+    </style>
+}
+
+@section Scripts {
+    <script>
+        // Enable Bootstrap validation
+        (function () {
+            'use strict'
+            var forms = document.querySelectorAll('.needs-validation')
+            Array.prototype.slice.call(forms)
+                .forEach(function (form) {
+                    form.addEventListener('submit', function (event) {
+                        if (!form.checkValidity()) {
+                            event.preventDefault()
+                            event.stopPropagation()
+                        }
+                        form.classList.add('was-validated')
+                    }, false)
+                })
+        })()
+
+        // Enhance date input with flatpickr if needed
+        document.addEventListener('DOMContentLoaded', function() {
+            // You can initialize date pickers here if needed
+        });
+    </script>
+}

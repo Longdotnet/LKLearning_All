@@ -1,0 +1,199 @@
+﻿@model WebLuanVan_ASP.NET_MVC.Areas.Admin.Models.CQuestion
+@using WebLuanVan_ASP.NET_MVC.Areas.Admin.Models
+@{
+    ViewData["Title"] = "Chi tiết bài nghe";
+    Layout = "~/Areas/User/Views/Shared/_LayoutKhung.cshtml";
+}
+
+<div class="container-fluid mt-5">
+    <!-- Page Header -->
+    <div class="text-center mb-5">
+        <h1 class="display-4 text-primary">@Html.Raw(Model.QuestionText)</h1>
+        <p class="lead text-muted">Đọc và nghe chi tiết bài nghe này.</p>
+    </div>
+
+    <!-- Article Content -->
+    <div class="card shadow-sm mb-5">
+        <div class="card-body">
+            <div class="article-content">
+                @if (!string.IsNullOrEmpty(Model.AnswerOptions))
+                {
+                    @Html.Raw(Model.AnswerOptions)
+                }
+                else
+                {
+                    <p class="text-muted">Không có nội dung chi tiết.</p>
+                }
+            </div>
+        </div>
+    </div>
+
+    <!-- Audio Footer -->
+  
+</div>
+@if (!string.IsNullOrEmpty(Model.AudioUrl))
+{
+    <div class="library-audio-footer">
+        <div class="custom-audio-player">
+            <div class="audio-controls d-flex align-items-center justify-content-center py-3 px-4">
+                <button id="audio-backward" class="audio-btn" title="Rewind 5s"><i class="fas fa-undo"></i></button>
+                <button id="audio-play" class="audio-btn mx-3" title="Play/Pause"><i class="fas fa-play"></i></button>
+                <button id="audio-forward" class="audio-btn" title="Forward 5s"><i class="fas fa-redo"></i></button>
+                <span class="audio-speed ms-4">1x</span>
+            </div>
+            <div class="audio-progress px-4 pb-3">
+                <span id="audio-current" class="audio-time">00:00</span>
+                <input type="range" id="audio-progress-bar" value="0" min="0" max="100" class="flex-grow-1 mx-2" />
+                <span id="audio-duration" class="audio-time">00:00</span>
+            </div>
+            <audio id="audio-element" src="@Model.AudioUrl"></audio>
+       
+        </div>
+    </div>
+}
+
+@section Styles {
+    <style>
+        .article-content {
+            line-height: 1.8;
+            font-size: 1.1rem;
+            color: #333;
+        }
+
+            .article-content p {
+                margin-bottom: 1.5rem;
+            }
+
+        .card-footer audio {
+            margin-bottom: 1rem;
+        }
+        .custom-audio-player {
+            border-radius: 8px;
+            border: 1px solid #e0e0e0;
+            background: #fff;
+            margin-top: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .audio-controls {
+            border-bottom: 1px solid #eee;
+        }
+
+        .audio-btn {
+            background: none;
+            border: none;
+            font-size: 2rem;
+            color: #1976d2;
+            transition: color 0.2s;
+            outline: none;
+            cursor: pointer;
+        }
+
+            .audio-btn:hover {
+                color: #1565c0;
+            }
+
+        .audio-speed {
+            font-size: 1.1rem;
+            color: #888;
+        }
+
+        .audio-progress {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .audio-time {
+            font-size: 1rem;
+            color: #888;
+            min-width: 48px;
+            text-align: center;
+        }
+
+        #audio-progress-bar {
+            width: 100%;
+            accent-color: #1976d2;
+            height: 4px;
+        }
+
+        .library-audio-footer {
+            position: fixed;
+            left: 0;
+            bottom: 0px; /* Leave space for chat button/box */
+            width: 100vw;
+            z-index: 1050;
+            background: #fff;
+            box-shadow: 0 -2px 16px rgba(0,0,0,0.08);
+            border-top: 1px solid #e0e0e0;
+            padding: 0;
+        }
+
+        .custom-audio-player {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+     
+        /* Optional: add extra bottom margin to page content so audio doesn't cover it */
+        .container-fluid {
+            margin-bottom: 120px;
+        }
+      
+    </style>
+}
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const audio = document.getElementById('audio-element');
+            const playBtn = document.getElementById('audio-play');
+            const backwardBtn = document.getElementById('audio-backward');
+            const forwardBtn = document.getElementById('audio-forward');
+            const progressBar = document.getElementById('audio-progress-bar');
+            const currentTimeSpan = document.getElementById('audio-current');
+            const durationSpan = document.getElementById('audio-duration');
+
+            function formatTime(sec) {
+                sec = Math.floor(sec);
+                const m = Math.floor(sec / 60).toString().padStart(2, '0');
+                const s = (sec % 60).toString().padStart(2, '0');
+                return `${m}:${s}`;
+            }
+
+            audio.addEventListener('loadedmetadata', function () {
+                durationSpan.textContent = formatTime(audio.duration);
+                progressBar.max = Math.floor(audio.duration);
+            });
+
+            audio.addEventListener('timeupdate', function () {
+                currentTimeSpan.textContent = formatTime(audio.currentTime);
+                progressBar.value = Math.floor(audio.currentTime);
+            });
+
+            playBtn.addEventListener('click', function () {
+                if (audio.paused) {
+                    audio.play();
+                    playBtn.innerHTML = '<i class="fas fa-pause"></i>';
+                } else {
+                    audio.pause();
+                    playBtn.innerHTML = '<i class="fas fa-play"></i>';
+                }
+            });
+
+            audio.addEventListener('ended', function () {
+                playBtn.innerHTML = '<i class="fas fa-play"></i>';
+            });
+
+            backwardBtn.addEventListener('click', function () {
+                audio.currentTime = Math.max(0, audio.currentTime - 5);
+            });
+
+            forwardBtn.addEventListener('click', function () {
+                audio.currentTime = Math.min(audio.duration, audio.currentTime + 5);
+            });
+
+            progressBar.addEventListener('input', function () {
+                audio.currentTime = progressBar.value;
+            });
+        });
+    </script>
+}

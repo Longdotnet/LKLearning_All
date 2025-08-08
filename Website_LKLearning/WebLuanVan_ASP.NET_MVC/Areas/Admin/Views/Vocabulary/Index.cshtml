@@ -1,0 +1,113 @@
+﻿@model IEnumerable<WebLuanVan_ASP.NET_MVC.Areas.Admin.Models.CVocabulary>
+@using WebLuanVan_ASP.NET_MVC.Areas.Admin.Models
+@{
+    ViewData["Title"] = "Quản lý từ vựng";
+    Layout = "~/Areas/Admin/Views/Shared/_LayoutAdmin.cshtml";
+    var categories = ViewBag.Categories as List<CVocabularyCategory>;
+    int? currentCategoryId = ViewBag.CurrentCategoryId as int?;
+    string searchTerm = ViewBag.SearchTerm as string;
+    Paginate paginate = ViewBag.Paginate as Paginate ?? new Paginate();
+}
+<link rel="stylesheet" href="~/AdminTL/assets/css/index.css">
+
+<div class="content-header">
+    <h1>Quản lý từ vựng</h1>
+</div>
+
+<div class="card mb-4">
+    <div class="card-header">
+        <h5>Bộ lọc</h5>
+    </div>
+    <div class="card-body">
+        <form method="get" class="row">
+            <div class="col-md-4">
+                <label class="form-label">Loại từ vựng</label>
+                <select name="categoryId" class="form-select select2">
+                    <option value="">-- Tất cả loại --</option>
+                    @if (categories != null)
+                    {
+                        foreach (var cat in categories)
+                        {
+                            <option value="@cat.VocabularyCategoryId" selected="@(currentCategoryId == cat.VocabularyCategoryId)">
+                                @cat.VocabularyCategoryName
+                            </option>
+                        }
+                    }
+                </select>
+            </div>
+            <div class="col-md-4">
+                <label class="form-label">Tìm kiếm từ vựng</label>
+                <input type="text" name="searchTerm" class="form-control" value="@searchTerm" placeholder="Nhập từ cần tìm..." />
+            </div>
+            <div class="col-md-4 d-flex align-items-end">
+                <button type="submit" class="btn btn-primary">Lọc</button>
+                @if (!string.IsNullOrEmpty(searchTerm) || currentCategoryId.HasValue)
+                {
+                    <a asp-area="Admin" asp-controller="Vocabulary" asp-action="Index" class="btn btn-outline-secondary ms-2">Xóa lọc</a>
+                }
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2>Danh sách từ vựng</h2>
+    <div>
+        <a asp-area="Admin" asp-controller="Vocabulary" asp-action="formCreateVocabulary" class="btn btn-primary">
+            <i class="fas fa-plus me-1"></i>Thêm từ vựng
+        </a>
+    </div>
+</div>
+
+<table class="table table-striped table-responsive">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Từ vựng</th>
+            <th>Phát âm</th>
+            <th>Ngày tạo</th>
+            <th>Thao tác</th>
+        </tr>
+    </thead>
+    <tbody>
+        @if (Model != null && Model.Any())
+        {
+            foreach (var vocab in Model)
+            {
+                <tr>
+                    <td>@vocab.VocabularyId</td>
+                    <td>@vocab.Word</td>
+                    <td>@vocab.Pronunciation</td>
+                    <td>@(vocab.CreatedAt?.ToString("dd/MM/yyyy HH:mm") ?? "-")</td>
+                    <td>
+                        <a asp-area="Admin" asp-controller="Vocabulary" asp-action="Details" asp-route-id="@vocab.VocabularyId" class="btn btn-sm btn-primary">
+                            <i class="fas fa-eye"></i>
+                        </a>
+                        <a asp-area="Admin" asp-controller="Vocabulary" asp-action="formEditVocabulary" asp-route-id="@vocab.VocabularyId" class="btn btn-sm btn-warning">
+                            <i class="fas fa-edit"></i>
+                        </a>
+                        <a asp-area="Admin" asp-controller="Vocabulary" asp-action="DeleteVocabulary" asp-route-id="@vocab.VocabularyId" class="btn btn-sm btn-danger" onclick="return confirm('Bạn có chắc muốn xóa?');">
+                            <i class="fas fa-trash"></i>
+                        </a>
+                    </td>
+                </tr>
+            }
+        }
+        else
+        {
+            <tr>
+                <td colspan="7" class="text-center">Không có dữ liệu từ vựng.</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<partial name="_Paging" model="@paginate" />
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            $('.select2').select2();
+        });
+    </script>
+}

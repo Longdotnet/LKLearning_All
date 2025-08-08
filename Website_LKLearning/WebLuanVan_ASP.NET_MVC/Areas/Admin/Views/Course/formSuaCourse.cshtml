@@ -1,0 +1,245 @@
+﻿@model WebLuanVan_ASP.NET_MVC.Areas.Admin.Models.CCourse
+@using WebLuanVan_ASP.NET_MVC.Areas.Admin.Models;
+@{
+    ViewData["Title"] = "Edit Course";
+    Layout = "~/Areas/Admin/Views/Shared/_LayoutAdmin.cshtml";
+    int? currentcategory = ViewBag.CurrentCategory;
+    int? currentlevel = ViewBag.CurrentLevel;
+    int? currentPackages = ViewBag.CurrentPackage;
+    var category = ViewBag.Categories as List<CCategory>;
+    var level = ViewBag.Levels as List<CLevel>;
+    var packages = ViewBag.Packages as List<CPackage>;
+}
+
+<div class="container-fluid px-4">
+    <div class="card mb-4">
+        <div class="card-header bg-primary text-white">
+            <h4 class="mb-0">
+                <i class="fas fa-edit me-2"></i>Sửa khóa học
+            </h4>
+        </div>
+        <div class="card-body">
+            <form asp-action="SuaCourse" asp-route-id="@Model.CourseId" class="needs-validation" novalidate>
+                <input asp-for="CourseId" type="hidden" />
+
+                <div class="row g-3">
+                    <!-- Course Name -->
+                    <div class="col-md-12">
+                        <label asp-for="CourseName" class="control-label"></label>
+                        <input asp-for="CourseName" class="form-control" required />
+                        <span asp-validation-for="CourseName" class="text-danger"></span>
+                        <div class="invalid-feedback">Please provide a course name.</div>
+                    </div>
+
+                    <!-- Category and Level -->
+                    <div class="col-md-4">
+                        <label asp-for="CategoryId" class="control-label"></label>
+                        <select id="categorySelect" asp-for="CategoryId" class="form-select select2" required>
+                            <option value="">Select a category</option>
+                            @foreach (var categori in category)
+                            {
+                                <option value="@categori.CategoryId" selected="@(currentcategory==categori.CategoryId)">
+                                    @categori.CategoryName
+                                </option>
+                            }
+                        </select>
+                        <span asp-validation-for="CategoryId" class="text-danger"></span>
+                        <div class="invalid-feedback">Please select a category.</div>
+                    </div>
+
+                    <div class="col-md-4">
+                        <label asp-for="LevelId" class="control-label"></label>
+                        <select id="levelSelect" asp-for="LevelId" class="form-select select2" required>
+                            <option value="">Select a level</option>
+                            @foreach (var levels in level)
+                            {
+                                <option value="@levels.LevelId" selected="@(currentlevel==levels.LevelId)">
+                                    @levels.LevelName
+                                </option>
+                            }
+                        </select>
+                        <span asp-validation-for="LevelId" class="text-danger"></span>
+                        <div class="invalid-feedback">Please select a level.</div>
+                    </div>
+                    <div class="col-md-4">
+                        <label asp-for="PackageId" class="control-label"></label>
+                        <select id="PackageSelect" asp-for="PackageId" class="form-select select2" required>
+                            <option value="">Select a level</option>
+                            @foreach (var package in packages)
+                            {
+                                <option value="@package.PackageId" selected="@(currentPackages==package.PackageId)">
+                                    @package.PackageName
+                                </option>
+                            }
+                        </select>
+                        <span asp-validation-for="LevelId" class="text-danger"></span>
+                        <div class="invalid-feedback">Please select a level.</div>
+                    </div>
+                    <!-- Description -->
+                    <div class="col-md-12">
+                        <label asp-for="Description" class="control-label"></label>
+                        <textarea asp-for="Description" id="summernote-description" class="form-control" rows="30" required></textarea>
+                        <span asp-validation-for="Description" class="text-danger"></span>
+                    </div>
+
+                    <!-- Duration -->
+                    <div class="col-md-6">
+                        <label asp-for="DurationInMonths" class="control-label"></label>
+                        <input asp-for="DurationInMonths" class="form-control" type="number" min="1" required />
+                        <span asp-validation-for="DurationInMonths" class="text-danger"></span>
+                        <div class="invalid-feedback">Please provide a valid duration.</div>
+                    </div>
+                    <div class="col-md-6">
+                        <label asp-for="UrlImage" class="control-label"></label>
+                        <input asp-for="UrlImage" class="form-control" required />
+                        <span asp-validation-for="UrlImage" class="text-danger"></span>
+                        @if (!string.IsNullOrEmpty(Model.UrlImage))
+                        {
+                            <div class="mt-2">
+                                <img src="@Model.UrlImage" class="img-responsive" />
+                            </div>
+                        }
+                    </div>
+                    <div class="col-md-6">
+                        <label asp-for="CertificateDurationDays" class="control-label"></label>
+                        <input asp-for="CertificateDurationDays" class="form-control" type="number" placeholder="trống là vĩnh viễn" />
+                        <span asp-validation-for="CertificateDurationDays" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <hr class="my-4" />
+
+                <div class="d-flex justify-content-between">
+                    <a asp-action="Index" class="btn btn-outline-secondary">
+                        <i class="fas fa-arrow-left me-2"></i>Quay lại
+                    </a>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save me-2"></i>Lưu
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Styles {
+    <style>
+        .select2-container--default .select2-selection--single {
+            height: calc(1.5em + 1rem + 2px);
+            padding: 0.375rem 0.75rem;
+            border: 1px solid #ced4da;
+            border-radius: 0.375rem;
+        }
+
+            .select2-container--default .select2-selection--single .select2-selection__arrow {
+                height: calc(1.5em + 1rem + 2px);
+            }
+
+        .card {
+            box-shadow: 0 0.15rem 1.75rem 0 rgba(33, 40, 50, 0.15);
+        }
+
+        .card-header {
+            border-bottom: 1px solid rgba(33, 40, 50, 0.125);
+        }
+    </style>
+}
+
+@section Scripts {
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            // Enable Select2
+            $('.select2').select2({
+                theme: 'bootstrap-5',
+                width: '100%'
+            });
+
+            // Enable client-side validation
+            (function () {
+                'use strict'
+                var forms = document.querySelectorAll('.needs-validation')
+                Array.prototype.slice.call(forms)
+                    .forEach(function (form) {
+                        form.addEventListener('submit', function (event) {
+                            if (!form.checkValidity()) {
+                                event.preventDefault()
+                                event.stopPropagation()
+                            }
+                            form.classList.add('was-validated')
+                        }, false)
+                    })
+            })();
+
+            // AJAX configuration for large datasets (commented out but available)
+            
+            $('#categorySelect').select2({
+                ajax: {
+                    url: '@Url.Action("searchCategory", "Course")',
+                    dataType: 'json',
+                    delay: 250,
+                    data: function(params) {
+                        return {
+                            searchTerm: params.term,
+                            page: params.page || 1
+                        };
+                    },
+                    processResults: function(data, params) {
+                        params.page = params.page || 1;
+                        return {
+                            results: data.items,
+                            pagination: {
+                                more: (params.page * 10) < data.totalCount
+                            }
+                        };
+                    },
+                }
+            });
+
+            $('#levelSelect').select2({
+                ajax: {
+                    url: '@Url.Action("searchLevel", "Course")',
+                    dataType: 'json',
+                    delay: 250,
+                    data: function(params){
+                        return {
+                            searchTerm: params.term,
+                            page: params.page || 1
+                        };
+                    },
+                    processResults: function(data, params){
+                        params.page = params.page || 1;
+                        return {
+                            results: data.items,
+                            pagination: {
+                                more: (params.page * 10) < data.totalCount
+                            }
+                        }
+                    },
+                }
+            });
+             $('#PackageSelect').select2({
+                ajax: {
+                    url: '@Url.Action("searchPackage", "Course")',
+                    dataType: 'json',
+                    delay: 250,
+                    data: function(params){
+                        return {
+                            searchTerm: params.term,
+                            page: params.page || 1
+                        };
+                    },
+                    processResults: function(data, params){
+                        params.page = params.page || 1;
+                        return {
+                            results: data.items,
+                            pagination: {
+                                more: (params.page * 10) < data.totalCount
+                            }
+                        }
+                    },
+                }
+            });
+        });
+    </script>
+}

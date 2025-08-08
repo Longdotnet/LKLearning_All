@@ -1,0 +1,30 @@
+﻿@model WebLuanVan_ASP.NET_MVC.Areas.Admin.Models.CReview
+@using Microsoft.AspNetCore.Html
+@{
+    ViewData["Title"] = "Chi tiết báo cáo";
+    Layout = "~/Areas/Admin/Views/Shared/_LayoutAdmin.cshtml";
+}
+<link rel="stylesheet" href="~/AdminTL/assets/css/index.css">
+
+<div class="card mt-4">
+    <div class="card-header bg-info text-white">
+        <h4>Chi tiết báo cáo</h4>
+    </div>
+    <div class="card-body">
+        <dl class="row">
+            <dt class="col-sm-3">Người dùng</dt>
+            <dd class="col-sm-9">@Model.Name</dd>
+            <dt class="col-sm-3">Khóa học</dt>
+            <dd class="col-sm-9">@Model.CourseName</dd>
+            <dt class="col-sm-3">Bài học</dt>
+            <dd class="col-sm-9">@(Model.LessonName ?? "N/A")</dd>
+            <dt class="col-sm-3">Loại báo cáo</dt>
+            <dd class="col-sm-9">@(Model.ReviewType == "2" ? "Báo cáo bài học" : "Báo cáo khóa học")</dd>
+            <dt class="col-sm-3">Bình luận</dt>
+            <dd class="col-sm-9">@Model.Comment</dd>
+            <dt class="col-sm-3">Ngày tạo</dt>
+            <dd class="col-sm-9">@Model.CreatedAt?.ToString("dd/MM/yyyy")</dd>
+        </dl>
+        <a asp-action="Index" class="btn btn-secondary">Quay lại</a>
+    </div>
+</div>

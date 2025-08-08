@@ -1,0 +1,51 @@
+﻿@model WebLuanVan_ASP.NET_MVC.Areas.Admin.Models.CReview
+@using Microsoft.AspNetCore.Html
+@{
+    ViewData["Title"] = "Chi tiết đánh giá";
+    Layout = "~/Areas/Admin/Views/Shared/_LayoutAdmin.cshtml";
+    IHtmlContent RenderStars(int rating, int max = 5)
+    {
+        var sb = new System.Text.StringBuilder();
+        for (int i = 1; i <= max; i++)
+        {
+            if (i <= rating)
+                sb.Append("<i class='fas fa-star star-filled'></i>");   
+            else
+                sb.Append("<i class='fas fa-star star-empty'></i>");
+        }
+        return new HtmlString(sb.ToString());
+    }
+}
+<link rel="stylesheet" href="~/AdminTL/assets/css/index.css">
+
+<div class="card mt-4">
+    <div class="card-header bg-info text-white">
+        <h4>Chi tiết đánh giá</h4>
+    </div>
+    <div class="card-body">
+        <dl class="row">
+            <dt class="col-sm-3">Người dùng</dt>
+            <dd class="col-sm-9">@Model.Name</dd>
+            <dt class="col-sm-3">Khóa học</dt>
+            <dd class="col-sm-9">@Model.CourseName</dd>
+            <dt class="col-sm-3">Số sao</dt>
+            <dd class="col-sm-9">@RenderStars(Model.Rating)</dd>
+            <dt class="col-sm-3">Bình luận</dt>
+            <dd class="col-sm-9">@Model.Comment</dd>
+            <dt class="col-sm-3">Ngày tạo</dt>
+            <dd class="col-sm-9">@Model.CreatedAt?.ToString("dd/MM/yyyy")</dd>
+        </dl>
+        <a asp-action="Index" class="btn btn-secondary">Quay lại</a>
+    </div>
+</div>
+<style>
+    .star-filled {
+        color: #FFC107;
+        margin-right: 2px;
+    }
+
+    .star-empty {
+        color: #e0e0e0;
+        margin-right: 2px;
+    }
+</style>

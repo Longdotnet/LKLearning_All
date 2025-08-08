@@ -1,0 +1,132 @@
+﻿@model WebLuanVan_ASP.NET_MVC.Areas.Admin.Models.CCertificate
+@using WebLuanVan_ASP.NET_MVC.Areas.Admin.Models
+@{
+    ViewData["Title"] = "Chi tiết chứng chỉ";
+    Layout = "~/Areas/Admin/Views/Shared/_LayoutAdmin.cshtml";
+}
+
+<link rel="stylesheet" href="~/AdminTL/assets/css/index.css">
+
+<div class="container-fluid px-4">
+    <div class="card mb-4">
+        <div class="card-header bg-primary text-white">
+            <h4 class="mb-0">
+                <i class="fas fa-certificate me-2"></i>Thông tin chứng chỉ
+            </h4>
+        </div>
+        <div class="card-body">
+            @if (Model != null)
+            {
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label class="fw-bold">Tên người nhận:</label> @Model.Fullname
+                    </div>
+                    <div class="col-md-6">
+                        <label class="fw-bold">Khóa học:</label> @Model.CourseName
+                    </div>
+                    <div class="col-md-6">
+                        <label class="fw-bold">Loại chứng chỉ:</label> @Model.CertificateTypeName
+                    </div>
+                    <div class="col-md-6">
+                        <label class="fw-bold">Mã xác thực:</label> <span class="badge bg-info">@Model.VerificationCode</span>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="fw-bold">Ngày cấp:</label> @Model.CreatedAt.ToString("dd/MM/yyyy")
+                    </div>
+                    <div class="col-md-6">
+                        <label class="fw-bold">Ngày hết hạn:</label>
+                        @(Model.ExpirationDate.HasValue ? Model.ExpirationDate.Value.ToString("dd/MM/yyyy") : "Vĩnh viễn")
+                    </div>
+                    <div class="col-md-6">
+                        <label class="fw-bold">Trạng thái:</label>
+                        @{
+                            var isExpired = Model.ExpirationDate.HasValue && Model.ExpirationDate.Value < DateTime.Now;
+                        }
+                        <span class="badge @(isExpired ? "bg-danger" : "bg-success")">
+                            @(isExpired ? "Hết hạn" : "Còn hiệu lực")
+                        </span>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="fw-bold">Chữ ký:</label>
+                        <span class="text-break">@Model.Signature</span>
+                    </div>
+                    <div class="col-md-12">
+                        <label class="fw-bold">Ảnh chứng chỉ:</label>
+                        @if (!string.IsNullOrEmpty(Model.ImageUrl))
+                        {
+                            <div class="mb-2">
+                                <a href="@Model.ImageUrl" target="_blank">
+                                    <img src="@Model.ImageUrl" alt="Certificate" style="max-width:300px;max-height:150px;border-radius:8px;box-shadow:0 2px 8px rgba(0,0,0,0.1);" />
+                                </a>
+                            </div>
+                        }
+                        else
+                        {
+                            <span class="text-muted">Không có ảnh chứng chỉ</span>
+                        }
+                    </div>
+                </div>
+            }
+            else
+            {
+                <div class="alert alert-danger">Không tìm thấy thông tin chứng chỉ.</div>
+            }
+        </div>
+        <div class="card-footer d-flex justify-content-between align-items-center">
+            <div class="d-flex gap-2">
+                @if (!string.IsNullOrEmpty(Model?.ImageUrl))
+                {
+                    <a href="@Model.ImageUrl" download class="btn btn-outline-primary">
+                        <i class="fas fa-download me-1"></i>Tải về
+                    </a>
+                }
+                <button class="btn btn-outline-info" onclick="showVerifyModal('@Model.VerificationCode')">
+                    <i class="fas fa-qrcode me-1"></i>Kiểm tra/Xác thực
+                </button>
+            </div>
+            <a asp-action="Index" class="btn btn-outline-secondary">
+                <i class="fas fa-arrow-left me-2"></i>Quay lại danh sách
+            </a>
+        </div>
+    </div>
+</div>
+
+
+
+@section Scripts {
+    <script>
+        function showVerifyModal(code) {
+            Swal.fire({
+                title: 'Đang xác thực...',
+                html: '<div class="spinner-border text-primary"></div>',
+                showConfirmButton: false,
+                allowOutsideClick: false,
+                didOpen: () => {
+                    fetch('@Url.Action("VerifyCertificate", "Certificate", new { area = "Admin" })', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ verifyCode: code })
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        let html = `<div><b>${data.message || 'Không xác thực được chứng chỉ.'}</b></div>`;
+                        if (data.imageUrl) {
+                            html += `<div class="mt-2"><img src="${data.imageUrl}" style="max-width:300px;border-radius:8px;" /></div>`;
+                        }
+                        if (data.expiration) {
+                            html += `<div class="mt-2"><span class="badge bg-info">${data.expiration}</span></div>`;
+                        }
+                        Swal.fire({
+                            title: 'Kết quả xác thực',
+                            html: html,
+                            icon: data.message && data.message.includes('thật') ? 'success' : 'error'
+                        });
+                    })
+                    .catch(() => {
+                        Swal.fire('Lỗi', 'Không thể xác thực chứng chỉ.', 'error');
+                    });
+                }
+            });
+        }
+    </script>
+}

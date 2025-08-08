@@ -1,0 +1,150 @@
+﻿@model List<WebLuanVan_ASP.NET_MVC.Areas.Admin.Models.CVocabulary>
+
+@{
+    var firstVocab = Model?.FirstOrDefault(x => x != null);
+}
+<style>
+    .vocab-meanings-scroll {
+        max-height: 180px;
+        overflow-y: auto;
+        padding-right: 8px;
+        margin-bottom: 8px;
+    }
+
+    .other-dictionaries-bar {
+        border: 1px solid #eee;
+        background: #fff;
+        border-radius: 8px;
+        gap: 0.5rem;
+    }
+
+    .dict-link {
+        text-decoration: none;
+        color: #222;
+        font-weight: 500;
+        transition: background 0.2s;
+        border-radius: 6px;
+    }
+
+        .dict-link:hover {
+            background: #f5f5f5;
+        }
+
+    .dict-divider {
+        width: 1px;
+        height: 32px;
+        background: #eee;
+        margin: 0 8px;
+        display: inline-block;
+    }
+
+    .dict-nav-arrow {
+        user-select: none;
+    }
+
+</style>
+<div class="vocab-suggestions position-relative">
+    <span class="vocab-close-btn" onclick="$('#vocabSearchResults').hide();">&times;</span>
+    <div class="fw-bold mb-3" style="font-size:1.1rem;">Tìm kiếm trong từ điển</div>
+    @if (!Model.Any())
+    {
+        <div class="alert alert-warning mb-0">Không tìm thấy từ vựng phù hợp.</div>
+    }
+    else
+    {
+        @foreach (var vocab in Model.Take(5))
+        {
+            if (vocab == null)
+            {
+                <div class="alert alert-warning mb-0">Không tìm thấy từ vựng phù hợp.</div>
+                continue;
+            }
+            <div class="vocab-suggestion border-bottom pb-2 mb-2">
+                <div class="fw-bold text-primary mb-1">
+                    <span class="vocab-word">@vocab.Word</span>
+                    <span class="text-muted ms-2">/@vocab.Pronunciation/</span>
+                </div>
+                <div class="d-flex align-items-center mb-1">
+                    @if (!string.IsNullOrEmpty(vocab.AudioUrlUk))
+                    {
+                        <span class="me-3 d-flex align-items-center">
+                            <span class="fw-bold me-1">UK</span>
+                            <span class="me-1 play-audio" data-audio="audio-uk-@vocab.Word" style="font-size:1.2em; color:gray; cursor:pointer;">
+                                <i class="fas fa-volume-up"></i>
+                            </span>
+                            <audio id="audio-uk-@vocab.Word" style="width:1px; height:1px;" preload="auto">
+                                <source src="@vocab.AudioUrlUk" type="audio/mpeg" />
+                            </audio>
+                        </span>
+                    }
+                    @if (!string.IsNullOrEmpty(vocab.AudioUrlUs))
+                    {
+                        <span class="me-3 d-flex align-items-center">
+                            <span class="fw-bold me-1">US</span>
+                            <span class="me-1 play-audio" data-audio="audio-us-@vocab.Word" style="font-size:1.2em; color:gray; cursor:pointer;">
+                                <i class="fas fa-volume-up"></i>
+                            </span>
+                            <audio id="audio-us-@vocab.Word" style="width:1px; height:1px;" preload="auto">
+                                <source src="@vocab.AudioUrlUs" type="audio/mpeg" />
+                            </audio>
+                        </span>
+                    }
+                    @if (string.IsNullOrEmpty(vocab.AudioUrlUk) && string.IsNullOrEmpty(vocab.AudioUrlUs))
+                    {
+                        <span class="text-muted">Không có dữ liệu phát âm US/UK.</span>
+                    }
+                </div>
+
+                <div class="vocab-meanings-scroll">
+                    @{
+                        var rnd = new Random();
+                        var randomMeanings = vocab.Meanings
+                        .OrderBy(x => rnd.Next())
+                        .Take(3)
+                        .ToList();
+                    }
+                    @foreach (var meaning in randomMeanings)
+                    {
+                        <div class="small mb-1">
+                            <span class="badge bg-info text-dark">@meaning.PartOfSpeech</span>
+                            <span class="ms-1">@Html.Raw(meaning.Meaning)</span>
+                            <span class="ms-1 text-success">@Html.Raw(meaning.TranslatedMeaning)</span>
+                        </div>
+                    }
+                </div>
+            </div>
+        }
+        <div class="mt-3">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <span class="fw-bold">Xem các từ điển khác</span>
+            </div>
+            <div class="other-dictionaries-bar d-flex align-items-center px-2 py-2 rounded shadow-sm" style="background:#fff;">
+                <a href="https://translate.google.com/?sl=en&tl=vi&text=@(firstVocab?.Word ?? "")" target="_blank" class="dict-link d-flex align-items-center px-2">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/c1/Google_%22G%22_logo.svg/1200px-Google_%22G%22_logo.svg.png" style="height:28px; width:28px; object-fit:contain; margin-right:8px;" alt="Google Translate" />
+                    <span>Google Translate</span>
+                </a>
+                <span class="dict-divider"></span>
+
+
+                <a href="https://www.google.com/search?tbm=isch&q=@(firstVocab?.Word ?? "")" target="_blank" class="dict-link d-flex align-items-center px-2">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/c1/Google_%22G%22_logo.svg/1200px-Google_%22G%22_logo.svg.png" style="height:28px; width:28px; object-fit:contain; margin-right:8px;" alt="Google Image" />
+                    <span>Google Image</span>
+                </a>
+            </div>
+        </div>
+
+    }
+</div>
+<script>
+    document.querySelectorAll('.play-audio').forEach(function(el) {
+        el.addEventListener('click', function() {
+            var audioId = el.getAttribute('data-audio');
+            var audio = document.getElementById(audioId);
+            if(audio) {
+                audio.currentTime = 0;
+                audio.play();
+            }
+        });
+    });
+</script>
+

@@ -1,0 +1,192 @@
+﻿@{
+    Layout = null;
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <title>User Profile</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet" />
+    <link href="~/UserTemplate/css/style.css" rel="stylesheet" />
+    <style>
+        body {
+            background: #f8f9fa;
+        }
+
+        .sidebar {
+            min-height: 100vh;
+            background: #343a40;
+            color: #fff;
+        }
+
+            .sidebar .nav-link, .sidebar .nav-link i {
+                color: #adb5bd;
+            }
+
+                .sidebar .nav-link.active, .sidebar .nav-link:hover {
+                    background: #495057;
+                    color: #fff;
+                }
+
+        .navbar {
+            background: #fff;
+        }
+
+        .dropdown-menu {
+            min-width: 200px;
+        }
+    </style>
+    @RenderSection("Styles", required: false)
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="container-fluid nav-bar p-0">
+            <nav class="navbar navbar-expand-lg navbar-light bg-white px-4 px-lg-5 py-3 py-lg-0">
+                <a class="navbar-brand p-0" href="/">
+                    <h1 class="display-5 text-secondary m-0">
+                        <img src="/AdminTL/assets/images/logo1.gif" class="img-fluid" alt="">
+                    </h1>
+                </a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse">
+                    <span class="fa fa-bars"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarCollapse">
+                    <div class="nav-item dropdown">
+                        <a href="#" class="nav-link" data-bs-toggle="dropdown">
+                            <span class="dropdown-toggle"><i class="fas fa-search"></i> Tìm từ vựng</span>
+                        </a>
+                        <div class="dropdown-menu p-3" style="min-width: 320px;">
+                            <form id="vocabSearchForm" autocomplete="off">
+                                <div class="input-group">
+                                    <input type="search" id="vocabSearchInput" name="q" class="form-control rounded-pill" placeholder="Nhập từ muốn tìm..." aria-label="Tìm từ vựng">
+                                    <button class="btn btn-primary rounded-pill ms-2" type="submit">
+                                        <i class="fas fa-search"></i>
+                                    </button>
+                                </div>
+                            </form>
+                            <div id="vocabSuggestionList" class="vocab-suggestion-list" style="display:none;"></div>
+                            <div id="vocabSearchResults" style="display:none;"></div>
+                        </div>
+                    </div>
+
+                    <div class="navbar-nav ms-auto py-0">
+                        <a class="nav-item nav-link active" href="/">Trang chủ</a>
+                        <a class="nav-item nav-link" href="/cart">Gói cước</a>
+                        <a class="nav-item nav-link" href="/User/Certificate">Chứng chỉ</a>
+                        <div class="nav-item dropdown">
+                            <a href="#" class="nav-link" data-bs-toggle="dropdown">
+                                <span class="dropdown-toggle">Danh mục</span>
+                            </a>
+                            <div class="dropdown-menu m-0">
+                                <a href="/User/Courses?categoryId=1" class="dropdown-item">
+                                    TOEIC
+                                </a>
+                                <a href="/User/Courses?categoryId=2" class="dropdown-item">
+                                    IELTS
+                                </a>
+                                <a href="/User/Courses?categoryId=4" class="dropdown-item">
+                                    Atios
+                                </a>
+                            </div>
+                        </div>
+                        <a class="nav-item nav-link" href="/library">Thư viện</a>
+                        <!-- Vocabulary Search as nav-item dropdown with AJAX results -->
+
+                    </div>
+                    <div class="nav-item dropdown">
+                        <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+                            <i class="fa fa-user"></i> Học viên
+                        </a>
+                        <div class="dropdown-menu dropdown-menu-end">
+                            <a class="dropdown-item" href="/UpdateProfile?area=Update">Cập nhật</a>
+                            <a class="dropdown-item" href="/User/Logout">Đăng xuất</a>
+                        </div>
+                    </div>
+                </div>
+            </nav>
+        </div>
+        <div class="row flex-nowrap">
+            <!-- Sidebar -->
+            <nav class="col-auto col-lg-2 sidebar d-flex flex-column p-3 shadow-sm" style="background: #fff; min-height: 100vh;">
+                <!-- Profile Card -->
+                <div class="text-center mb-4">
+                    <img src="~/UserTemplate/img/LinkApp.png" alt="Avatar" class="rounded-circle mb-2" style="width:64px;height:64px;object-fit:cover;">
+                    <h5 class="mb-0 text-primary">Học viên</h5>
+                    <small class="text-muted">Quản lý tài khoản</small>
+                </div>
+                <hr>
+                <!-- Navigation -->
+                <ul class="nav nav-pills flex-column mb-auto gap-1">
+                    <li>
+                        <a asp-area="User" asp-controller="Profile" asp-action="Index" class="nav-link d-flex align-items-center">
+                            <i class="fa-solid fa-gauge me-2"></i> Trang chủ
+                        </a>
+                    </li>
+                    <li>
+                        <a asp-area="User" asp-controller="Profile" asp-action="Certificate" class="nav-link d-flex align-items-center">
+                            <i class="fa-solid fa-certificate me-2"></i> Chứng chỉ
+                        </a>
+                    </li>
+                    <li>
+                        <a asp-area="User" asp-controller="Profile" asp-action="Package" class="nav-link d-flex align-items-center">
+                            <i class="fa-solid fa-box me-2"></i> Gói cước
+                        </a>
+                    </li>
+                    <li>
+                        <a asp-area="User" asp-controller="Profile" asp-action="ExamHistory" class="nav-link d-flex align-items-center">
+                            <i class="fa-solid fa-history me-2"></i> Lịch sử thi
+                        </a>
+                    </li>
+                    <li>
+                        <a asp-area="User" asp-controller="Profile" asp-action="Review" class="nav-link d-flex align-items-center">
+                            <i class="fa-solid fa-star me-2"></i> Đánh giá
+                        </a>
+                    </li>
+                    <li>
+                        <a asp-area="User" asp-controller="Profile" asp-action="Report" class="nav-link d-flex align-items-center">
+                            <i class="fa-solid fa-flag me-2"></i> Báo cáo
+                        </a>
+                    </li>
+                    <li>
+                        <a asp-area="User" asp-controller="Profile" asp-action="Payment" class="nav-link d-flex align-items-center">
+                            <i class="fa-solid fa-credit-card me-2"></i> Thanh toán
+                        </a>
+                    </li>
+                </ul>
+                <hr>
+                <!-- User Dropdown -->
+                <div class="dropdown mt-auto">
+                    <a href="#" class="d-flex align-items-center text-dark text-decoration-none dropdown-toggle" id="dropdownUser" data-bs-toggle="dropdown" aria-expanded="false">
+                        <img src="~/UserTemplate/img/LinkApp.png" alt="" width="32" height="32" class="rounded-circle me-2">
+                        <strong>Học viên</strong>
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-light text-small shadow" aria-labelledby="dropdownUser">
+                        <li>
+                            <a class="dropdown-item" asp-area="Update" asp-controller="UpdateProfile" asp-action="Index">
+                                <i class="fa-solid fa-gear me-2"></i> Cập nhật
+                            </a>
+                        </li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li>
+                            <a class="dropdown-item" href="/Login/Logout">
+                                <i class="fa-solid fa-right-from-bracket me-2"></i> Đăng xuất
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </nav>
+
+            <!-- Main Content -->
+            <div class="col p-0">
+                <main class="p-4">
+                    @RenderBody()
+                </main>
+            </div>
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    @RenderSection("Scripts", required: false)
+</body>
+</html>

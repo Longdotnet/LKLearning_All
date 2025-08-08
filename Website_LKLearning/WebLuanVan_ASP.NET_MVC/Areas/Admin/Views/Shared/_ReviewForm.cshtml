@@ -1,0 +1,64 @@
+﻿@model WebLuanVan_ASP.NET_MVC.Areas.Admin.Models.CReview
+@using WebLuanVan_ASP.NET_MVC.Areas.Admin.Models
+@{
+    var isEdit = Model != null && Model.ReviewId > 0;
+    var users = ViewBag.Users as List<CUsers>;
+    var courses = ViewBag.Courses as List<CCourse>;
+}
+<div class="mb-3">
+    <label class="form-label">Người dùng</label>
+    @if (!isEdit)
+    {
+        <select asp-for="UserId" class="form-select" required>
+            <option value="">Chọn người dùng</option>
+            @if (users != null)
+            {
+                foreach (var user in users)
+                {
+                    <option value="@user.UserId">@user.Fullname (@user.Email)</option>
+                }
+            }
+        </select>
+    }
+    else
+    {
+        <input type="text" class="form-control" value="@Model?.Name" readonly />
+        <input type="hidden" asp-for="UserId" />
+    }
+</div>
+<div class="mb-3">
+    <label class="form-label">Khóa học</label>
+    @if (!isEdit)
+    {
+        <select asp-for="CourseId" class="form-select" required>
+            <option value="">Chọn khóa học</option>
+            @if (courses != null)
+            {
+                foreach (var course in courses)
+                {
+                    <option value="@course.CourseId">@course.CourseName</option>
+                }
+            }
+        </select>
+    }
+    else
+    {
+        <input type="text" class="form-control" value="@Model?.CourseName" readonly />
+        <input type="hidden" asp-for="CourseId" />
+    }
+</div>
+<div class="mb-3">
+    <label class="form-label">Số sao</label>
+    <select asp-for="Rating" class="form-select" required>
+        <option value="">Chọn số sao</option>
+        @for (int i = 1; i <= 5; i++)
+        {
+            <option value="@i">@i sao</option>
+        }
+    </select>
+</div>
+<div class="mb-3">
+    <label asp-for="Comment" class="form-label"></label>
+    <textarea asp-for="Comment" class="form-control" rows="3" required></textarea>
+    <span asp-validation-for="Comment" class="text-danger"></span>
+</div>

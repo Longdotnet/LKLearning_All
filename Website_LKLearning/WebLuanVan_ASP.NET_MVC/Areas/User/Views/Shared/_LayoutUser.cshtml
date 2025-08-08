@@ -1,0 +1,658 @@
+﻿
+@using Microsoft.AspNetCore.Html
+@using WebLuanVan_ASP.NET_MVC.Areas.Admin.Models;
+@using WebLuanVan_ASP.NET_MVC.Areas.UpdateProfile.Models;
+@{
+    var firstBanner = (ViewBag.Banner as List<CBanner>)?.FirstOrDefault(b => b.IsActive ?? false);
+    var userProfile = ViewBag.UserProfile as UserProfile;
+}
+<!--Đánh giá icon sao -->
+@{
+    var recentReviews = ViewBag.RecentReviews as List<CReview> ?? new List<CReview>();
+    Func<int, int, IHtmlContent> RenderStars = (rating, max) =>
+    {
+        var sb = new System.Text.StringBuilder();
+        for (int i = 1; i <= max; i++)
+        {
+            if (i <= rating)
+                sb.Append("<i class='fa fa-star star-filled'></i>");
+            else
+                sb.Append("<i class='fa fa-star star-empty'></i>");
+        }
+        return new HtmlString(sb.ToString());
+    };
+}
+
+@{
+    var courses = ViewBag.Courses as List<CCourse> ?? new List<CCourse>();
+    int maxCourses = 4; // hiển thị tối đa 4
+    Func<string, int, string> Truncate = (text, maxLength) =>
+    {
+        if (string.IsNullOrEmpty(text)) return "";
+        return text.Length > maxLength ? text.Substring(0, maxLength) + "..." : text;
+    };
+}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <title>LK Learning</title>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <meta content="" name="keywords">
+    <meta content="" name="description">
+
+    <!-- Google Web Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;500;600;700&family=Poppins:wght@200;300;400;500;600&display=swap" rel="stylesheet">
+
+    <!-- Icon Font Stylesheet -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.4.1/font/bootstrap-icons.css" rel="stylesheet">
+
+    <!-- Libraries Stylesheet -->
+    <link href="~/UserTemplate/lib/animate/animate.min.css" rel="stylesheet">
+    <link href="~/UserTemplate/lib/owlcarousel/assets/owl.carousel.min.css" rel="stylesheet">
+
+
+    <!-- Customized Bootstrap Stylesheet -->
+    <link href="~/UserTemplate/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Template Stylesheet -->
+    <link href="~/UserTemplate/css/style.css" rel="stylesheet">
+    @RenderSection("Styles", required: false)
+
+</head>
+
+<body>
+
+    <!-- Spinner Start -->
+    <div id="spinner" class="show bg-white position-fixed translate-middle w-100 vh-100 top-50 start-50 d-flex align-items-center justify-content-center">
+        <div class="spinner-border text-secondary" style="width: 3rem; height: 3rem;" role="status">
+            <span class="sr-only">Đang tải...</span>
+        </div>
+    </div>
+
+    <div class="container-fluid nav-bar p-0">
+        <nav class="navbar navbar-expand-lg navbar-light bg-white px-4 px-lg-5 py-3 py-lg-0">
+            <a asp-area="User" asp-action="Index" asp-controller="Dashboard" class="navbar-brand p-0">
+                <h1 class="display-5 text-secondary m-0">
+                    <img src="~/AdminTL/assets/images/logo1.gif" class="img-fluid" alt="">
+                </h1>
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse">
+                <span class="fa fa-bars"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarCollapse">
+                <div class="nav-item dropdown">
+                    <a href="#" class="nav-link" data-bs-toggle="dropdown">
+                        <span class="dropdown-toggle"><i class="fas fa-search"></i> Tìm từ vựng</span>
+                    </a>
+                    <div class="dropdown-menu p-3" style="min-width: 320px;">
+                        <form id="vocabSearchForm" autocomplete="off">
+                            <div class="input-group">
+                                <input type="search" id="vocabSearchInput" name="q" class="form-control rounded-pill" placeholder="Nhập từ muốn tìm..." aria-label="Tìm từ vựng" />
+                                <button class="btn btn-primary rounded-pill ms-2" type="submit">
+                                    <i class="fas fa-search"></i>
+                                </button>
+                            </div>
+                        </form>
+                        <div id="vocabSuggestionList" class="vocab-suggestion-list" style="display:none;"></div>
+                        <div id="vocabSearchResults" style="display:none;"></div>
+                    </div>
+                </div>
+
+                <div class="navbar-nav ms-auto py-0">
+                    <a asp-area="User" asp-action="Index" asp-controller="Dashboard" class="nav-item nav-link active">Trang chủ</a>
+                    <a asp-area="User" asp-action="Index" asp-controller="Package" class="nav-item nav-link">Gói cước</a>
+                    <a asp-area="User" asp-action="Index" asp-controller="Certificate" class="nav-item nav-link">Chứng chỉ</a>
+                    <div class="nav-item dropdown">
+                        <a href="#" class="nav-link" data-bs-toggle="dropdown">
+                            <span class="dropdown-toggle">Danh mục</span>
+                        </a>
+                        <div class="dropdown-menu m-0">
+                            @if (ViewBag.Categories is List<CCategory> categories && categories.Any())
+                            {
+                                foreach (var category in categories)
+                                {
+                                    <a href="@Url.Action("Index", "Course", new { area = "User", categoryId = category.CategoryId })" class="dropdown-item">
+                                        @category.CategoryName
+                                    </a>
+                                }
+                            }
+                            else
+                            {
+                                <span class="dropdown-item text-muted">Không có danh mục</span>
+                            }
+                        </div>
+                    </div>
+                    <a asp-area="User" asp-controller="Library" asp-action="Index" class="nav-item nav-link">Thư viện</a>
+                    <!-- Vocabulary Search as nav-item dropdown with AJAX results -->
+
+                </div>
+                @if (userProfile != null)
+                {
+                    <div class="nav-item dropdown">
+                        <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+                            <i class="fa fa-user"></i> @(userProfile.Fullname ?? "Guest")
+                        </a>
+                        <div class="dropdown-menu dropdown-menu-end">
+                            <a asp-controller="Profile" asp-action="Index" asp-area="User" class="dropdown-item">Lịch sử hoạt động</a>
+
+                            <a asp-controller="UpdateProfile" asp-action="Index" asp-area="Update" class="dropdown-item">Cập nhật</a>
+
+                            <a asp-controller="Dashboard" asp-action="Logout" class="dropdown-item">Đăng xuất</a>
+                        </div>
+                    </div>
+                }
+                else
+                {
+                    <div class="nav-item">
+                        <a asp-action="Index" asp-area="Login" asp-controller="LogIn" class="btn btn-primary border-secondary rounded-pill py-2 px-4 px-lg-3 mb-3 mb-md-3 mb-lg-0">Đăng nhập</a>
+                    </div>
+                }
+            </div>
+        </nav>
+    </div>
+
+        <!-- Navbar & Hero End -->
+        <!-- Carousel Start -->
+        <div class="carousel-header">
+            <div id="carouselId" class="carousel slide" data-bs-ride="carousel">
+                @if (ViewBag.Banner is List<CBanner> banners && banners.Any())
+                {
+                    <ol class="carousel-indicators">
+                        @for (int i = 0; i < banners.Count; i++)
+                        {
+                            <li data-bs-target="#carouselId" data-bs-slide-to="@i" class="@(i == 0 ? "active" : "")"></li>
+                        }
+                    </ol>
+                    <div class="carousel-inner" role="listbox">
+                        @for (int i = 0; i < banners.Count; i++)
+                        {
+                            var banner = banners[i];
+                            <div class="carousel-item @(i == 0 ? "active" : "")">
+                                <img src="@banner.BannerImageUrl" class="img-fluid" alt="Banner Image">
+                                <div class="carousel-caption">
+                                    <div class="text-center p-4" style="max-width: 900px;">
+                                        <h4 class="text-white text-uppercase fw-bold mb-3 mb-md-4 wow fadeInUp" data-wow-delay="0.1s">@banner.BannerTitle</h4>
+                                        @if (!string.IsNullOrEmpty(banner.BannerSubtitle))
+                                        {
+                                            <h1 class="display-1 text-capitalize text-white mb-3 mb-md-4 wow fadeInUp" data-wow-delay="0.3s">@banner.BannerSubtitle</h1>
+                                        }
+                                        @if (!string.IsNullOrEmpty(banner.BannerDescription))
+                                        {
+                                            <p class="text-white mb-4 mb-md-5 fs-5 wow fadeInUp" data-wow-delay="0.5s">
+                                                @banner.BannerDescription
+                                            </p>
+                                        }
+                                        @if (!string.IsNullOrEmpty(banner.LinkUrl))
+                                        {
+                                            <a class="btn btn-primary border-secondary rounded-pill text-white py-3 px-5 wow fadeInUp" data-wow-delay="0.7s" href="@banner.LinkUrl">Xem thêm</a>
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                    <button class="carousel-control-prev" type="button" data-bs-target="#carouselId" data-bs-slide="prev">
+                        <span class="carousel-control-prev-icon bg-secondary wow fadeInLeft" data-wow-delay="0.2s" aria-hidden="false"></span>
+                        <span class="visually-hidden-focusable">Previous</span>
+                    </button>
+                    <button class="carousel-control-next" type="button" data-bs-target="#carouselId" data-bs-slide="next">
+                        <span class="carousel-control-next-icon bg-secondary wow fadeInRight" data-wow-delay="0.2s" aria-hidden="false"></span>
+                        <span class="visually-hidden-focusable">Next</span>
+                    </button>
+                }
+                else
+                {
+                    <div class="carousel-inner">
+                        <div class="carousel-item active">
+                            <img src="~/UserTemplate/img/carousel-1.jpg" class="img-fluid" alt="Default Banner">
+                            <div class="carousel-caption">
+                                <div class="text-center p-4" style="max-width: 900px;">
+                                    <h4 class="text-white text-uppercase fw-bold mb-3 mb-md-4">Không có banner</h4>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+
+        <!-- Carousel End -->
+        <!-- About Start -->
+        <div class="container-fluid py-5">
+            <div class="container py-5">
+                <div class="row g-5">
+                    <div class="col-xl-5 wow fadeInLeft" data-wow-delay="0.1s">
+                        <div class="bg-light rounded text-center">
+                            <img src="~/UserTemplate/img/LinkApp.png" class="img-fluid  border-bottom border-5 border-primary" alt="Ứng dụng đa nền tảng">
+                        </div>
+                    </div>
+                    <div class="col-xl-7 wow fadeInRight" data-wow-delay="0.3s">
+                        <h5 class="sub-title pe-3">Giới thiệu ứng dụng</h5>
+                        <h1 class="display-5 mb-4 text-primary">Ứng dụng học Tiếng Anh đa nền tảng</h1>
+                        <p class="mb-4">
+                            Ứng dụng hỗ trợ học giao tiếp Tiếng Anh hiệu quả trên nhiều thiết bị.
+                            Giải quyết tới 89% vấn đề thường gặp của người học giao tiếp, giúp bạn luyện tập, kiểm tra và nâng cao kỹ năng mỗi ngày.
+                        </p>
+                        <div class="row gy-4 align-items-center">
+                            <div class="col-12 col-sm-6 d-flex align-items-center">
+                                <i class="fas fa-mobile-alt fa-3x text-secondary"></i>
+                                <h5 class="ms-4">Hỗ trợ đa nền tảng</h5>
+                            </div>
+                            <div class="col-12 col-sm-6 d-flex align-items-center">
+                                <i class="fas fa-robot fa-3x text-secondary"></i>
+                                <h5 class="ms-4">Công nghệ Blockchain chứng chỉ</h5>
+                            </div>
+                            <div class="col-8 col-md-9">
+                                <div class="mb-5">
+                                    <p class="text-primary h6 mb-3"><i class="fa fa-check-circle text-secondary me-2"></i> Luyện tập giao tiếp thực tế</p>
+                                    <p class="text-primary h6 mb-3"><i class="fa fa-check-circle text-secondary me-2"></i> Theo dõi tiến độ học tập</p>
+                                    <p class="text-primary h6 mb-3"><i class="fa fa-check-circle text-secondary me-2"></i> Đánh giá kỹ năng tự động</p>
+                                </div>
+                                <div class="d-flex flex-wrap">
+                                    <div id="phone-tada" class="d-flex align-items-center justify-content-center me-4">
+                                        <a href="#" class="position-relative wow tada" data-wow-delay=".9s">
+                                            <i class="fa fa-download text-primary fa-3x"></i>
+                                            <div class="position-absolute" style="top: 0; left: 25px;">
+                                                <span><i class="fa fa-arrow-down text-secondary"></i></span>
+                                            </div>
+                                        </a>
+                                    </div>
+                                    <div class="d-flex flex-column justify-content-center">
+                                        <span class="text-primary">Tải ứng dụng ngay</span>
+                                        <span class="text-secondary fw-bold fs-5" style="letter-spacing: 2px;">App LK Learning</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- About End -->
+
+        <!-- Counter Facts Start -->
+        <div class="container-fluid counter-facts py-5">
+            <div class="container py-5">
+                <div class="row g-4">
+                    <div class="col-12 col-sm-6 col-md-6 col-xl-3 wow fadeInUp" data-wow-delay="0.1s">
+                        <div class="counter">
+                            <div class="counter-icon">
+                                <i class="fas fa-passport"></i>
+                            </div>
+                            <div class="counter-content">
+                                <h3>Khóa học</h3>
+                                <div class="d-flex align-items-center justify-content-center">
+                                    <span class="counter-value" data-toggle="counter-up">@ViewBag.TotalCourses</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12 col-sm-6 col-md-6 col-xl-3 wow fadeInUp" data-wow-delay="0.3s">
+                        <div class="counter">
+                            <div class="counter-icon">
+                                <i class="fas fa-users"></i>
+                            </div>
+                            <div class="counter-content">
+                                <h3>Quản trị</h3>
+                                <div class="d-flex align-items-center justify-content-center">
+                                    <span class="counter-value" data-toggle="counter-up">@ViewBag.TotalAdmin</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12 col-sm-6 col-md-6 col-xl-3 wow fadeInUp" data-wow-delay="0.5s">
+                        <div class="counter">
+                            <div class="counter-icon">
+                                <i class="fas fa-user-check"></i>
+                            </div>
+                            <div class="counter-content">
+                                <h3>Học viên</h3>
+                                <div class="d-flex align-items-center justify-content-center">
+                                    <span class="counter-value" data-toggle="counter-up">@ViewBag.TotalStudents</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12 col-sm-6 col-md-6 col-xl-3 wow fadeInUp" data-wow-delay="0.7s">
+                        <div class="counter">
+                            <div class="counter-icon">
+                                <i class="fa fa-question-circle"></i>
+                            </div>
+                            <div class="counter-content">
+                                <h3>Câu hỏi</h3>
+                                <div class="d-flex align-items-center justify-content-center">
+                                    <span class="counter-value" data-toggle="counter-up">@ViewBag.TotalQuestions</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Counter Facts End -->
+        <!-- Services End -->
+        <!-- Features Start -->
+        <div class="container-fluid features overflow-hidden py-5">
+            <div class="container">
+                <div class="section-title text-center mb-5 wow fadeInUp" data-wow-delay="0.1s">
+                    <div class="sub-style">
+                        <h5 class="sub-title text-primary px-3">Tại sao chọn chúng tôi</h5>
+                    </div>
+
+                </div>
+                <div class="row g-4 justify-content-center text-center">
+                    <div class="col-md-6 col-lg-6 col-xl-3 wow fadeInUp" data-wow-delay="0.1s">
+                        <div class="feature-item text-center p-4">
+                            <div class="feature-icon p-3 mb-4">
+                                <i class="fas fa-dollar-sign fa-4x text-primary"></i>
+                            </div>
+                            <div class="feature-content d-flex flex-column">
+                                <h5 class="mb-3">Tiết kiệm chi phí</h5>
+                                <p class="mb-3">Các gói cước đa dạng phù hợp cho học sinh, sinh viên</p>
+                                <a class="btn btn-secondary rounded-pill" asp-area="User" asp-action="Index" asp-controller="Package">Đọc thêm<i class="fas fa-arrow-right ms-2"></i></a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 col-lg-6 col-xl-3 wow fadeInUp" data-wow-delay="0.3s">
+                        <div class="feature-item text-center p-4">
+                            <div class="feature-icon p-3 mb-4">
+                                <i class="fa fa-certificate fa-4x text-primary"></i>
+                            </div>
+                            <div class="feature-content d-flex flex-column">
+                                <h5 class="mb-3">Chứng chỉ khóa học</h5>
+                                <p class="mb-3">Kiểm tra chứng chỉ mọi lúc mọi nơi</p>
+                            <a class="btn btn-secondary rounded-pill" asp-area="User" asp-action="Index" asp-controller="Certificate">Đọc thêm<i class="fas fa-arrow-right ms-2"></i></a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 col-lg-6 col-xl-3 wow fadeInUp" data-wow-delay="0.5s">
+                        <div class="feature-item text-center p-4">
+                            <div class="feature-icon p-3 mb-4">
+                                <i class="fas fa-atlas fa-4x text-primary"></i>
+                            </div>
+                            <div class="feature-content d-flex flex-column">
+                                <h5 class="mb-3">Khóa học</h5>
+                                <p class="mb-3">Các khóa học đa dạng cho mọi người dùng khi học xong khóa học sẽ có kiểm tra để lấy chứng chỉ</p>
+                                <a class="btn btn-secondary rounded-pill" asp-area="User" asp-action="Index" asp-controller="Course">Đọc thêm<i class="fas fa-arrow-right ms-2"></i></a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 col-lg-6 col-xl-3 wow fadeInUp" data-wow-delay="0.7s">
+                        <div class="feature-item text-center p-4">
+                            <div class="feature-icon p-3 mb-4">
+                                <i class="fas fa-users fa-4x text-primary"></i>
+                            </div>
+                            <div class="feature-content d-flex flex-column">
+                                <h5 class="mb-3">Admin hỗ trợ 24/7 </h5>
+                                <p class="mb-3">Với đội ngũ admin có thể hỗ trợ trực tiếp khi bạn cần báo cáo hay đóng góp</p>
+                            </div>
+                        </div>
+                    </div>
+                 
+
+                </div>
+            </div>
+        </div>
+        <!-- Features End -->
+
+        <!-- Countries We Offer End -->
+        <!-- Testimonial Start -->
+        <div class="container-fluid testimonial overflow-hidden pb-5">
+            <div class="container py-5">
+                <div class="section-title text-center mb-5 wow fadeInUp" data-wow-delay="0.1s">
+                    <div class="sub-style">
+                        <h5 class="sub-title text-primary px-3">Đánh giá khóa học</h5>
+                    </div>
+                    <h1 class="display-5 mb-4">Các học viên đánh giá nói về khóa học</h1>
+                </div>
+                <div class="owl-carousel testimonial-carousel wow zoomInDown" data-wow-delay="0.2s">
+                    @if (recentReviews.Any())
+                    {
+                        foreach (var review in recentReviews)
+                        {
+                            <div class="testimonial-item">
+                                <div class="testimonial-content p-4 mb-5">
+                                    <p class="fs-5 mb-0">@review.Comment</p>
+                                    <div class="d-flex justify-content-end">
+                                        @RenderStars(review.Rating, 5)
+                                    </div>
+                                </div>
+                                <div class="d-flex">
+                                    <div class="rounded-circle me-4" style="width: 100px; height: 100px;">
+                                        <img class="img-fluid rounded-circle" src="~/AdminTL/assets/images/faces/face1.jpg" alt="img">
+                                    </div>
+                                    <div class="my-auto">
+                                        <h5>@review.Name</h5>
+                                        <p class="mb-0">@review.CourseName</p>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    }
+                    else
+                    {
+                        <div class="testimonial-item">
+                            <div class="testimonial-content p-4 mb-5">
+                                <p class="fs-5 mb-0">Chưa có đánh giá nào gần đây.</p>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <!-- Testimonial End -->
+        <!-- Training Start -->
+        <div class="container-fluid training overflow-hidden bg-light py-5">
+            <div class="container py-5">
+                <div class="section-title text-center mb-5 wow fadeInUp" data-wow-delay="0.1s">
+                    <div class="sub-style">
+                        <h5 class="sub-title text-primary px-3">KHÓA HỌC NỔI BẬT</h5>
+                    </div>
+                    <h1 class="display-5 mb-4">Khám phá các khóa học tiếng Anh đa nền tảng</h1>
+                    <p class="mb-0">Chọn khóa học phù hợp để nâng cao kỹ năng giao tiếp, luyện tập và nhận chứng chỉ ngay trên ứng dụng.</p>
+                </div>
+                <div class="row g-4">
+                    @foreach (var course in courses.Take(maxCourses))
+                    {
+                        <div class="col-lg-6 col-xl-3 wow fadeInUp" data-wow-delay="0.1s">
+                            <div class="training-item">
+                                <div class="training-inner">
+                                    <img src="@(!string.IsNullOrEmpty(course.UrlImage) ? course.UrlImage : "~/UserTemplate/img/training-1.jpg")"
+                                         class="img-fluid w-100 rounded" alt="@course.CourseName">
+                                    <div class="training-title-name">
+                                        <a href="#" class="h4 text-white mb-0">@course.CourseName</a>
+                                    </div>
+                                </div>
+                                <div class="training-content bg-secondary rounded-bottom p-4">
+                                    <a href="#"><h4 class="text-white">@course.CourseName</h4></a>
+                                    <p class="text-white-50">
+                                       @Truncate(course.Description, 120)
+                                    </p>
+                                    <a class="btn btn-secondary rounded-pill text-white p-0" href="#">Xem chi tiết <i class="fa fa-arrow-right"></i></a>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                    @if (!courses.Any())
+                    {
+                        <div class="col-12">
+                            <div class="alert alert-warning text-center">Chưa có khóa học nào được hiển thị.</div>
+                        </div>
+                    }
+                    <div class="col-12 text-center">
+                        <a asp-area="User" asp-action="Index" asp-controller="Course" class="btn btn-primary border-secondary rounded-pill py-3 px-5 wow fadeInUp" data-wow-delay="0.1s" >Xem thêm khóa học</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Training End -->
+        <!-- Contact Start -->
+        <!-- Contact End -->
+        <!-- Footer Start -->
+    
+        <!-- Footer End -->
+        @RenderBody()
+        <!-- Copyright Start -->
+        <div class="container-fluid copyright py-4">
+            <div class="container">
+                <div class="row g-4 align-items-center">
+                    <div class="col-md-6 text-center text-md-start mb-md-0">
+                        <span class="text-white">Võ Thanh Trường Long - DH52111246</span>
+                    </div>
+                    <div class="col-md-6 text-center text-md-end text-white">
+
+                    <span class="text-white">Phạm Nguyễn Anh Khoa - DH52111146</span>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Copyright End -->
+        <!-- Back to Top -->
+        <a href="#" class="btn btn-primary btn-lg-square back-to-top"><i class="fa fa-arrow-up"></i></a>
+
+
+        <!-- JavaScript Libraries -->
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script>
+        <script src="~/UserTemplate/lib/wow/wow.min.js"></script>
+        <script src="~/UserTemplate/lib/easing/easing.min.js"></script>
+        <script src="~/UserTemplate/lib/waypoints/waypoints.min.js"></script>
+        <script src="~/UserTemplate/lib/counterup/counterup.min.js"></script>
+        <script src="~/UserTemplate/lib/owlcarousel/owl.carousel.min.js"></script>
+
+
+        <!-- Template Javascript -->
+        <script src="~/UserTemplate/js/main.js"></script>
+
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.22.0/dist/sweetalert2.all.min.js"></script>
+   
+    <script>
+        function toggleChatBox() {
+            var box = document.getElementById('floatingChatBox');
+            var frame = document.getElementById('chatFrame');
+            if (box.style.display === 'none' || box.style.display === '') {
+                // Gọi API kiểm tra/tạo cuộc trò chuyện trước khi mở chat
+                fetch('/User/Chat/GetOrCreateConversation', { method: 'POST' })
+                    .then(res => res.json())
+                    .then(data => {
+                        if (data && data.conversationId && data.userId) {
+                            frame.src = '/User/Chat/Chat?conversationId=' + data.conversationId + '&userId=' + data.userId;
+                            box.style.display = 'block';
+                        } else {
+                            alert('Không thể tạo cuộc trò chuyện.');
+                        }
+                    });
+            } else {
+                box.style.display = 'none';
+                frame.src = '';
+            }
+        }
+    </script>
+
+    <!-- Floating Chat Button & Box -->
+    <div id="floatingChatBtn" style="position:fixed;bottom:32px;right:32px;z-index:9999;">
+        <button class="btn btn-primary" style="border-radius:50%;width:56px;height:56px;font-size:24px;" onclick="toggleChatBox()">
+            <i class="fa fa-comments"></i>
+        </button>
+    </div>
+    <div id="floatingChatBox" style="display:none;position:fixed;bottom:100px;right:32px;z-index:10000;width:370px;max-width:98vw;box-shadow:0 8px 32px rgba(0,0,0,0.18);border-radius:18px;overflow:hidden;">
+        <iframe id="chatFrame"
+                src=""
+                style="width:100%;height:480px;border:none;outline:none;border-radius:18px;background:#fff;box-shadow:none;"
+                frameborder="0"
+                allowtransparency="true"></iframe>
+    </div>
+
+
+
+    @Html.Partial("~/Areas/Admin/Views/Shared/_DeleteConfirmation.cshtml")
+    @RenderSection("Scripts", required: false)
+
+    
+</body>
+
+<!-- Mirrored from themes.iamabdus.com/royal/1.3/index.html by HTTrack Website Copier/3.x [XR&CO'2014], Wed, 25 Sep 2019 12:12:33 GMT -->
+</html>
+<style>
+    .star-filled {
+        color: #FFC107;
+        margin-right: 2px;
+    }
+
+    .star-empty {
+        color: #e0e0e0;
+        margin-right: 2px;
+    }
+
+</style>
+<script>
+    $(document).ready(function () {
+        // Show suggestions as you type
+    $('#vocabSearchInput').on('keyup', function () {
+        var query = $(this).val().trim();
+        if (!query) {
+            $('#vocabSuggestionList').hide();
+            $('#vocabSearchResults').hide();
+            return;
+        }
+        // First, get suggestions from DB
+        $.get('/User/Dashboard/VocabularySuggestionAjax', { q: query }, function (data) {
+            var foundExact = data.some(function (item) {
+                return item.word.toLowerCase() === query.toLowerCase();
+            });
+            var html = '<ul class="list-group">';
+            data.forEach(function (item) {
+                html += '<li class="list-group-item list-group-item-action" style="cursor:pointer;" onclick="showVocabDetail(' + item.vocabularyId + ', \'' + item.word.replace(/'/g, "\\'") + '\')">' + item.word + '</li>';
+            });
+            html += '</ul>';
+            $('#vocabSuggestionList').html(html).show();
+            $('#vocabSearchResults').hide();
+
+            // If not found, auto-crawl from API
+            if (!foundExact) {
+                $.get('/User/Dashboard/VocabularyDetailAjax', { id: 0, word: query }, function (data) {
+                    // Optionally, refresh suggestions after crawl
+                    $('#vocabSearchResults').html(data).show();
+                    // Or, you can re-trigger the suggestion AJAX to update the list
+                });
+            }
+        });
+    });
+
+
+        // Hide suggestions and popup when clicking outside
+        $(document).on('click', function (e) {
+            if (!$(e.target).closest('#vocabSearchInput, #vocabSuggestionList, #vocabSearchResults').length) {
+                $('#vocabSuggestionList').hide();
+                $('#vocabSearchResults').hide();
+            }
+        });
+
+        // Show suggestions when input is focused and has value
+        $('#vocabSearchInput').on('focus', function () {
+            if ($(this).val().trim()) {
+                $('#vocabSuggestionList').show();
+            }
+        });
+    });
+
+    // Show popup with full details
+    function showVocabDetail(id, word) {
+        $('#vocabSearchResults').show().html('<div class="text-center text-secondary py-2"><i class="fa fa-spinner fa-spin"></i> Đang tải chi tiết...</div>');
+        $.get('/User/Dashboard/VocabularyDetailAjax', { id: id, word: word }, function (data) {
+            $('#vocabSearchResults').html(data).show();
+            $('#vocabSuggestionList').hide();
+        });
+    }
+
+</script>
+

@@ -1,0 +1,78 @@
+﻿@model WebLuanVan_ASP.NET_MVC.Areas.Admin.Models.CBanner
+@{
+    ViewData["Title"] = "Chi tiết Banner";
+    Layout = "~/Areas/Admin/Views/Shared/_LayoutAdmin.cshtml";
+}
+<link rel="stylesheet" href="~/AdminTL/assets/css/index.css">
+
+<div class="container-fluid px-4">
+    <div class="card mb-4">
+        <div class="card-header bg-primary text-white">
+            <h4 class="mb-0">
+                <i class="fas fa-image me-2"></i>Thông tin chi tiết Banner
+            </h4>
+        </div>
+        <div class="card-body">
+            <form>
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label class="form-label">Tiêu đề</label>
+                        <div class="fw-bold">@Model.BannerTitle</div>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Phụ đề</label>
+                        <div>@Model.BannerSubtitle</div>
+                    </div>
+                    <div class="col-md-12">
+                        <label class="form-label">Mô tả</label>
+                        <div>@Model.BannerDescription</div>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Ảnh Banner</label>
+                        @if (!string.IsNullOrEmpty(Model.BannerImageUrl))
+                        {
+                            <img src="@Model.BannerImageUrl" alt="Banner" class="img-fluid rounded" style="max-width:300px;max-height:200px;" />
+                        }
+                        else
+                        {
+                            <span class="text-muted">Không có ảnh</span>
+                        }
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Đường dẫn liên kết</label>
+                        @if (!string.IsNullOrEmpty(Model.LinkUrl))
+                        {
+                            <a href="@Model.LinkUrl" target="_blank">@Model.LinkUrl</a>
+                        }
+                        else
+                        {
+                            <span class="text-muted">Không có</span>
+                        }
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label">Trạng thái hiển thị</label>
+                        @if (Model.IsActive == true)
+                        {
+                            <span class="badge bg-success">Hiện</span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-secondary">Ẩn</span>
+                        }
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label">Ngày tạo</label>
+                        <div>@Model.CreatedAt.ToString("dd/MM/yyyy HH:mm")</div>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label">Ngày sửa</label>
+                        <div>@(Model.UpdatedAt?.ToString("dd/MM/yyyy HH:mm") ?? "-")</div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+    <a asp-action="Index" class="btn btn-outline-secondary">
+        <i class="fas fa-arrow-left me-2"></i>Quay lại danh sách
+    </a>
+</div>
