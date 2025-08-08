@@ -33,10 +33,10 @@ git clone https://github.com/Longdotnet/LKLearning_All.git
 ## 💡 CÔNG NGHỆ SỬ DỤNG - DEMO
 <img width="1075" height="446" alt="475006821-a43ff7a8-80ca-4d23-a824-b83e39f4db38" src="https://github.com/user-attachments/assets/b9f8963a-a56c-4d8e-b356-4c6a537dda97" />
 <img width="1037" height="390" alt="475007173-ce8c53a6-1026-41d9-a3ed-bfa7dc54e60a" src="https://github.com/user-attachments/assets/ff48c1e9-6325-44f6-b909-5d85a2f85de4" />
-<img width="500" height="300" alt="475109832-4af44062-d231-4f69-b185-de308f3fe0b4" src="https://github.com/user-attachments/assets/a8e14c72-29f0-428b-8bd2-f4f44333295a" />
-<img width="500" height="300" alt="475111026-950bd3e2-fa2d-41f6-8da0-9bf676338181" src="https://github.com/user-attachments/assets/298b1108-59e9-46ff-8199-ddf4f9f18a8c" />
-<img width="500" height="300" alt="475111186-ff773c9c-9ee1-44d1-95c9-b5fce04855db" src="https://github.com/user-attachments/assets/3d394acf-78c5-4aa1-90b1-a61124bee544" />
-<img width="500" height="300" alt="475113791-41770dfd-b699-483e-b50c-6d8838163491" src="https://github.com/user-attachments/assets/ee4154e0-614f-4122-8de9-6c7769c35365" />
+<img width="900" height="400" alt="475109832-4af44062-d231-4f69-b185-de308f3fe0b4" src="https://github.com/user-attachments/assets/a8e14c72-29f0-428b-8bd2-f4f44333295a" />
+<img width="900" height="400" alt="475111026-950bd3e2-fa2d-41f6-8da0-9bf676338181" src="https://github.com/user-attachments/assets/298b1108-59e9-46ff-8199-ddf4f9f18a8c" />
+<img width="900" height="400" alt="475111186-ff773c9c-9ee1-44d1-95c9-b5fce04855db" src="https://github.com/user-attachments/assets/3d394acf-78c5-4aa1-90b1-a61124bee544" />
+<img width="900" height="400" alt="475113791-41770dfd-b699-483e-b50c-6d8838163491" src="https://github.com/user-attachments/assets/ee4154e0-614f-4122-8de9-6c7769c35365" />
 
 // Mobile
 ## 📱 Demo Giao Diện Mobile
@@ -64,10 +64,6 @@ git clone https://github.com/Longdotnet/LKLearning_All.git
   <img src="https://github.com/user-attachments/assets/21d99fa5-d5d6-4949-8708-53aaa1fc5ecd" alt="Mobile 11" height="900" />
   <img src="https://github.com/user-attachments/assets/f126bf49-ce25-4de0-a35c-731e7327cb98" alt="Mobile 12" height="900" />
 </div>
----
-**Liên hệ:**  
-- GitHub: [Longdotnet](https://github.com/Longdotnet)  
-- Email: [longvo04100000@gmail.com](mailto:longvo04100000@gmail.com)  
 
 ---
 
