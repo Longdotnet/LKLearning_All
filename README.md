@@ -37,6 +37,8 @@ git clone https://github.com/Longdotnet/LKLearning_All.git
 <img width="500" height="300" alt="475111026-950bd3e2-fa2d-41f6-8da0-9bf676338181" src="https://github.com/user-attachments/assets/298b1108-59e9-46ff-8199-ddf4f9f18a8c" />
 <img width="500" height="300" alt="475111186-ff773c9c-9ee1-44d1-95c9-b5fce04855db" src="https://github.com/user-attachments/assets/3d394acf-78c5-4aa1-90b1-a61124bee544" />
 <img width="500" height="300" alt="475113791-41770dfd-b699-483e-b50c-6d8838163491" src="https://github.com/user-attachments/assets/ee4154e0-614f-4122-8de9-6c7769c35365" />
+
+// Mobile
 <img width="407" height="300" alt="475319836-d1d22f63-9bad-4a05-b995-90b133e0b33f" src="https://github.com/user-attachments/assets/a58f316f-1042-4f54-ae7d-6b8812219604" />
 <img width="411" height="300" alt="475319982-164183cb-5a12-4782-baa7-44326bf4baf7" src="https://github.com/user-attachments/assets/0df514ae-c755-43d7-a140-2f59cd271628" />
 <img width="409" height="300" alt="475320632-4ea6e78b-d032-453e-b38b-87a237a63eb5" src="https://github.com/user-attachments/assets/c0965c47-ed76-47c4-97ef-7669d942caa9" />
