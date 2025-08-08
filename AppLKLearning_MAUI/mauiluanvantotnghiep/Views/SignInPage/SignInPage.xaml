@@ -1,0 +1,191 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    x:Class="mauiluanvantotnghiep.Views.SignInPage.SignInPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:vm="clr-namespace:mauiluanvantotnghiep.ViewModels"
+    Title="SignInPage"
+    Shell.NavBarIsVisible="False">
+    <!--  Gán BindingContext từ ViewModel  -->
+    <ContentPage.BindingContext>
+        <vm:SignInViewModel />
+    </ContentPage.BindingContext>
+
+
+    <Grid RowDefinitions="1*,8*,1*">
+        <Image
+            Margin="10,30,10,10"
+            HeightRequest="300"
+            HorizontalOptions="Start"
+            IsAnimationPlaying="True"
+            Source="logo.gif"
+            WidthRequest="220" />
+
+        <Frame
+            Grid.Row="0"
+            Margin="0,-80,-80,0"
+            Padding="0"
+            BackgroundColor="#cfd0d8"
+            CornerRadius="125"
+            HeightRequest="250"
+            HorizontalOptions="EndAndExpand"
+            WidthRequest="250" />
+
+
+        <Frame
+            Grid.Row="0"
+            Margin="0,-120,-120,0"
+            Padding="0"
+            BackgroundColor="#6600FF"
+            CornerRadius="125"
+            HeightRequest="250"
+            HorizontalOptions="EndAndExpand"
+            WidthRequest="250" />
+
+        <!--  Frame chứa các control đăng nhập  -->
+        <Frame
+            Grid.Row="1"
+            Margin="20,0,20,0"
+            BackgroundColor="White"
+            CornerRadius="0"
+            VerticalOptions="CenterAndExpand">
+            <VerticalStackLayout Padding="20" Spacing="25">
+                <Label
+                    FontAttributes="Bold"
+                    FontSize="28"
+                    Text="Đăng Nhập" />
+
+                <!--  Ô nhập email  -->
+                <Frame
+                    Padding="10"
+                    BorderColor="Transparent"
+                    CornerRadius="0">
+                    <Grid ColumnDefinitions="30,*" ColumnSpacing="10">
+                        <Image
+                            HeightRequest="25"
+                            Source="email.png"
+                            VerticalOptions="Center"
+                            WidthRequest="25" />
+                        <Entry
+                            x:Name="emailEntry"
+                            Grid.Column="1"
+                            Keyboard="Email"
+                            Placeholder="Email"
+                            Text="{Binding Email, Mode=TwoWay}"
+                            VerticalOptions="Center" />
+                    </Grid>
+                </Frame>
+                <!--  Hiển thị thông báo lỗi email  -->
+
+                <Label
+                    Margin="40,0,0,0"
+                    FontSize="12"
+                    HorizontalOptions="Start"
+                    IsVisible="{Binding IsEmailErrorVisible}"
+                    Text="{Binding EmailError}"
+                    TextColor="Red" />
+                <!--  Ô nhập password  -->
+                <Frame
+                    Padding="10"
+                    BorderColor="Transparent"
+                    CornerRadius="0">
+                    <Grid ColumnDefinitions="30,*,30" ColumnSpacing="10">
+                        <Image
+                            HeightRequest="25"
+                            Source="password.png"
+                            VerticalOptions="Center"
+                            WidthRequest="25" />
+                        <Entry
+                            x:Name="passwordEntry"
+                            Grid.Column="1"
+                            IsPassword="{Binding IsPassword, Mode=TwoWay}"
+                            Placeholder="Mật Khẩu"
+                            Text="{Binding Password, Mode=TwoWay}"
+                            VerticalOptions="Center" />
+                        <ImageButton
+                            Grid.Column="2"
+                            Command="{Binding TogglePasswordVisibilityCommand}"
+                            HeightRequest="25"
+                            Source="{Binding EyeIconSource}"
+                            VerticalOptions="Center"
+                            WidthRequest="25" />
+                    </Grid>
+                </Frame>
+
+                <Label
+                    Margin="40,0,0,0"
+                    FontSize="12"
+                    HorizontalOptions="Start"
+                    IsVisible="{Binding IsPasswordErrorVisible}"
+                    Text="{Binding PasswordError}"
+                    TextColor="Red" />
+
+                <!--  Nút đăng nhập  -->
+                <Button
+                    Command="{Binding SignInCommand}"
+                    CornerRadius="0"
+                    FontAttributes="Bold"
+                    FontSize="20"
+                    HeightRequest="60"
+                    Text="Đăng Nhập" />
+
+                <!--  Liên kết quên mật khẩu  -->
+                <Label
+                    FontAttributes="Bold"
+                    HorizontalTextAlignment="Center"
+                    Text="Quên Mật Khẩu?"
+                    TextColor="Gray">
+                    <Label.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding NavigateToForgotPasswordCommand}" />
+                    </Label.GestureRecognizers>
+                </Label>
+
+                <!--  Liên kết chuyển sang trang đăng ký  -->
+                <HorizontalStackLayout HorizontalOptions="Center" Spacing="10">
+                    <Label
+                        FontAttributes="Bold"
+                        Text="Không Có Tài Khoản?"
+                        TextColor="Gray"
+                        VerticalTextAlignment="Center" />
+                    <Label
+                        FontAttributes="Bold"
+                        FontSize="18"
+                        Text="Đăng Ký"
+                        TextColor="#6600FF">
+                        <Label.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding NavigateToSignUpCommand}" />
+                        </Label.GestureRecognizers>
+                    </Label>
+                </HorizontalStackLayout>
+            </VerticalStackLayout>
+        </Frame>
+
+        <!--  Frame nền góc dưới bên trái  -->
+        <Frame
+            Grid.Row="2"
+            Margin="0,0,0,-180"
+            Padding="0"
+            BackgroundColor="#cfd0d8"
+            CornerRadius="125"
+            HeightRequest="250"
+            HorizontalOptions="StartAndExpand"
+            VerticalOptions="EndAndExpand"
+            WidthRequest="250" />
+
+        <Frame
+            Grid.Row="2"
+            Margin="0,0,0,-200"
+            Padding="0"
+            BackgroundColor="#6600FF"
+            CornerRadius="125"
+            HeightRequest="250"
+            HorizontalOptions="StartAndExpand"
+            VerticalOptions="EndAndExpand"
+            WidthRequest="250" />
+
+
+
+
+    </Grid>
+
+</ContentPage>

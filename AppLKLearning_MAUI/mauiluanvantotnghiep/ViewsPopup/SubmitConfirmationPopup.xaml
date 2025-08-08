@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<toolkit:Popup
+    x:Class="mauiluanvantotnghiep.ViewsPopup.SubmitConfirmationPopup"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+    CanBeDismissedByTappingOutsideOfPopup="False"
+    Color="Transparent">
+
+    <Frame
+        Padding="20"
+        BackgroundColor="White"
+        BorderColor="#FF9800"
+        CornerRadius="24"
+        HasShadow="True"
+        HorizontalOptions="Center"
+        VerticalOptions="Center"
+        WidthRequest="350">
+
+        <VerticalStackLayout
+            Padding="10"
+            HorizontalOptions="Center"
+            Spacing="20">
+
+            <!--  Warning Icon  -->
+            <Frame
+                Padding="0"
+                BackgroundColor="#FF9800"
+                CornerRadius="40"
+                HasShadow="True"
+                HeightRequest="80"
+                HorizontalOptions="Center"
+                WidthRequest="80">
+                <Label
+                    FontAttributes="Bold"
+                    FontSize="40"
+                    HorizontalOptions="Center"
+                    Text="⚠"
+                    TextColor="White"
+                    VerticalOptions="Center" />
+            </Frame>
+
+            <!--  Title  -->
+            <Label
+                FontAttributes="Bold"
+                FontSize="22"
+                HorizontalOptions="Center"
+                Text="Xác nhận nộp bài"
+                TextColor="#FF9800"
+                VerticalOptions="Center" />
+
+            <!--  Question Count Info  -->
+            <Frame
+                Padding="15"
+                BackgroundColor="#FFF3E0"
+                CornerRadius="12"
+                HasShadow="False"
+                HorizontalOptions="Center">
+                <VerticalStackLayout Spacing="8">
+                    <Label
+                        x:Name="QuestionStatsLabel"
+                        FontAttributes="Bold"
+                        FontSize="16"
+                        HorizontalTextAlignment="Center"
+                        TextColor="#E65100" />
+                    <Label
+                        x:Name="TimeRemainingLabel"
+                        FontSize="14"
+                        HorizontalTextAlignment="Center"
+                        TextColor="#E65100" />
+                </VerticalStackLayout>
+            </Frame>
+
+            <!--  Warning Message  -->
+            <VerticalStackLayout Spacing="10">
+                <Label
+                    FontSize="16"
+                    HorizontalOptions="Center"
+                    HorizontalTextAlignment="Center"
+                    MaxLines="3"
+                    Text="Bạn có chắc chắn muốn nộp bài không?"
+                    TextColor="Black" />
+
+                <Frame
+                    Padding="12"
+                    BackgroundColor="#FFEBEE"
+                    CornerRadius="10"
+                    HasShadow="False"
+                    HorizontalOptions="Center">
+                    <Label
+                        FontAttributes="Italic"
+                        FontSize="13"
+                        HorizontalTextAlignment="Center"
+                        MaxLines="2"
+                        Text="⚠️ Sau khi nộp bài, bạn sẽ không thể thay đổi câu trả lời."
+                        TextColor="#C62828" />
+                </Frame>
+            </VerticalStackLayout>
+
+            <!--  Buttons  -->
+            <Grid ColumnDefinitions="*,15,*" HorizontalOptions="Center">
+                <Button
+                    x:Name="CancelButton"
+                    Grid.Column="0"
+                    BackgroundColor="#9E9E9E"
+                    CornerRadius="12"
+                    FontAttributes="Bold"
+                    HeightRequest="50"
+                    Text="Hủy"
+                    TextColor="White" />
+
+                <Button
+                    x:Name="SubmitButton"
+                    Grid.Column="2"
+                    BackgroundColor="#4CAF50"
+                    CornerRadius="12"
+                    FontAttributes="Bold"
+                    HeightRequest="50"
+                    Text="Nộp bài"
+                    TextColor="White" />
+            </Grid>
+
+        </VerticalStackLayout>
+    </Frame>
+</toolkit:Popup>

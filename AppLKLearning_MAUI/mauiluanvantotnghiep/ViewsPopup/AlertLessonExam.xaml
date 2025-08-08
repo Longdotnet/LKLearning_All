@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<toolkit:Popup
+    x:Class="mauiluanvantotnghiep.ViewsPopup.AlertLessonExam"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+    Color="Transparent">
+    <Frame
+        Padding="20"
+        BackgroundColor="White"
+        BorderColor="#2D88C9"
+        CornerRadius="24"
+        HasShadow="True"
+        HorizontalOptions="Center"
+        VerticalOptions="Center"
+        WidthRequest="320">
+        <VerticalStackLayout
+            Padding="10"
+            HorizontalOptions="Center"
+            Spacing="16">
+            <!--  Exam Icon  -->
+            <Frame
+                Padding="0"
+                BackgroundColor="Transparent"
+                CornerRadius="16"
+                HasShadow="True"
+                HeightRequest="120"
+                HorizontalOptions="Center"
+                IsClippedToBounds="True"
+                VerticalOptions="Center"
+                WidthRequest="120">
+                <Image
+                    Aspect="AspectFit"
+                    HeightRequest="100"
+                    Source="examicon.png"
+                    VerticalOptions="Center">
+                    <Image.Shadow>
+                        <Shadow
+                            Brush="#80000000"
+                            Radius="4"
+                            Offset="0,4" />
+                    </Image.Shadow>
+                </Image>
+            </Frame>
+
+            <!--  Text Content  -->
+            <Label
+                FontAttributes="Bold"
+                FontSize="24"
+                HorizontalOptions="Center"
+                Text="Kiểm Tra Cuối Khóa"
+                TextColor="#2D88C9"
+                VerticalOptions="Center" />
+
+            <Label
+                FontSize="14"
+                HorizontalOptions="Center"
+                HorizontalTextAlignment="Center"
+                MaxLines="3"
+                Text="Hoàn thành bài kiểm tra này với điểm số đạt yêu cầu, bạn sẽ được cấp chứng chỉ hoàn thành khóa học."
+                TextColor="#777777" />
+
+            <Image
+                Aspect="AspectFit"
+                HeightRequest="70"
+                HorizontalOptions="Center"
+                Source="https://img.icons8.com/external-justicon-flat-justicon/50/external-certificate-reward-and-badges-justicon-flat-justicon.png"
+                VerticalOptions="Center"
+                WidthRequest="70">
+                <Image.Shadow>
+                    <Shadow
+                        Brush="#80000000"
+                        Radius="3"
+                        Offset="0,2" />
+                </Image.Shadow>
+            </Image>
+
+
+            <!--  Button  -->
+            <Button
+                Margin="0,10,0,0"
+                BackgroundColor="#5D9CEC"
+                Command="{Binding StartExamCommand}"
+                CornerRadius="20"
+                FontAttributes="Bold"
+                HeightRequest="50"
+                Text="Bắt Đầu"
+                TextColor="White" />
+        </VerticalStackLayout>
+    </Frame>
+</toolkit:Popup>

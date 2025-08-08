@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    x:Class="mauiluanvantotnghiep.Views.WelcomePage.WelcomePage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml">
+
+    <Shell.NavBarIsVisible>false</Shell.NavBarIsVisible>
+    <Shell.TabBarIsVisible>false</Shell.TabBarIsVisible>
+
+    <Grid BackgroundColor="#6600FF">
+        <!--  Các Frame nền tạo hiệu ứng hình học  -->
+        <Grid>
+            <Frame
+                x:Name="mainFrame"
+                Margin="-90,30,0,0"
+                BackgroundColor="#FBEBE3"
+                CornerRadius="300"
+                HeightRequest="500"
+                HorizontalOptions="Start"
+                Opacity="0.7"
+                WidthRequest="400" />
+            <Frame
+                x:Name="subFrame"
+                Margin="-50,0,0,0"
+                BackgroundColor="#6600CC"
+                CornerRadius="0"
+                HeightRequest="270"
+                HorizontalOptions="End"
+                Opacity="0.6"
+                VerticalOptions="End"
+                WidthRequest="280" />
+            <Frame
+                x:Name="subFrame2"
+                Margin="0,0,-250,-230"
+                BackgroundColor="#FBEBE3"
+                CornerRadius="200"
+                HeightRequest="400"
+                HorizontalOptions="End"
+                Opacity="0.6"
+                VerticalOptions="End"
+                WidthRequest="450" />
+            <Frame
+                x:Name="subFrame3"
+                Margin="0,-100,-80,0"
+                Padding="0"
+                BackgroundColor="#cfd0d8"
+                CornerRadius="125"
+                HeightRequest="250"
+                HorizontalOptions="EndAndExpand"
+                WidthRequest="250" />
+
+            <Frame
+                x:Name="subframe4"
+                Margin="0,-500,-80,0"
+                Padding="0"
+                BackgroundColor="{x:StaticResource Primary}"
+                CornerRadius="125"
+                HeightRequest="250"
+                HorizontalOptions="EndAndExpand"
+                WidthRequest="250" />
+        </Grid>
+
+        <!--  Nội dung chính  -->
+        <Grid RowDefinitions="Auto,*,150">
+            <!--  Header  -->
+
+            <!--  Nội dung trung tâm  -->
+            <StackLayout Grid.Row="1" VerticalOptions="Center">
+                <Label
+                    Margin="10"
+                    FontAttributes="Bold, Italic"
+                    FontFamily="Arial"
+                    FontSize="50"
+                    LineHeight="1"
+                    Text="Chào Mừng&#10;tới LK&#10;English App" />
+                <Label
+                    Margin="10"
+                    FontFamily="Arial"
+                    FontSize="Body"
+                    LineHeight="1"
+                    Text="Tiếng Anh dễ dàng - Thành công gần hơn" />
+                <!--  Nút chuyển trang: sử dụng Gesture Recognizer  -->
+                <Label
+                    x:Name="enterLabel"
+                    Margin="10,0"
+                    FontFamily="Arial"
+                    FontSize="50"
+                    LineHeight="1"
+                    Text="→">
+                    <Label.GestureRecognizers>
+                        <TapGestureRecognizer NumberOfTapsRequired="1" Tapped="TapGestureRecognizer_Tapped" />
+                    </Label.GestureRecognizers>
+                </Label>
+            </StackLayout>
+        </Grid>
+    </Grid>
+</ContentPage>

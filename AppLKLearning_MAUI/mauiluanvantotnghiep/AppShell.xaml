@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<Shell
+    x:Class="mauiluanvantotnghiep.AppShell"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:CoursePage="clr-namespace:mauiluanvantotnghiep.Views.CoursesPage"
+    xmlns:ForgotPasswordPage="clr-namespace:mauiluanvantotnghiep.Views.ForgotPasswordPage"
+    xmlns:PackagePage="clr-namespace:mauiluanvantotnghiep.Views.PackagePage"
+    xmlns:PaymentGateway="clr-namespace:mauiluanvantotnghiep.Views.PaymentPage"
+    xmlns:PaymentPage="clr-namespace:mauiluanvantotnghiep.Views.PaymentPage"
+    xmlns:RegisterPage="clr-namespace:mauiluanvantotnghiep.Views.RegisterPage"
+    xmlns:SignInPage="clr-namespace:mauiluanvantotnghiep.Views.SignInPage"
+    xmlns:StoryPage="clr-namespace:mauiluanvantotnghiep.Views.StoryPage"
+    xmlns:TransactionPage="clr-namespace:mauiluanvantotnghiep.Views.TransactionPage"
+    xmlns:UserProfilePage="clr-namespace:mauiluanvantotnghiep.Views.UserProfilePage"
+    xmlns:VocabularyPage="clr-namespace:mauiluanvantotnghiep.Views.VocabularyPage"
+    xmlns:WelcomePage="clr-namespace:mauiluanvantotnghiep.Views.WelcomePage"
+    xmlns:local="clr-namespace:mauiluanvantotnghiep"
+    Title="mauiluanvantotnghiep"
+    Shell.FlyoutBehavior="Disabled"
+    Shell.NavBarIsVisible="True"
+    Shell.TabBarForegroundColor="White"
+    Shell.TabBarTitleColor="Transparent"
+    Shell.TabBarUnselectedColor="#6B7280">
+
+    <Shell.Resources>
+        <Style x:Key="DarkTabBarStyle" TargetType="Element">
+            <Setter Property="Shell.TabBarForegroundColor" Value="White" />
+            <Setter Property="Shell.TabBarUnselectedColor" Value="#6B7280" />
+            <Setter Property="Shell.TabBarTitleColor" Value="Transparent" />
+        </Style>
+
+        <Style x:Key="TabItemStyle" TargetType="ShellContent">
+            <Setter Property="Shell.TabBarTitleColor" Value="Transparent" />
+        </Style>
+    </Shell.Resources>
+
+    <ShellContent
+        Title="SignInPage"
+        ContentTemplate="{DataTemplate SignInPage:SignInPage}"
+        Route="SignInPage" />
+
+
+
+    <ShellContent
+        Title="StoryPage"
+        ContentTemplate="{DataTemplate StoryPage:StoryPage}"
+        Route="StoryPage" />
+
+
+
+
+
+
+
+
+
+
+    <ShellContent ContentTemplate="{DataTemplate WelcomePage:WelcomePage}" Route="WelcomePage" />
+
+    <ShellContent
+        Title="SignInPage"
+        ContentTemplate="{DataTemplate PaymentPage:PaymentPage}"
+        Route="PaymentPage" />
+
+    <ShellContent
+        Title="RegisterPage"
+        ContentTemplate="{DataTemplate RegisterPage:RegisterPage}"
+        Route="RegisterPage" />
+
+    <ShellContent
+        Title="ForgotPasswordPage"
+        ContentTemplate="{DataTemplate ForgotPasswordPage:ForgotPasswordPage}"
+        Route="ForgotPasswordPage" />
+
+    <ShellContent
+        Title="UpdatePasswordPage"
+        ContentTemplate="{DataTemplate UserProfilePage:UpdatePasswordPage}"
+        Route="UpdatePasswordPage" />
+
+    <TabBar Style="{StaticResource DarkTabBarStyle}">
+        <ShellContent
+            Title=""
+            ContentTemplate="{DataTemplate CoursePage:CoursesPage}"
+            Icon="course2.png"
+            Route="CoursePage"
+            Style="{StaticResource TabItemStyle}" />
+
+        <ShellContent
+            Title=""
+            ContentTemplate="{DataTemplate VocabularyPage:SearchVocabulariesPage}"
+            Icon="search2.png"
+            Route="SearchVocabulariesPage"
+            Style="{StaticResource TabItemStyle}" />
+
+        <ShellContent
+            Title=""
+            ContentTemplate="{DataTemplate PackagePage:PackagePage}"
+            Icon="package2.png"
+            Route="PackagePage"
+            Style="{StaticResource TabItemStyle}" />
+
+        <ShellContent
+            Title=""
+            ContentTemplate="{DataTemplate TransactionPage:TransactionsPage}"
+            Icon="transaction2.png"
+            Route="TransactionsPage"
+            Style="{StaticResource TabItemStyle}" />
+
+
+    </TabBar>
+
+</Shell>

@@ -1,0 +1,523 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    x:Class="mauiluanvantotnghiep.Views.UserProfilePage.UserProfilePage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:vm="clr-namespace:mauiluanvantotnghiep.ViewModels"
+    BackgroundColor="#F8F9FA"
+    Shell.NavBarIsVisible="False">
+
+    <!--  Gán BindingContext từ ViewMod el  -->
+    <ContentPage.BindingContext>
+        <vm:UserProfileViewModel />
+    </ContentPage.BindingContext>
+
+    <!--  Grid chứa ScrollView và Header chồng lên nhau  -->
+    <Grid>
+        <!--  SCROLLABLE CONTENT  -->
+        <ScrollView x:Name="MainScroll" Scrolled="MainScroll_Scrolled">
+            <!--  Padding trên bằng chiều cao header (150)  -->
+            <StackLayout Padding="20,150,20,30" Spacing="25">
+
+                <!--  Avatar và edit với hiệu ứng đẹp hơn  -->
+                <Grid HorizontalOptions="Center" VerticalOptions="Center">
+                    <Frame
+                        Padding="0"
+                        BackgroundColor="White"
+                        BorderColor="#E0E6ED"
+                        CornerRadius="60"
+                        HasShadow="True"
+                        HeightRequest="120"
+                        HorizontalOptions="Center"
+                        WidthRequest="120">
+                        <Image Aspect="AspectFill" Source="{Binding AvatarUrl, FallbackValue='https://img.icons8.com/3d-fluency/120/000000/user-male-circle.png'}" />
+                    </Frame>
+
+                    <!--  Edit button với background tròn  -->
+                    <Frame
+                        Padding="8"
+                        BackgroundColor="White"
+                        BorderColor="#E0E6ED"
+                        CornerRadius="18"
+                        HasShadow="True"
+                        HeightRequest="36"
+                        HorizontalOptions="End"
+                        VerticalOptions="End"
+                        WidthRequest="36">
+                        <Image
+                            HeightRequest="20"
+                            Source="https://img.icons8.com/sf-regular/20/A259FF/edit.png"
+                            WidthRequest="20">
+                            <Image.GestureRecognizers>
+                                <TapGestureRecognizer Command="{Binding ToggleAvatarUrlEditableCommand}" />
+                            </Image.GestureRecognizers>
+                        </Image>
+                    </Frame>
+                </Grid>
+
+                <!--  Tên và thông tin với typography đẹp hơn  -->
+                <VerticalStackLayout HorizontalOptions="Center" Spacing="8">
+                    <Label
+                        FontAttributes="Bold"
+                        FontSize="28"
+                        HorizontalTextAlignment="Center"
+                        Text="{Binding Fullname}"
+                        TextColor="#1A1D29" />
+                    <Frame
+                        Padding="12,6"
+                        BackgroundColor="#F0F4FF"
+                        BorderColor="#A259FF"
+                        CornerRadius="15"
+                        HasShadow="False"
+                        HorizontalOptions="Center">
+                        <Label
+                            FontSize="14"
+                            HorizontalTextAlignment="Center"
+                            Text="{Binding LastLoginDate, StringFormat='Lần cuối online: {0:dd/MM/yyyy}'}"
+                            TextColor="#A259FF" />
+                    </Frame>
+                </VerticalStackLayout>
+
+                <!--  FORM với card design đẹp hơn  -->
+                <Frame
+                    Padding="24"
+                    BackgroundColor="White"
+                    BorderColor="#E0E6ED"
+                    CornerRadius="20"
+                    HasShadow="True">
+                    <VerticalStackLayout Spacing="20">
+
+                        <!--  Email Field  -->
+                        <VerticalStackLayout Spacing="8">
+                            <Label
+                                FontAttributes="Bold"
+                                FontSize="16"
+                                Text="Email của bạn"
+                                TextColor="#4A5568" />
+                            <Frame
+                                Padding="0"
+                                BackgroundColor="#F7FAFC"
+                                BorderColor="#E2E8F0"
+                                CornerRadius="12"
+                                HasShadow="False"
+                                HeightRequest="56">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="50" />
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="50" />
+                                    </Grid.ColumnDefinitions>
+                                    <Image
+                                        Grid.Column="0"
+                                        HeightRequest="24"
+                                        HorizontalOptions="Center"
+                                        Source="https://img.icons8.com/sf-regular/24/A259FF/new-post.png"
+                                        VerticalOptions="Center"
+                                        WidthRequest="24" />
+                                    <Entry
+                                        Grid.Column="1"
+                                        BackgroundColor="Transparent"
+                                        FontSize="16"
+                                        IsEnabled="{Binding IsEmailEditable}"
+                                        Placeholder="Nhập email của bạn"
+                                        Text="{Binding Email}"
+                                        TextColor="#2D3748"
+                                        VerticalOptions="Center" />
+                                    <Frame
+                                        Grid.Column="2"
+                                        Padding="8"
+                                        BackgroundColor="Transparent"
+                                        BorderColor="Transparent"
+                                        CornerRadius="8"
+                                        HasShadow="False"
+                                        HorizontalOptions="Center"
+                                        VerticalOptions="Center">
+                                        <Image
+                                            HeightRequest="20"
+                                            Source="https://img.icons8.com/sf-regular/20/A259FF/edit.png"
+                                            WidthRequest="20">
+                                            <Image.GestureRecognizers>
+                                                <TapGestureRecognizer Command="{Binding ToggleEmailEditableCommand}" />
+                                            </Image.GestureRecognizers>
+                                        </Image>
+                                    </Frame>
+                                </Grid>
+                            </Frame>
+                            <Label
+                                FontSize="12"
+                                IsVisible="{Binding IsEmailErrorVisible}"
+                                Text="{Binding EmailError}"
+                                TextColor="#E53E3E" />
+                        </VerticalStackLayout>
+
+                        <!--  Họ Tên Field  -->
+                        <VerticalStackLayout Spacing="8">
+                            <Label
+                                FontAttributes="Bold"
+                                FontSize="16"
+                                Text="Họ và Tên"
+                                TextColor="#4A5568" />
+                            <Frame
+                                Padding="0"
+                                BackgroundColor="#F7FAFC"
+                                BorderColor="#E2E8F0"
+                                CornerRadius="12"
+                                HasShadow="False"
+                                HeightRequest="56">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="50" />
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="50" />
+                                    </Grid.ColumnDefinitions>
+                                    <Image
+                                        Grid.Column="0"
+                                        HeightRequest="24"
+                                        HorizontalOptions="Center"
+                                        Source="https://img.icons8.com/sf-regular/24/A259FF/user.png"
+                                        VerticalOptions="Center"
+                                        WidthRequest="24" />
+                                    <Entry
+                                        Grid.Column="1"
+                                        BackgroundColor="Transparent"
+                                        FontSize="16"
+                                        IsEnabled="{Binding IsFullnameEditable}"
+                                        Placeholder="Nhập họ và tên"
+                                        Text="{Binding Fullname}"
+                                        TextColor="#2D3748"
+                                        VerticalOptions="Center" />
+                                    <Frame
+                                        Grid.Column="2"
+                                        Padding="8"
+                                        BackgroundColor="Transparent"
+                                        BorderColor="Transparent"
+                                        CornerRadius="8"
+                                        HasShadow="False"
+                                        HorizontalOptions="Center"
+                                        VerticalOptions="Center">
+                                        <Image
+                                            HeightRequest="20"
+                                            Source="https://img.icons8.com/sf-regular/20/A259FF/edit.png"
+                                            WidthRequest="20">
+                                            <Image.GestureRecognizers>
+                                                <TapGestureRecognizer Command="{Binding ToggleFullnameEditableCommand}" />
+                                            </Image.GestureRecognizers>
+                                        </Image>
+                                    </Frame>
+                                </Grid>
+                            </Frame>
+                        </VerticalStackLayout>
+
+                        <!--  Phone Number Field  -->
+                        <VerticalStackLayout Spacing="8">
+                            <Label
+                                FontAttributes="Bold"
+                                FontSize="16"
+                                Text="Số điện thoại"
+                                TextColor="#4A5568" />
+                            <Frame
+                                Padding="0"
+                                BackgroundColor="#F7FAFC"
+                                BorderColor="#E2E8F0"
+                                CornerRadius="12"
+                                HasShadow="False"
+                                HeightRequest="56">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="50" />
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="50" />
+                                    </Grid.ColumnDefinitions>
+                                    <Image
+                                        Grid.Column="0"
+                                        HeightRequest="24"
+                                        HorizontalOptions="Center"
+                                        Source="https://img.icons8.com/sf-regular/24/A259FF/phone.png"
+                                        VerticalOptions="Center"
+                                        WidthRequest="24" />
+                                    <Entry
+                                        Grid.Column="1"
+                                        BackgroundColor="Transparent"
+                                        FontSize="16"
+                                        IsEnabled="{Binding IsPhoneEditable}"
+                                        Placeholder="Nhập số điện thoại"
+                                        Text="{Binding Phone}"
+                                        TextColor="#2D3748"
+                                        VerticalOptions="Center" />
+                                    <Frame
+                                        Grid.Column="2"
+                                        Padding="8"
+                                        BackgroundColor="Transparent"
+                                        BorderColor="Transparent"
+                                        CornerRadius="8"
+                                        HasShadow="False"
+                                        HorizontalOptions="Center"
+                                        VerticalOptions="Center">
+                                        <Image
+                                            HeightRequest="20"
+                                            Source="https://img.icons8.com/sf-regular/20/A259FF/edit.png"
+                                            WidthRequest="20">
+                                            <Image.GestureRecognizers>
+                                                <TapGestureRecognizer Command="{Binding TogglePhoneEditableCommand}" />
+                                            </Image.GestureRecognizers>
+                                        </Image>
+                                    </Frame>
+                                </Grid>
+                            </Frame>
+                        </VerticalStackLayout>
+
+                        <!--  Gender Field  -->
+                        <VerticalStackLayout Spacing="8">
+                            <Label
+                                FontAttributes="Bold"
+                                FontSize="16"
+                                Text="Giới Tính"
+                                TextColor="#4A5568" />
+                            <Frame
+                                Padding="0"
+                                BackgroundColor="#F7FAFC"
+                                BorderColor="#E2E8F0"
+                                CornerRadius="12"
+                                HasShadow="False"
+                                HeightRequest="56">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="50" />
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="50" />
+                                    </Grid.ColumnDefinitions>
+                                    <Image
+                                        Grid.Column="0"
+                                        HeightRequest="24"
+                                        HorizontalOptions="Center"
+                                        Source="https://img.icons8.com/sf-regular/24/A259FF/gender.png"
+                                        VerticalOptions="Center"
+                                        WidthRequest="24" />
+                                    <Picker
+                                        Title="Chọn giới tính"
+                                        Grid.Column="1"
+                                        BackgroundColor="Transparent"
+                                        FontSize="16"
+                                        IsEnabled="{Binding IsGenderEditable}"
+                                        ItemsSource="{Binding GenderOptions}"
+                                        SelectedItem="{Binding Gender}"
+                                        TextColor="#2D3748"
+                                        VerticalOptions="Center" />
+                                    <Frame
+                                        Grid.Column="2"
+                                        Padding="8"
+                                        BackgroundColor="Transparent"
+                                        BorderColor="Transparent"
+                                        CornerRadius="8"
+                                        HasShadow="False"
+                                        HorizontalOptions="Center"
+                                        VerticalOptions="Center">
+                                        <Image
+                                            HeightRequest="20"
+                                            Source="https://img.icons8.com/sf-regular/20/A259FF/edit.png"
+                                            WidthRequest="20">
+                                            <Image.GestureRecognizers>
+                                                <TapGestureRecognizer Command="{Binding ToggleGenderEditableCommand}" />
+                                            </Image.GestureRecognizers>
+                                        </Image>
+                                    </Frame>
+                                </Grid>
+                            </Frame>
+                        </VerticalStackLayout>
+
+                        <!--  Date of Birth Field  -->
+                        <VerticalStackLayout Spacing="8">
+                            <Label
+                                FontAttributes="Bold"
+                                FontSize="16"
+                                Text="Ngày Sinh"
+                                TextColor="#4A5568" />
+                            <Frame
+                                Padding="0"
+                                BackgroundColor="#F7FAFC"
+                                BorderColor="#E2E8F0"
+                                CornerRadius="12"
+                                HasShadow="False"
+                                HeightRequest="56">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="50" />
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="50" />
+                                    </Grid.ColumnDefinitions>
+                                    <Image
+                                        Grid.Column="0"
+                                        HeightRequest="24"
+                                        HorizontalOptions="Center"
+                                        Source="https://img.icons8.com/sf-regular/24/A259FF/calendar.png"
+                                        VerticalOptions="Center"
+                                        WidthRequest="24" />
+                                    <DatePicker
+                                        Grid.Column="1"
+                                        BackgroundColor="Transparent"
+                                        Date="{Binding DateOfBirth}"
+                                        FontSize="16"
+                                        Format="dd/MM/yyyy"
+                                        IsEnabled="{Binding IsDateOfBirthEditable}"
+                                        TextColor="#2D3748"
+                                        VerticalOptions="Center" />
+                                    <Frame
+                                        Grid.Column="2"
+                                        Padding="8"
+                                        BackgroundColor="Transparent"
+                                        BorderColor="Transparent"
+                                        CornerRadius="8"
+                                        HasShadow="False"
+                                        HorizontalOptions="Center"
+                                        VerticalOptions="Center">
+                                        <Image
+                                            HeightRequest="20"
+                                            Source="https://img.icons8.com/sf-regular/20/A259FF/edit.png"
+                                            WidthRequest="20">
+                                            <Image.GestureRecognizers>
+                                                <TapGestureRecognizer Command="{Binding ToggleDateOfBirthEditableCommand}" />
+                                            </Image.GestureRecognizers>
+                                        </Image>
+                                    </Frame>
+                                </Grid>
+                            </Frame>
+                        </VerticalStackLayout>
+
+                    </VerticalStackLayout>
+                </Frame>
+
+                <!--  Action Buttons với design hiện đại  -->
+                <VerticalStackLayout Spacing="16">
+                    <!--  Nút Save  -->
+                    <Frame
+                        Padding="2"
+                        BackgroundColor="#A259FF"
+                        BorderColor="Transparent"
+                        CornerRadius="16"
+                        HasShadow="True">
+                        <Button
+                            BackgroundColor="Transparent"
+                            Command="{Binding SaveUserDataCommand}"
+                            FontAttributes="Bold"
+                            FontSize="16"
+                            HeightRequest="52"
+                            Text="💾 Lưu Thay Đổi"
+                            TextColor="White" />
+                    </Frame>
+
+                    <!--  Nút Đổi mật khẩu  -->
+                    <Frame
+                        Padding="2"
+                        BackgroundColor="White"
+                        BorderColor="#E2E8F0"
+                        CornerRadius="16"
+                        HasShadow="True">
+                        <Button
+                            BackgroundColor="Transparent"
+                            Command="{Binding NavigateToUpdatePasswordPageCommand}"
+                            FontAttributes="Bold"
+                            FontSize="16"
+                            HeightRequest="52"
+                            Text="🔒 Đổi mật khẩu"
+                            TextColor="#4A5568" />
+                    </Frame>
+
+                    <!--  Nút Đăng xuất  -->
+                    <Frame
+                        Padding="2"
+                        BackgroundColor="White"
+                        BorderColor="#E2E8F0"
+                        CornerRadius="16"
+                        HasShadow="True">
+                        <Button
+                            BackgroundColor="Transparent"
+                            Command="{Binding NavigateToLogOutCommand}"
+                            FontAttributes="Bold"
+                            FontSize="16"
+                            HeightRequest="52"
+                            Text="👋 Đăng xuất"
+                            TextColor="#4A5568" />
+                    </Frame>
+
+                    <!--  Nút Xóa Tài Khoản  -->
+                    <Frame
+                        Padding="2"
+                        BackgroundColor="#E53E3E"
+                        BorderColor="Transparent"
+                        CornerRadius="16"
+                        HasShadow="True">
+                        <Button
+                            BackgroundColor="Transparent"
+                            Command="{Binding DeleteUserDataCommand}"
+                            FontAttributes="Bold"
+                            FontSize="16"
+                            HeightRequest="52"
+                            Text="🗑️ Xóa Tài Khoản"
+                            TextColor="White" />
+                    </Frame>
+                </VerticalStackLayout>
+
+            </StackLayout>
+        </ScrollView>
+
+        <!--  HEADER được cải thiện với gradient  -->
+        <Grid
+            x:Name="HeaderContainer"
+            BackgroundColor="Transparent"
+            HeightRequest="80"
+            VerticalOptions="Start">
+            <Border>
+                <Border.StrokeShape>
+                    <RoundRectangle CornerRadius="0,0,40,40" />
+                </Border.StrokeShape>
+                <Border.Background>
+                    <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                        <GradientStop Offset="0.0" Color="#A259FF" />
+                        <GradientStop Offset="1.0" Color="#7C3AED" />
+                    </LinearGradientBrush>
+                </Border.Background>
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="80" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+
+                    <!--  Back Button được cải thiện  -->
+                    <Frame
+                        Grid.Column="0"
+                        Margin="12,12,0,0"
+                        Padding="0"
+                        BackgroundColor="White"
+                        BorderColor="#E0E6ED"
+                        CornerRadius="25"
+                        HasShadow="True"
+                        HeightRequest="50"
+                        HorizontalOptions="Start"
+                        VerticalOptions="Start"
+                        WidthRequest="50">
+                        <Button
+                            BackgroundColor="Transparent"
+                            BorderWidth="0"
+                            Clicked="OnBackButtonClicked"
+                            FontAttributes="Bold"
+                            FontFamily="Arial"
+                            FontSize="28"
+                            Text="←"
+                            TextColor="Black" />
+                    </Frame>
+
+                    <Label
+                        Grid.Column="1"
+                        Margin="0,20,24,0"
+                        FontAttributes="Bold"
+                        FontSize="24"
+                        Text="Trang Cá Nhân"
+                        TextColor="White"
+                        VerticalOptions="Start" />
+
+                </Grid>
+            </Border>
+        </Grid>
+    </Grid>
+
+</ContentPage>

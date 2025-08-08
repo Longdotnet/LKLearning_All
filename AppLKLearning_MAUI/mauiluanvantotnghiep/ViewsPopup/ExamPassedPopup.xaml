@@ -1,0 +1,182 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<toolkit:Popup
+    x:Class="mauiluanvantotnghiep.ViewsPopup.ExamPassedPopup"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+    CanBeDismissedByTappingOutsideOfPopup="False"
+    Color="Transparent">
+
+    <Frame
+        Padding="20"
+        BackgroundColor="White"
+        BorderColor="#4CAF50"
+        CornerRadius="24"
+        HasShadow="True"
+        HorizontalOptions="Center"
+        VerticalOptions="Center"
+        WidthRequest="380">
+        <!--  ✅ SỬA: Tăng WidthRequest để chứa 3 nút  -->
+
+        <VerticalStackLayout
+            Padding="10"
+            HorizontalOptions="Center"
+            Spacing="16">
+
+            <!--  Success Icon  -->
+            <Frame
+                Padding="0"
+                BackgroundColor="#4CAF50"
+                CornerRadius="40"
+                HasShadow="True"
+                HeightRequest="80"
+                HorizontalOptions="Center"
+                WidthRequest="80">
+                <Label
+                    FontAttributes="Bold"
+                    FontSize="40"
+                    HorizontalOptions="Center"
+                    Text="✓"
+                    TextColor="White"
+                    VerticalOptions="Center" />
+            </Frame>
+
+            <!--  Title  -->
+            <Label
+                FontAttributes="Bold"
+                FontSize="24"
+                HorizontalOptions="Center"
+                Text="🎉 Chúc mừng! 🎉"
+                TextColor="#4CAF50"
+                VerticalOptions="Center" />
+
+            <!--  Message  -->
+            <Label
+                FontSize="16"
+                HorizontalOptions="Center"
+                HorizontalTextAlignment="Center"
+                Text="Bạn đã vượt qua bài kiểm tra thành công!"
+                TextColor="Black" />
+
+            <!--  Score Information  -->
+            <Frame
+                Padding="15"
+                BackgroundColor="#E8F5E8"
+                CornerRadius="12"
+                HasShadow="False"
+                HorizontalOptions="Center">
+                <VerticalStackLayout Spacing="8">
+                    <Label
+                        x:Name="ScoreLabel"
+                        FontAttributes="Bold"
+                        FontSize="18"
+                        HorizontalTextAlignment="Center"
+                        Text="Điểm số: -- điểm"
+                        TextColor="#2E7D32" />
+                    <Label
+                        x:Name="PassingScoreLabel"
+                        FontSize="14"
+                        HorizontalTextAlignment="Center"
+                        Text="Điểm cần đạt: -- điểm"
+                        TextColor="#2E7D32" />
+                </VerticalStackLayout>
+            </Frame>
+
+            <!--  Certificate Image tràn viền toàn bộ chiều rộng  -->
+            <Frame
+                Padding="0"
+                BackgroundColor="Transparent"
+                BorderColor="Transparent"
+                CornerRadius="12"
+                HasShadow="True"
+                HeightRequest="200"
+                HorizontalOptions="FillAndExpand">
+                <Grid>
+                    <!--  Main Certificate Image - Fill toàn bộ khung  -->
+                    <Image
+                        x:Name="CertificateImage"
+                        Aspect="AspectFill"
+                        BackgroundColor="White"
+                        HorizontalOptions="FillAndExpand"
+                        VerticalOptions="FillAndExpand" />
+
+                    <!--  Loading Overlay  -->
+                    <Frame
+                        Padding="0"
+                        BackgroundColor="#80000000"
+                        BorderColor="Transparent"
+                        CornerRadius="12"
+                        HorizontalOptions="FillAndExpand"
+                        IsVisible="{Binding Source={x:Reference CertificateImage}, Path=IsLoading}"
+                        VerticalOptions="FillAndExpand">
+                        <StackLayout
+                            HorizontalOptions="Center"
+                            Orientation="Vertical"
+                            Spacing="10"
+                            VerticalOptions="Center">
+                            <ActivityIndicator
+                                HorizontalOptions="Center"
+                                IsRunning="{Binding Source={x:Reference CertificateImage}, Path=IsLoading}"
+                                VerticalOptions="Center"
+                                Color="White" />
+                            <Label
+                                FontSize="12"
+                                HorizontalOptions="Center"
+                                Text="Đang tải chứng chỉ..."
+                                TextColor="White"
+                                VerticalOptions="Center" />
+                        </StackLayout>
+                    </Frame>
+                </Grid>
+            </Frame>
+
+            <!--  Info  -->
+            <Label
+                FontSize="12"
+                HorizontalOptions="Center"
+                HorizontalTextAlignment="Center"
+                Text="Bạn có thể xem lại chứng chỉ qua mục chứng chỉ trong tiện ích."
+                TextColor="Gray" />
+
+            <!--  ✅ SỬA: 3 Buttons với Share button  -->
+            <Grid ColumnDefinitions="*,5,*,5,*" HorizontalOptions="Center">
+                <!--  Download Button  -->
+                <Button
+                    x:Name="DownloadButton"
+                    Grid.Column="0"
+                    BackgroundColor="#2196F3"
+                    CornerRadius="12"
+                    FontAttributes="Bold"
+                    FontSize="12"
+                    HeightRequest="45"
+                    Text="Tải về"
+                    TextColor="White" />
+
+                <!--  Share Button  -->
+                <Button
+                    x:Name="ShareButton"
+                    Grid.Column="2"
+                    BackgroundColor="#FF9800"
+                    CornerRadius="12"
+                    FontAttributes="Bold"
+                    FontSize="12"
+                    HeightRequest="45"
+                    Text="Chia sẻ"
+                    TextColor="White" />
+
+                <!--  Close Button  -->
+                <Button
+                    x:Name="CloseButton"
+                    Grid.Column="4"
+                    BackgroundColor="#4CAF50"
+                    CornerRadius="12"
+                    FontAttributes="Bold"
+                    FontSize="12"
+                    HeightRequest="45"
+                    Text="Hiểu rồi"
+                    TextColor="White" />
+            </Grid>
+
+        </VerticalStackLayout>
+    </Frame>
+</toolkit:Popup>

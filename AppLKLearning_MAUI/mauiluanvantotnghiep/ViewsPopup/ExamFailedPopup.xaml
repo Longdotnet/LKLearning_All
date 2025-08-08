@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<toolkit:Popup
+    x:Class="mauiluanvantotnghiep.ViewsPopup.ExamFailedPopup"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+    CanBeDismissedByTappingOutsideOfPopup="False"
+    Color="Transparent">
+
+    <Frame
+        Padding="20"
+        BackgroundColor="White"
+        BorderColor="#F44336"
+        CornerRadius="24"
+        HasShadow="True"
+        HorizontalOptions="Center"
+        VerticalOptions="Center"
+        WidthRequest="350">
+
+        <VerticalStackLayout
+            Padding="10"
+            HorizontalOptions="Center"
+            Spacing="16">
+
+            <!--  Failed Icon  -->
+            <Frame
+                Padding="0"
+                BackgroundColor="#F44336"
+                CornerRadius="40"
+                HasShadow="True"
+                HeightRequest="80"
+                HorizontalOptions="Center"
+                WidthRequest="80">
+                <Label
+                    FontAttributes="Bold"
+                    FontSize="40"
+                    HorizontalOptions="Center"
+                    Text="✗"
+                    TextColor="White"
+                    VerticalOptions="Center" />
+            </Frame>
+
+            <!--  Title  -->
+            <Label
+                FontAttributes="Bold"
+                FontSize="20"
+                HorizontalOptions="Center"
+                Text="Chưa đạt yêu cầu"
+                TextColor="#F44336"
+                VerticalOptions="Center" />
+
+            <!--  Message  -->
+            <Label
+                FontSize="14"
+                HorizontalOptions="Center"
+                HorizontalTextAlignment="Center"
+                MaxLines="2"
+                Text="Rất tiếc! Bạn chưa đạt điểm tối thiểu để vượt qua bài kiểm tra."
+                TextColor="Black" />
+
+            <!--  Score Information  -->
+            <Frame
+                Padding="15"
+                BackgroundColor="#FFEBEE"
+                CornerRadius="12"
+                HasShadow="False"
+                HorizontalOptions="Center">
+                <VerticalStackLayout Spacing="8">
+                    <Label
+                        x:Name="ScoreLabel"
+                        FontAttributes="Bold"
+                        FontSize="18"
+                        HorizontalTextAlignment="Center"
+                        TextColor="#C62828" />
+                    <Label
+                        x:Name="PassingScoreLabel"
+                        FontSize="14"
+                        HorizontalTextAlignment="Center"
+                        TextColor="#C62828" />
+                </VerticalStackLayout>
+            </Frame>
+
+            <!--  Encouragement Message  -->
+            <Frame
+                Padding="15"
+                BackgroundColor="#FFF3E0"
+                CornerRadius="12"
+                HasShadow="False"
+                HorizontalOptions="Center">
+                <VerticalStackLayout Spacing="5">
+                    <Label
+                        FontAttributes="Bold"
+                        FontSize="14"
+                        HorizontalTextAlignment="Center"
+                        Text="💪 Đừng bỏ cuộc!"
+                        TextColor="#FF8F00" />
+                    <Label
+                        FontSize="12"
+                        HorizontalTextAlignment="Center"
+                        MaxLines="2"
+                        Text="Hãy ôn tập thêm các bài học và thử lại. Bạn sẽ thành công!"
+                        TextColor="#FF8F00" />
+                </VerticalStackLayout>
+            </Frame>
+
+            <!--  Buttons  -->
+            <Grid ColumnDefinitions="*,10,*" HorizontalOptions="Center">
+                <Button
+                    x:Name="RetryButton"
+                    Grid.Column="0"
+                    BackgroundColor="#FF9800"
+                    CornerRadius="12"
+                    FontAttributes="Bold"
+                    HeightRequest="45"
+                    Text="Làm lại"
+                    TextColor="White" />
+
+                <Button
+                    x:Name="CloseButton"
+                    Grid.Column="2"
+                    BackgroundColor="#9E9E9E"
+                    CornerRadius="12"
+                    FontAttributes="Bold"
+                    HeightRequest="45"
+                    Text="Về trang chủ"
+                    TextColor="White" />
+            </Grid>
+
+        </VerticalStackLayout>
+    </Frame>
+</toolkit:Popup>

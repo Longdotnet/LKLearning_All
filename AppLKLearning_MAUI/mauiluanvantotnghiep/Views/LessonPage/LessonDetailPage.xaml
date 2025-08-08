@@ -1,0 +1,267 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    x:Class="mauiluanvantotnghiep.Views.LessonPage.LessonDetailPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:conv="clr-namespace:mauiluanvantotnghiep.Converters">
+
+    <ContentPage.Background>
+        <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+            <GradientStop Offset="0.0" Color="#F0F8FF" />
+            <GradientStop Offset="1.0" Color="#E1E1FF" />
+        </LinearGradientBrush>
+    </ContentPage.Background>
+
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <conv:HtmlWrapperConverter x:Key="HtmlWrapperConverter" />
+            <Style TargetType="Button">
+                <Setter Property="BackgroundColor" Value="#FF69B4" />
+                <Setter Property="TextColor" Value="White" />
+                <Setter Property="CornerRadius" Value="24" />
+                <Setter Property="FontAttributes" Value="Bold" />
+                <Setter Property="HeightRequest" Value="52" />
+            </Style>
+        </ResourceDictionary>
+    </ContentPage.Resources>
+
+    <Grid>
+        <!--  Enhanced Section Indicator  -->
+        <Border
+            x:Name="SectionIndicator"
+            Margin="0,25,0,0"
+            Padding="20,12"
+            BackgroundColor="#FF69B4"
+            HorizontalOptions="Center"
+            IsVisible="False"
+            StrokeShape="RoundRectangle 25"
+            VerticalOptions="Start"
+            ZIndex="10">
+            <Border.Shadow>
+                <Shadow
+                    Brush="#AA000000"
+                    Opacity="0.3"
+                    Radius="8"
+                    Offset="0,4" />
+            </Border.Shadow>
+            <Border.Background>
+                <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                    <GradientStop Offset="0.0" Color="#FF69B4" />
+                    <GradientStop Offset="1.0" Color="#FF1493" />
+                </LinearGradientBrush>
+            </Border.Background>
+            <Grid ColumnDefinitions="Auto,*,Auto">
+                <!--  Icon indicator  -->
+                <Label
+                    x:Name="IndicatorIcon"
+                    Grid.Column="0"
+                    FontSize="18"
+                    Text="📍"
+                    TextColor="White"
+                    VerticalOptions="Center" />
+
+                <!--  Text indicator  -->
+                <Label
+                    x:Name="IndicatorLabel"
+                    Grid.Column="1"
+                    Margin="8,0,8,0"
+                    FontAttributes="Bold"
+                    FontSize="16"
+                    HorizontalOptions="Center"
+                    Text="Tiêu đề bài học"
+                    TextColor="White"
+                    VerticalOptions="Center" />
+
+                <!--  Progress dots  -->
+                <StackLayout
+                    x:Name="ProgressDots"
+                    Grid.Column="2"
+                    Orientation="Horizontal"
+                    Spacing="4"
+                    VerticalOptions="Center">
+                    <Ellipse
+                        x:Name="Dot1"
+                        Fill="White"
+                        HeightRequest="6"
+                        Opacity="0.6"
+                        WidthRequest="6" />
+                    <Ellipse
+                        x:Name="Dot2"
+                        Fill="White"
+                        HeightRequest="6"
+                        Opacity="0.6"
+                        WidthRequest="6" />
+                    <Ellipse
+                        x:Name="Dot3"
+                        Fill="White"
+                        HeightRequest="6"
+                        Opacity="0.6"
+                        WidthRequest="6" />
+                    <Ellipse
+                        x:Name="Dot4"
+                        Fill="White"
+                        HeightRequest="6"
+                        Opacity="0.6"
+                        WidthRequest="6" />
+                </StackLayout>
+            </Grid>
+        </Border>
+
+        <!--  Main Scrollable Content  -->
+        <ScrollView x:Name="MainScrollView" Scrolled="MainScrollView_Scrolled">
+            <VerticalStackLayout Padding="14,0,28,0" Spacing="20">
+
+                <!--  Section 1: Title Section  -->
+                <Frame
+                    x:Name="TitleSection"
+                    Padding="24"
+                    BackgroundColor="White"
+                    BorderColor="#FF69B4"
+                    CornerRadius="24"
+                    HasShadow="True">
+                    <VerticalStackLayout HorizontalOptions="Center" Spacing="16">
+                        <Image
+                            x:Name="SectionImage"
+                            HeightRequest="200"
+                            HorizontalOptions="Center"
+                            Source="{Binding UrlImageLesson}"
+                            WidthRequest="200" />
+                        <Label
+                            x:Name="SectionTitle"
+                            FontAttributes="Bold"
+                            FontSize="32"
+                            HorizontalOptions="Center"
+                            Text="{Binding LessonTitle}"
+                            TextColor="#FF69B4"
+                            TextTransform="Uppercase" />
+                        <BoxView
+                            BackgroundColor="#FF69B4"
+                            CornerRadius="1.5"
+                            HeightRequest="3"
+                            HorizontalOptions="Center"
+                            WidthRequest="80" />
+                    </VerticalStackLayout>
+                </Frame>
+
+                <!--  Section 2: Introduction Section  -->
+                <Frame
+                    x:Name="IntroductionSection"
+                    Padding="24"
+                    BackgroundColor="White"
+                    BorderColor="#E1E1FF"
+                    CornerRadius="20"
+                    HasShadow="True">
+                    <VerticalStackLayout Spacing="12">
+                        <Label
+                            FontAttributes="Bold"
+                            FontSize="22"
+                            HorizontalOptions="Start"
+                            Text="📖 Giới thiệu bài học"
+                            TextColor="#FF69B4" />
+                        <BoxView
+                            BackgroundColor="#FF69B4"
+                            CornerRadius="1"
+                            HeightRequest="2"
+                            Opacity="0.3" />
+                        <Label
+                            x:Name="SectionContent"
+                            Margin="0,8,0,0"
+                            FontSize="16"
+                            LineBreakMode="WordWrap"
+                            LineHeight="1.4"
+                            Text="{Binding LessonContent}"
+                            TextColor="#333" />
+                    </VerticalStackLayout>
+                </Frame>
+
+                <!--  Section 3: Main Content Section  -->
+                <Frame
+                    x:Name="ContentSection"
+                    Padding="24"
+                    BackgroundColor="White"
+                    BorderColor="#E1E1FF"
+                    CornerRadius="20"
+                    HasShadow="True">
+                    <VerticalStackLayout Spacing="16">
+                        <Label
+                            FontAttributes="Bold"
+                            FontSize="22"
+                            HorizontalOptions="Start"
+                            Text="📚 Nội dung bài học"
+                            TextColor="#FF69B4" />
+                        <BoxView
+                            BackgroundColor="#FF69B4"
+                            CornerRadius="1"
+                            HeightRequest="2"
+                            Opacity="0.3" />
+                        <WebView
+                            x:Name="SectionDescription"
+                            Margin="0,8,0,0"
+                            MinimumHeightRequest="300"
+                            Source="{Binding LessonDescription, Converter={StaticResource HtmlWrapperConverter}}" />
+                    </VerticalStackLayout>
+                </Frame>
+
+                <!--  Section 4: Quiz Action Section  -->
+                <Frame
+                    x:Name="QuizSection"
+                    Padding="24"
+                    BackgroundColor="#FF69B4"
+                    BorderColor="#FF69B4"
+                    CornerRadius="20"
+                    HasShadow="True">
+                    <VerticalStackLayout HorizontalOptions="Center" Spacing="16">
+                        <Label
+                            FontAttributes="Bold"
+                            FontSize="20"
+                            HorizontalOptions="Center"
+                            Text="🎯 Sẵn sàng kiểm tra kiến thức?"
+                            TextColor="White" />
+                        <Button
+                            x:Name="SectionQuiz"
+                            BackgroundColor="White"
+                            Command="{Binding GoToTestCommand}"
+                            CornerRadius="24"
+                            FontAttributes="Bold"
+                            FontSize="18"
+                            HeightRequest="52"
+                            Text="Làm Bài Tập Test"
+                            TextColor="#FF69B4" />
+                    </VerticalStackLayout>
+                </Frame>
+
+                <!--  Bottom Spacing  -->
+                <BoxView BackgroundColor="Transparent" HeightRequest="20" />
+
+            </VerticalStackLayout>
+        </ScrollView>
+
+        <!--  Custom Scrollbar  -->
+        <Grid
+            Margin="0,24,12,24"
+            HorizontalOptions="End"
+            VerticalOptions="Fill"
+            WidthRequest="16">
+            <BoxView CornerRadius="8">
+                <BoxView.Background>
+                    <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                        <GradientStop Offset="0.0" Color="#FF69B4" />
+                        <GradientStop Offset="1.0" Color="#E1E1FF" />
+                    </LinearGradientBrush>
+                </BoxView.Background>
+            </BoxView>
+            <BoxView
+                x:Name="ThumbBar"
+                CornerRadius="8"
+                HeightRequest="60"
+                VerticalOptions="Start">
+                <BoxView.Background>
+                    <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                        <GradientStop Offset="0.0" Color="#FF69B4" />
+                        <GradientStop Offset="1.0" Color="#6A8DFF" />
+                    </LinearGradientBrush>
+                </BoxView.Background>
+            </BoxView>
+        </Grid>
+    </Grid>
+</ContentPage>

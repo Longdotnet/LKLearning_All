@@ -1,0 +1,602 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    x:Class="mauiluanvantotnghiep.Views.StoryPage.StoryPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:converters="clr-namespace:mauiluanvantotnghiep.Converters"
+    xmlns:tookit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+    xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+    xmlns:vm="clr-namespace:mauiluanvantotnghiep.ViewModels"
+    Title="Story Generator"
+    BackgroundColor="{StaticResource Gray100}">
+
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <converters:StringToBoolConverter x:Key="StringToBoolConverter" />
+
+            <!--  Custom Styles  -->
+            <Style x:Key="GenreCardStyle" TargetType="Frame">
+                <Setter Property="BackgroundColor" Value="{StaticResource White}" />
+                <Setter Property="HasShadow" Value="True" />
+                <Setter Property="CornerRadius" Value="16" />
+                <Setter Property="Padding" Value="12" />
+                <Setter Property="Margin" Value="4" />
+                <Setter Property="HeightRequest" Value="100" />
+                <Setter Property="VerticalOptions" Value="Fill" />
+            </Style>
+
+            <Style x:Key="AgeCardStyle" TargetType="Frame">
+                <Setter Property="BackgroundColor" Value="{StaticResource White}" />
+                <Setter Property="HasShadow" Value="True" />
+                <Setter Property="CornerRadius" Value="16" />
+                <Setter Property="Padding" Value="12" />
+                <Setter Property="Margin" Value="4" />
+                <Setter Property="HeightRequest" Value="90" />
+                <Setter Property="VerticalOptions" Value="Fill" />
+            </Style>
+
+            <Style x:Key="GenrePickerStyle" TargetType="Frame">
+                <Setter Property="BackgroundColor" Value="{StaticResource White}" />
+                <Setter Property="HasShadow" Value="True" />
+                <Setter Property="CornerRadius" Value="16" />
+                <Setter Property="Padding" Value="16" />
+                <Setter Property="Margin" Value="8,4" />
+            </Style>
+
+            <Style x:Key="AudioButtonStyle" TargetType="Button">
+                <Setter Property="BackgroundColor" Value="{StaticResource Secondary}" />
+                <Setter Property="TextColor" Value="{StaticResource Primary}" />
+                <Setter Property="FontSize" Value="16" />
+                <Setter Property="FontAttributes" Value="Bold" />
+                <Setter Property="CornerRadius" Value="25" />
+                <Setter Property="HeightRequest" Value="50" />
+                <Setter Property="WidthRequest" Value="50" />
+            </Style>
+
+            <!--  Language Toggle Button Style  -->
+            <Style x:Key="LanguageToggleStyle" TargetType="Button">
+                <Setter Property="BackgroundColor" Value="{StaticResource Primary}" />
+                <Setter Property="TextColor" Value="{StaticResource White}" />
+                <Setter Property="FontSize" Value="14" />
+                <Setter Property="FontAttributes" Value="Bold" />
+                <Setter Property="CornerRadius" Value="20" />
+                <Setter Property="HeightRequest" Value="40" />
+                <Setter Property="Padding" Value="15,0" />
+            </Style>
+        </ResourceDictionary>
+    </ContentPage.Resources>
+
+    <ContentPage.BindingContext>
+        <vm:StoryViewModel />
+    </ContentPage.BindingContext>
+
+    <Grid>
+        <ScrollView>
+            <VerticalStackLayout Padding="16" Spacing="20">
+
+                <!--  Header  -->
+                <Frame
+                    Padding="20"
+                    BackgroundColor="{StaticResource Primary}"
+                    CornerRadius="20">
+                    <VerticalStackLayout Spacing="12">
+                        <Image
+                            HeightRequest="60"
+                            HorizontalOptions="Center"
+                            IsAnimationPlaying="True"
+                            Source="logo.gif"
+                            WidthRequest="250" />
+
+                        <Label
+                            FontAttributes="Bold"
+                            FontSize="20"
+                            HorizontalTextAlignment="Center"
+                            Text="✨ Tạo câu truyện song ngữ ✨"
+                            TextColor="{StaticResource White}" />
+                    </VerticalStackLayout>
+                </Frame>
+
+                <!--  Genre Selection  -->
+                <Frame Style="{StaticResource GenrePickerStyle}">
+                    <VerticalStackLayout Spacing="16">
+                        <Label
+                            FontAttributes="Bold"
+                            FontSize="18"
+                            Text="🎨 Chọn thể loại truyện"
+                            TextColor="{StaticResource Primary}" />
+
+                        <!--  Selected Genre Display  -->
+                        <Frame HeightRequest="70" Style="{StaticResource GenreCardStyle}">
+                            <Frame.GestureRecognizers>
+                                <TapGestureRecognizer Command="{Binding ToggleGenrePickerCommand}" />
+                            </Frame.GestureRecognizers>
+
+                            <Grid ColumnDefinitions="Auto,*,Auto" RowSpacing="4">
+                                <Border
+                                    Grid.Column="0"
+                                    BackgroundColor="{Binding SelectedGenre.Color}"
+                                    HeightRequest="40"
+                                    HorizontalOptions="Center"
+                                    StrokeShape="RoundRectangle 20"
+                                    VerticalOptions="Start"
+                                    WidthRequest="40">
+                                    <Label
+                                        FontSize="20"
+                                        HorizontalOptions="Center"
+                                        Text="{Binding SelectedGenre.Icon}"
+                                        VerticalOptions="Center" />
+                                </Border>
+
+                                <VerticalStackLayout
+                                    Grid.Column="1"
+                                    Margin="12,0,0,0"
+                                    Spacing="4"
+                                    VerticalOptions="Center">
+                                    <Label
+                                        FontAttributes="Bold"
+                                        FontSize="16"
+                                        LineBreakMode="WordWrap"
+                                        Text="{Binding SelectedGenre.DisplayName}"
+                                        TextColor="{StaticResource Gray900}" />
+                                    <Label
+                                        FontSize="12"
+                                        LineBreakMode="WordWrap"
+                                        Text="{Binding SelectedGenre.Description}"
+                                        TextColor="{StaticResource Gray600}" />
+                                </VerticalStackLayout>
+
+                                <Label
+                                    Grid.Column="2"
+                                    FontSize="16"
+                                    HorizontalOptions="Center"
+                                    Text="▼"
+                                    VerticalOptions="Center">
+                                    <Label.Triggers>
+                                        <DataTrigger
+                                            Binding="{Binding IsGenrePickerVisible}"
+                                            TargetType="Label"
+                                            Value="True">
+                                            <Setter Property="Text" Value="▲" />
+                                        </DataTrigger>
+                                    </Label.Triggers>
+                                </Label>
+                            </Grid>
+                        </Frame>
+
+                        <!--  Genre Options - CollectionView  -->
+                        <CollectionView
+                            IsVisible="{Binding IsGenrePickerVisible}"
+                            ItemsSource="{Binding Genres}"
+                            SelectionMode="None">
+                            <CollectionView.ItemsLayout>
+                                <GridItemsLayout Orientation="Vertical" Span="2" />
+                            </CollectionView.ItemsLayout>
+
+                            <CollectionView.ItemTemplate>
+                                <DataTemplate>
+                                    <Frame Margin="4" Style="{StaticResource GenreCardStyle}">
+                                        <Frame.GestureRecognizers>
+                                            <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type vm:StoryViewModel}}, Path=SelectGenreCommand}" CommandParameter="{Binding}" />
+                                        </Frame.GestureRecognizers>
+
+                                        <Grid ColumnDefinitions="Auto,*" RowSpacing="4">
+                                            <Border
+                                                Grid.Column="0"
+                                                BackgroundColor="{Binding Color}"
+                                                HeightRequest="35"
+                                                HorizontalOptions="Start"
+                                                StrokeShape="RoundRectangle 17"
+                                                VerticalOptions="Start"
+                                                WidthRequest="35">
+                                                <Label
+                                                    FontSize="18"
+                                                    HorizontalOptions="Center"
+                                                    Text="{Binding Icon}"
+                                                    VerticalOptions="Center" />
+                                            </Border>
+
+                                            <VerticalStackLayout
+                                                Grid.Column="1"
+                                                Margin="8,0,0,0"
+                                                Spacing="2"
+                                                VerticalOptions="Start">
+                                                <Label
+                                                    FontAttributes="Bold"
+                                                    FontSize="14"
+                                                    Text="{Binding DisplayName}"
+                                                    TextColor="{StaticResource Gray900}" />
+                                                <Label
+                                                    FontSize="10"
+                                                    LineBreakMode="WordWrap"
+                                                    Text="{Binding Description}"
+                                                    TextColor="{StaticResource Gray600}" />
+                                            </VerticalStackLayout>
+                                        </Grid>
+                                    </Frame>
+                                </DataTemplate>
+                            </CollectionView.ItemTemplate>
+                        </CollectionView>
+                    </VerticalStackLayout>
+                </Frame>
+
+                <!--  Age Group Selection  -->
+                <Frame Style="{StaticResource GenrePickerStyle}">
+                    <VerticalStackLayout Spacing="16">
+                        <Label
+                            FontAttributes="Bold"
+                            FontSize="18"
+                            Text="👶 Chọn độ tuổi"
+                            TextColor="{StaticResource Primary}" />
+
+                        <!--  Selected Age Group Display  -->
+                        <Frame HeightRequest="70" Style="{StaticResource AgeCardStyle}">
+                            <Frame.GestureRecognizers>
+                                <TapGestureRecognizer Command="{Binding ToggleAgePickerCommand}" />
+                            </Frame.GestureRecognizers>
+
+                            <Grid ColumnDefinitions="Auto,*,Auto" RowSpacing="4">
+                                <Border
+                                    Grid.Column="0"
+                                    BackgroundColor="{Binding SelectedAgeGroup.Color}"
+                                    HeightRequest="40"
+                                    HorizontalOptions="Center"
+                                    StrokeShape="RoundRectangle 20"
+                                    VerticalOptions="Start"
+                                    WidthRequest="40">
+                                    <Label
+                                        FontSize="20"
+                                        HorizontalOptions="Center"
+                                        Text="{Binding SelectedAgeGroup.Icon}"
+                                        VerticalOptions="Center" />
+                                </Border>
+
+                                <VerticalStackLayout
+                                    Grid.Column="1"
+                                    Margin="12,0,0,0"
+                                    Spacing="2"
+                                    VerticalOptions="Center">
+                                    <Label
+                                        FontAttributes="Bold"
+                                        FontSize="16"
+                                        LineBreakMode="WordWrap"
+                                        Text="{Binding SelectedAgeGroup.DisplayName}"
+                                        TextColor="{StaticResource Gray900}" />
+                                    <Label
+                                        FontAttributes="Bold"
+                                        FontSize="12"
+                                        LineBreakMode="WordWrap"
+                                        Text="{Binding SelectedAgeGroup.AgeRange}"
+                                        TextColor="{StaticResource Primary}" />
+                                    <Label
+                                        FontSize="10"
+                                        LineBreakMode="WordWrap"
+                                        Text="{Binding SelectedAgeGroup.Description}"
+                                        TextColor="{StaticResource Gray600}" />
+                                </VerticalStackLayout>
+
+                                <Label
+                                    Grid.Column="2"
+                                    FontSize="16"
+                                    HorizontalOptions="Center"
+                                    Text="▼"
+                                    VerticalOptions="Center">
+                                    <Label.Triggers>
+                                        <DataTrigger
+                                            Binding="{Binding IsAgePickerVisible}"
+                                            TargetType="Label"
+                                            Value="True">
+                                            <Setter Property="Text" Value="▲" />
+                                        </DataTrigger>
+                                    </Label.Triggers>
+                                </Label>
+                            </Grid>
+                        </Frame>
+
+                        <!--  Age Group Options - CollectionView  -->
+                        <CollectionView
+                            IsVisible="{Binding IsAgePickerVisible}"
+                            ItemsSource="{Binding AgeGroups}"
+                            SelectionMode="None">
+                            <CollectionView.ItemsLayout>
+                                <GridItemsLayout Orientation="Vertical" Span="2" />
+                            </CollectionView.ItemsLayout>
+
+                            <CollectionView.ItemTemplate>
+                                <DataTemplate>
+                                    <Frame Margin="4" Style="{StaticResource AgeCardStyle}">
+                                        <Frame.GestureRecognizers>
+                                            <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type vm:StoryViewModel}}, Path=SelectAgeGroupCommand}" CommandParameter="{Binding}" />
+                                        </Frame.GestureRecognizers>
+
+                                        <Grid ColumnDefinitions="Auto,*" RowSpacing="2">
+                                            <Border
+                                                Grid.Column="0"
+                                                BackgroundColor="{Binding Color}"
+                                                HeightRequest="32"
+                                                HorizontalOptions="Start"
+                                                StrokeShape="RoundRectangle 16"
+                                                VerticalOptions="Start"
+                                                WidthRequest="32">
+                                                <Label
+                                                    FontSize="16"
+                                                    HorizontalOptions="Center"
+                                                    Text="{Binding Icon}"
+                                                    VerticalOptions="Center" />
+                                            </Border>
+
+                                            <VerticalStackLayout
+                                                Grid.Column="1"
+                                                Margin="8,0,0,0"
+                                                Spacing="1"
+                                                VerticalOptions="Start">
+                                                <Label
+                                                    FontAttributes="Bold"
+                                                    FontSize="13"
+                                                    Text="{Binding DisplayName}"
+                                                    TextColor="{StaticResource Gray900}" />
+                                                <Label
+                                                    FontAttributes="Bold"
+                                                    FontSize="11"
+                                                    Text="{Binding AgeRange}"
+                                                    TextColor="{StaticResource Primary}" />
+                                                <Label
+                                                    FontSize="9"
+                                                    LineBreakMode="WordWrap"
+                                                    Text="{Binding Description}"
+                                                    TextColor="{StaticResource Gray600}" />
+                                            </VerticalStackLayout>
+                                        </Grid>
+                                    </Frame>
+                                </DataTemplate>
+                            </CollectionView.ItemTemplate>
+                        </CollectionView>
+                    </VerticalStackLayout>
+                </Frame>
+
+                <!--  Generate Button  -->
+                <Button
+                    BackgroundColor="{StaticResource Primary}"
+                    Command="{Binding GenerateAllCommand}"
+                    CornerRadius="25"
+                    FontAttributes="Bold"
+                    FontSize="18"
+                    HeightRequest="60"
+                    IsEnabled="{Binding IsNotBusy}"
+                    Text="✨ Tạo Câu Chuyện Song Ngữ"
+                    TextColor="{StaticResource White}" />
+
+                <!--  Loading Indicator - CHỈ HIỂN THỊ KHI ĐANG LOADING  -->
+                <Frame
+                    Padding="20"
+                    BackgroundColor="{StaticResource White}"
+                    CornerRadius="16"
+                    IsVisible="{Binding IsBusy}">
+                    <VerticalStackLayout Spacing="16">
+                        <ActivityIndicator
+                            HeightRequest="40"
+                            HorizontalOptions="Center"
+                            IsRunning="{Binding IsBusy}"
+                            Color="{StaticResource Primary}" />
+                        <Label
+                            FontAttributes="Bold"
+                            FontSize="16"
+                            HorizontalTextAlignment="Center"
+                            Text="{Binding GenerationStatus}"
+                            TextColor="{StaticResource Primary}" />
+                        <ProgressBar
+                            BackgroundColor="{StaticResource Gray200}"
+                            Progress="{Binding GenerationProgress}"
+                            ProgressColor="{StaticResource Primary}" />
+                    </VerticalStackLayout>
+                </Frame>
+
+                <!--  Story Content Display với WebView cho rich content - BILINGUAL  -->
+                <Frame IsVisible="{Binding Story, Converter={StaticResource StringToBoolConverter}}" Style="{StaticResource GenrePickerStyle}">
+                    <VerticalStackLayout Spacing="16">
+                        <Grid ColumnDefinitions="Auto,*,Auto">
+                            <Label
+                                Grid.Column="0"
+                                FontAttributes="Bold"
+                                FontSize="13"
+                                Text="📖 Câu Chuyện"
+                                TextColor="{StaticResource Primary}"
+                                VerticalOptions="Center" />
+
+                            <!--  Language Toggle Button  -->
+                            <Button
+                                Grid.Column="1"
+                                Command="{Binding ToggleLanguageModeCommand}"
+                                HorizontalOptions="Center"
+                                Style="{StaticResource LanguageToggleStyle}"
+                                Text="{Binding CurrentLanguageMode}" />
+
+                            <Border
+                                Grid.Column="2"
+                                Padding="8,4"
+                                BackgroundColor="{StaticResource Secondary}"
+                                HorizontalOptions="End"
+                                Stroke="{StaticResource Primary}"
+                                StrokeShape="RoundRectangle 12">
+                                <Label
+                                    FontAttributes="Bold"
+                                    FontSize="12"
+                                    Text="🌐 Song ngữ"
+                                    TextColor="{StaticResource Primary}" />
+                            </Border>
+                        </Grid>
+
+                        <!--  WebView để hiển thị story song ngữ  -->
+                        <Frame
+                            Padding="8"
+                            BackgroundColor="{StaticResource Gray100}"
+                            CornerRadius="12"
+                            HasShadow="False"
+                            HeightRequest="500">
+                            <WebView
+                                x:Name="storyWebView"
+                                Source="{Binding HtmlStoryContent}"
+                                VerticalOptions="FillAndExpand" />
+                        </Frame>
+
+                        <!--  Story Features - Updated for Bilingual  -->
+                        <Grid ColumnDefinitions="*,*,*" ColumnSpacing="8">
+                            <Border
+                                Grid.Column="0"
+                                Padding="8"
+                                BackgroundColor="{StaticResource White}"
+                                Stroke="{StaticResource Gray300}"
+                                StrokeShape="RoundRectangle 8">
+                                <VerticalStackLayout Spacing="4">
+                                    <Label
+                                        FontSize="20"
+                                        HorizontalTextAlignment="Center"
+                                        Text="🌐" />
+                                    <Label
+                                        FontAttributes="Bold"
+                                        FontSize="12"
+                                        HorizontalTextAlignment="Center"
+                                        Text="Song ngữ"
+                                        TextColor="{StaticResource Gray600}" />
+                                </VerticalStackLayout>
+                            </Border>
+
+                            <Border
+                                Grid.Column="1"
+                                Padding="8"
+                                BackgroundColor="{StaticResource White}"
+                                Stroke="{StaticResource Gray300}"
+                                StrokeShape="RoundRectangle 8">
+                                <VerticalStackLayout Spacing="4">
+                                    <Label
+                                        FontSize="20"
+                                        HorizontalTextAlignment="Center"
+                                        Text="🎧" />
+                                    <Label
+                                        FontAttributes="Bold"
+                                        FontSize="12"
+                                        HorizontalTextAlignment="Center"
+                                        Text="Luyện nghe"
+                                        TextColor="{StaticResource Gray600}" />
+                                </VerticalStackLayout>
+                            </Border>
+
+                            <Border
+                                Grid.Column="2"
+                                Padding="8"
+                                BackgroundColor="{StaticResource White}"
+                                Stroke="{StaticResource Gray300}"
+                                StrokeShape="RoundRectangle 8">
+                                <VerticalStackLayout Spacing="4">
+                                    <Label
+                                        FontSize="20"
+                                        HorizontalTextAlignment="Center"
+                                        Text="📚" />
+                                    <Label
+                                        FontAttributes="Bold"
+                                        FontSize="12"
+                                        HorizontalTextAlignment="Center"
+                                        Text="So sánh"
+                                        TextColor="{StaticResource Gray600}" />
+                                </VerticalStackLayout>
+                            </Border>
+                        </Grid>
+                    </VerticalStackLayout>
+                </Frame>
+
+                <!--  Audio Controls - CHỈ HIỂN THỊ KHI CÓ AUDIO  -->
+                <Frame IsVisible="{Binding AudioUrl, Converter={StaticResource StringToBoolConverter}}" Style="{StaticResource GenrePickerStyle}">
+                    <VerticalStackLayout Spacing="16">
+                        <Label
+                            FontAttributes="Bold"
+                            FontSize="18"
+                            Text="🎧 Điều khiển âm thanh (Tiếng Anh)"
+                            TextColor="{StaticResource Primary}" />
+
+                        <!--  Audio Control Buttons  -->
+                        <Grid
+                            ColumnDefinitions="Auto,Auto,Auto,Auto,Auto"
+                            ColumnSpacing="12"
+                            HorizontalOptions="Center">
+
+                            <!--  Rewind 10s  -->
+                            <Button
+                                Grid.Column="0"
+                                Clicked="OnRewind10Clicked"
+                                IsEnabled="{Binding IsNotBusy}"
+                                Style="{StaticResource AudioButtonStyle}"
+                                Text="⏪" />
+
+                            <!--  Play/Pause  -->
+                            <Button
+                                x:Name="playPauseBtn"
+                                Grid.Column="1"
+                                Clicked="OnPlayPauseClicked"
+                                CommandParameter="{Binding ReadStoryURL}"
+                                HeightRequest="60"
+                                IsEnabled="{Binding IsNotBusy}"
+                                Style="{StaticResource AudioButtonStyle}"
+                                Text="▶️"
+                                WidthRequest="60" />
+
+                            <!--  Stop  -->
+                            <Button
+                                Grid.Column="2"
+                                Clicked="OnStopClicked"
+                                IsEnabled="{Binding IsNotBusy}"
+                                Style="{StaticResource AudioButtonStyle}"
+                                Text="⏹️" />
+
+                            <!--  Forward 10s  -->
+                            <Button
+                                Grid.Column="3"
+                                Clicked="OnForward10Clicked"
+                                IsEnabled="{Binding IsNotBusy}"
+                                Style="{StaticResource AudioButtonStyle}"
+                                Text="⏩" />
+
+                            <!--  Replay  -->
+                            <Button
+                                Grid.Column="4"
+                                Clicked="OnReplayClicked"
+                                IsEnabled="{Binding IsNotBusy}"
+                                Style="{StaticResource AudioButtonStyle}"
+                                Text="🔄" />
+                        </Grid>
+
+                        <!--  Audio Description  -->
+                        <Label
+                            FontAttributes="Italic"
+                            FontSize="14"
+                            HorizontalTextAlignment="Center"
+                            Text="🎧 Nghe phát âm tiếng Anh • 🔍 So sánh với bản dịch tiếng Việt • ⏪ Lui 10s • ⏩ Tua 10s • 🔄 Phát lại"
+                            TextColor="{StaticResource Gray500}" />
+
+                        <!--  Reload Audio Button  -->
+                        <Button
+                            BackgroundColor="{StaticResource Secondary}"
+                            Command="{Binding ReadStoryCommand}"
+                            CornerRadius="20"
+                            FontAttributes="Bold"
+                            FontSize="14"
+                            HeightRequest="40"
+                            HorizontalOptions="Center"
+                            IsEnabled="{Binding IsNotBusy}"
+                            Text="🔄 Tải lại Audio"
+                            TextColor="{StaticResource Primary}"
+                            WidthRequest="150" />
+
+                        <!--  Hidden MediaElement for audio playback  -->
+                        <tookit:MediaElement
+                            x:Name="mediaPlayerUs"
+                            HeightRequest="0"
+                            MediaEnded="OnMediaEnded"
+                            ShouldAutoPlay="False"
+                            ShouldShowPlaybackControls="False"
+                            WidthRequest="0" />
+                    </VerticalStackLayout>
+                </Frame>
+
+            </VerticalStackLayout>
+        </ScrollView>
+    </Grid>
+</ContentPage>

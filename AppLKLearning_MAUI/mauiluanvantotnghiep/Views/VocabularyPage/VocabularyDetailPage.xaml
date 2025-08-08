@@ -1,0 +1,679 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    x:Class="mauiluanvantotnghiep.Views.VocabularyPage.VocabularyDetailPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:converters="clr-namespace:mauiluanvantotnghiep.Converters"
+    xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+    xmlns:vm="clr-namespace:mauiluanvantotnghiep.ViewModels.VocabularyViewModel"
+    Shell.NavBarIsVisible="False">
+
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <converters:StringNotNullOrEmptyConverter x:Key="StringNotNullOrEmptyConverter" />
+
+            <!--  Tab Button Styles  -->
+            <Style x:Key="TabButton" TargetType="Button">
+                <Setter Property="FontSize" Value="14" />
+                <Setter Property="FontAttributes" Value="Bold" />
+                <Setter Property="CornerRadius" Value="20" />
+                <Setter Property="Padding" Value="20,12" />
+                <Setter Property="BorderWidth" Value="0" />
+                <Setter Property="Margin" Value="4,0" />
+            </Style>
+
+            <Style
+                x:Key="ActiveTab"
+                BasedOn="{StaticResource TabButton}"
+                TargetType="Button">
+                <Setter Property="BackgroundColor" Value="#6366F1" />
+                <Setter Property="TextColor" Value="White" />
+            </Style>
+
+            <Style
+                x:Key="InactiveTab"
+                BasedOn="{StaticResource TabButton}"
+                TargetType="Button">
+                <Setter Property="BackgroundColor" Value="#F1F5F9" />
+                <Setter Property="TextColor" Value="#64748B" />
+            </Style>
+
+            <Style
+                x:Key="DefaultTabButton"
+                BasedOn="{StaticResource InactiveTab}"
+                TargetType="Button" />
+            <Style
+                x:Key="SelectedTabButton"
+                BasedOn="{StaticResource ActiveTab}"
+                TargetType="Button" />
+
+            <!--  Card Styles  -->
+            <Style x:Key="MeaningCard" TargetType="Border">
+                <Setter Property="BackgroundColor" Value="White" />
+                <Setter Property="Padding" Value="20" />
+                <Setter Property="Margin" Value="0,8" />
+                <Setter Property="StrokeThickness" Value="0" />
+                <Setter Property="StrokeShape" Value="{RoundRectangle CornerRadius=16}" />
+                <Setter Property="Shadow">
+                    <Shadow
+                        Brush="#E2E8F0"
+                        Opacity="0.15"
+                        Radius="8"
+                        Offset="0,2" />
+                </Setter>
+            </Style>
+
+            <!--  Badge Style  -->
+            <Style x:Key="PartOfSpeechBadge" TargetType="Border">
+                <Setter Property="BackgroundColor" Value="#EEF2FF" />
+                <Setter Property="Padding" Value="12,6" />
+                <Setter Property="StrokeThickness" Value="0" />
+                <Setter Property="HorizontalOptions" Value="Start" />
+                <Setter Property="StrokeShape" Value="{RoundRectangle CornerRadius=12}" />
+            </Style>
+
+            <!--  Enhanced Filter Button Styles  -->
+            <Style x:Key="FilterButton" TargetType="Button">
+                <Setter Property="BackgroundColor" Value="#F8FAFC" />
+                <Setter Property="TextColor" Value="#6366F1" />
+                <Setter Property="FontSize" Value="12" />
+                <Setter Property="FontAttributes" Value="Bold" />
+                <Setter Property="CornerRadius" Value="16" />
+                <Setter Property="Padding" Value="16,8" />
+                <Setter Property="BorderWidth" Value="1" />
+                <Setter Property="BorderColor" Value="#E2E8F0" />
+                <Setter Property="Margin" Value="4,0" />
+            </Style>
+
+            <Style x:Key="ActiveFilterButton" TargetType="Button">
+                <Setter Property="BackgroundColor" Value="#6366F1" />
+                <Setter Property="TextColor" Value="White" />
+                <Setter Property="FontSize" Value="12" />
+                <Setter Property="FontAttributes" Value="Bold" />
+                <Setter Property="CornerRadius" Value="16" />
+                <Setter Property="Padding" Value="16,8" />
+                <Setter Property="BorderWidth" Value="0" />
+                <Setter Property="Margin" Value="4,0" />
+            </Style>
+
+            <!--  Empty State Style  -->
+            <Style x:Key="EmptyStateCard" TargetType="Border">
+                <Setter Property="BackgroundColor" Value="#F8FAFC" />
+                <Setter Property="Padding" Value="40,60" />
+                <Setter Property="Margin" Value="0,20" />
+                <Setter Property="StrokeThickness" Value="1" />
+                <Setter Property="Stroke" Value="#E2E8F0" />
+                <Setter Property="StrokeShape" Value="{RoundRectangle CornerRadius=16}" />
+            </Style>
+        </ResourceDictionary>
+    </ContentPage.Resources>
+
+    <Grid>
+        <!--  Background Gradient  -->
+        <Rectangle>
+            <Rectangle.Fill>
+                <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                    <GradientStop Offset="0.0" Color="#6366F1" />
+                    <GradientStop Offset="0.5" Color="#8B5CF6" />
+                    <GradientStop Offset="1.0" Color="#F8FAFC" />
+                </LinearGradientBrush>
+            </Rectangle.Fill>
+        </Rectangle>
+
+        <!--  Hidden Media Elements  -->
+        <VerticalStackLayout IsVisible="False">
+            <toolkit:MediaElement
+                x:Name="mediaPlayerlistUk"
+                ShouldAutoPlay="False"
+                ShouldShowPlaybackControls="False" />
+            <toolkit:MediaElement
+                x:Name="mediaPlayerlistUs"
+                ShouldAutoPlay="False"
+                ShouldShowPlaybackControls="False" />
+        </VerticalStackLayout>
+
+        <!--  Main Content  -->
+        <ScrollView>
+            <VerticalStackLayout Spacing="0">
+
+                <!--  Header Section  -->
+                <VerticalStackLayout Padding="20,40,20,30" Spacing="20">
+
+                    <!--  Back Button  -->
+                    <HorizontalStackLayout>
+                        <Border
+                            Padding="12"
+                            BackgroundColor="White"
+                            StrokeShape="{RoundRectangle CornerRadius=25}"
+                            StrokeThickness="0">
+                            <Border.Shadow>
+                                <Shadow
+                                    Brush="Black"
+                                    Opacity="0.1"
+                                    Radius="8"
+                                    Offset="0,2" />
+                            </Border.Shadow>
+                            <ImageButton
+                                BackgroundColor="Transparent"
+                                Clicked="OnBackClicked"
+                                HeightRequest="20"
+                                Source="https://img.icons8.com/color-glass/48/back.png"
+                                WidthRequest="20" />
+                        </Border>
+                    </HorizontalStackLayout>
+
+                    <!--  Word Display  -->
+                    <VerticalStackLayout HorizontalOptions="Center" Spacing="8">
+                        <Label
+                            FontAttributes="Bold"
+                            FontSize="36"
+                            HorizontalTextAlignment="Center"
+                            Text="{Binding VocabularyWithMeanings.Word}"
+                            TextColor="White" />
+
+                        <Label
+                            FontSize="18"
+                            HorizontalTextAlignment="Center"
+                            Opacity="0.9"
+                            Text="{Binding VocabularyWithMeanings.Pronunciation}"
+                            TextColor="White" />
+                    </VerticalStackLayout>
+
+                    <!--  Audio & Search Controls  -->
+                    <HorizontalStackLayout HorizontalOptions="Center" Spacing="20">
+
+                        <!--  UK Audio  -->
+                        <VerticalStackLayout
+                            HorizontalOptions="Center"
+                            IsVisible="{Binding VocabularyWithMeanings.AudioUrlUk, Converter={StaticResource StringNotNullOrEmptyConverter}}"
+                            Spacing="6">
+                            <Border
+                                Padding="12"
+                                BackgroundColor="#2563EB"
+                                StrokeShape="{RoundRectangle CornerRadius=30}"
+                                StrokeThickness="0">
+                                <Border.Shadow>
+                                    <Shadow
+                                        Brush="Black"
+                                        Opacity="0.2"
+                                        Radius="8"
+                                        Offset="0,2" />
+                                </Border.Shadow>
+                                <ImageButton
+                                    BackgroundColor="Transparent"
+                                    Clicked="OnPlayClickedItemLisstUk"
+                                    CommandParameter="{Binding VocabularyWithMeanings.AudioUrlUk}"
+                                    HeightRequest="24"
+                                    Source="play.png"
+                                    WidthRequest="24" />
+                            </Border>
+                            <Label
+                                FontAttributes="Bold"
+                                FontSize="12"
+                                HorizontalTextAlignment="Center"
+                                Text="UK"
+                                TextColor="White" />
+                        </VerticalStackLayout>
+
+                        <!--  US Audio  -->
+                        <VerticalStackLayout
+                            HorizontalOptions="Center"
+                            IsVisible="{Binding VocabularyWithMeanings.AudioUrlUs, Converter={StaticResource StringNotNullOrEmptyConverter}}"
+                            Spacing="6">
+                            <Border
+                                Padding="12"
+                                BackgroundColor="#DC2626"
+                                StrokeShape="{RoundRectangle CornerRadius=30}"
+                                StrokeThickness="0">
+                                <Border.Shadow>
+                                    <Shadow
+                                        Brush="Black"
+                                        Opacity="0.2"
+                                        Radius="8"
+                                        Offset="0,2" />
+                                </Border.Shadow>
+                                <ImageButton
+                                    BackgroundColor="Transparent"
+                                    Clicked="OnPlayClickedItemLisstUs"
+                                    CommandParameter="{Binding VocabularyWithMeanings.AudioUrlUs}"
+                                    HeightRequest="24"
+                                    Source="play.png"
+                                    WidthRequest="24" />
+                            </Border>
+                            <Label
+                                FontAttributes="Bold"
+                                FontSize="12"
+                                HorizontalTextAlignment="Center"
+                                Text="US"
+                                TextColor="White" />
+                        </VerticalStackLayout>
+
+                        <!--  Google Search  -->
+                        <VerticalStackLayout HorizontalOptions="Center" Spacing="6">
+                            <Border
+                                Padding="12"
+                                BackgroundColor="White"
+                                StrokeShape="{RoundRectangle CornerRadius=30}"
+                                StrokeThickness="0">
+                                <Border.Shadow>
+                                    <Shadow
+                                        Brush="Black"
+                                        Opacity="0.2"
+                                        Radius="8"
+                                        Offset="0,2" />
+                                </Border.Shadow>
+                                <ImageButton
+                                    BackgroundColor="Transparent"
+                                    Command="{Binding SearchCommand}"
+                                    HeightRequest="24"
+                                    Source="https://img.icons8.com/fluency/48/google-logo.png"
+                                    WidthRequest="24" />
+                            </Border>
+                            <Label
+                                FontAttributes="Bold"
+                                FontSize="12"
+                                HorizontalTextAlignment="Center"
+                                Text="Search"
+                                TextColor="White" />
+                        </VerticalStackLayout>
+                    </HorizontalStackLayout>
+                </VerticalStackLayout>
+
+                <!--  Content Section with Rounded Top  -->
+                <Border
+                    Padding="0"
+                    BackgroundColor="White"
+                    StrokeShape="{RoundRectangle CornerRadius='24,24,0,0'}"
+                    StrokeThickness="0">
+
+                    <VerticalStackLayout Spacing="0">
+
+                        <!--  Tab Navigation  -->
+                        <HorizontalStackLayout
+                            Padding="20,24,20,16"
+                            HorizontalOptions="Center"
+                            Spacing="8">
+                            <Button
+                                x:Name="TabMeanings"
+                                Clicked="OnTabClicked"
+                                CommandParameter="Meanings"
+                                Style="{StaticResource ActiveTab}"
+                                Text="📖 Nghĩa" />
+                            <Button
+                                x:Name="TabExamples"
+                                Clicked="OnTabClicked"
+                                CommandParameter="Examples"
+                                Style="{StaticResource InactiveTab}"
+                                Text="💬 Ví dụ" />
+                            <Button
+                                x:Name="TabAdditional"
+                                Clicked="OnTabClicked"
+                                CommandParameter="Additional"
+                                Style="{StaticResource InactiveTab}"
+                                Text="➕ Thêm" />
+                        </HorizontalStackLayout>
+
+                        <!--  Content Area  -->
+                        <VerticalStackLayout Padding="20,0,20,20" Spacing="16">
+
+                            <!--  Loading State  -->
+                            <Border
+                                Padding="24"
+                                BackgroundColor="#F8FAFC"
+                                IsVisible="{Binding IsLoading}"
+                                StrokeShape="{RoundRectangle CornerRadius=16}"
+                                StrokeThickness="0">
+                                <HorizontalStackLayout HorizontalOptions="Center" Spacing="12">
+                                    <ActivityIndicator IsRunning="{Binding IsLoading}" Color="#6366F1" />
+                                    <Label
+                                        FontSize="16"
+                                        Text="Đang tải thông tin..."
+                                        TextColor="#6366F1"
+                                        VerticalOptions="Center" />
+                                </HorizontalStackLayout>
+                            </Border>
+
+                            <!--  Error State  -->
+                            <Border
+                                Padding="20"
+                                BackgroundColor="#FEF2F2"
+                                IsVisible="{Binding GeneralError, Converter={StaticResource StringNotNullOrEmptyConverter}}"
+                                Stroke="#EF4444"
+                                StrokeShape="{RoundRectangle CornerRadius=12}"
+                                StrokeThickness="1">
+                                <HorizontalStackLayout HorizontalOptions="Center" Spacing="8">
+                                    <Label
+                                        FontSize="16"
+                                        Text="⚠️"
+                                        VerticalOptions="Center" />
+                                    <Label
+                                        FontSize="14"
+                                        Text="{Binding GeneralError}"
+                                        TextColor="#DC2626"
+                                        VerticalOptions="Center" />
+                                </HorizontalStackLayout>
+                            </Border>
+
+                            <!--  Meanings Content  -->
+                            <StackLayout
+                                x:Name="MeaningsView"
+                                IsVisible="True"
+                                Spacing="0">
+
+                                <!--  Enhanced Filter Section  -->
+                                <VerticalStackLayout Margin="0,0,0,16" Spacing="12">
+                                    <!--  Filter Toggle Button  -->
+                                    <HorizontalStackLayout HorizontalOptions="End">
+                                        <Button
+                                            Command="{Binding ToggleFilterCommand}"
+                                            Style="{StaticResource FilterButton}"
+                                            Text="🔍 Lọc theo từ loại" />
+                                    </HorizontalStackLayout>
+
+                                    <!--  Enhanced Filter Options  -->
+                                    <Border
+                                        Padding="16"
+                                        BackgroundColor="#F8FAFC"
+                                        IsVisible="{Binding IsFilterVisible}"
+                                        StrokeShape="{RoundRectangle CornerRadius=12}"
+                                        StrokeThickness="0">
+                                        <VerticalStackLayout Spacing="12">
+                                            <Label
+                                                FontAttributes="Bold"
+                                                FontSize="14"
+                                                Text="Chọn từ loại:"
+                                                TextColor="#6366F1" />
+
+                                            <ScrollView Orientation="Horizontal">
+                                                <CollectionView ItemsLayout="HorizontalList" ItemsSource="{Binding PartsOfSpeech}">
+                                                    <CollectionView.ItemTemplate>
+                                                        <DataTemplate>
+                                                            <Button
+                                                                Command="{Binding Source={RelativeSource AncestorType={x:Type vm:VocabularyDetailViewModel}}, Path=ApplyPartOfSpeechFilterCommand}"
+                                                                CommandParameter="{Binding .}"
+                                                                Text="{Binding .}">
+                                                                <Button.Style>
+                                                                    <Style TargetType="Button">
+                                                                        <!--  Default (unselected) style  -->
+                                                                        <Setter Property="BackgroundColor" Value="#FFFFFF" />
+                                                                        <Setter Property="TextColor" Value="#6366F1" />
+                                                                        <Setter Property="FontSize" Value="12" />
+                                                                        <Setter Property="FontAttributes" Value="Bold" />
+                                                                        <Setter Property="CornerRadius" Value="18" />
+                                                                        <Setter Property="Padding" Value="16,10" />
+                                                                        <Setter Property="BorderWidth" Value="2" />
+                                                                        <Setter Property="BorderColor" Value="#E2E8F0" />
+                                                                        <Setter Property="Margin" Value="4,0" />
+                                                                        <Setter Property="Shadow">
+                                                                            <Shadow
+                                                                                Brush="#E2E8F0"
+                                                                                Opacity="0.1"
+                                                                                Radius="4"
+                                                                                Offset="0,1" />
+                                                                        </Setter>
+                                                                        <Style.Triggers>
+                                                                            <!--  Selected style with enhanced visual indication  -->
+                                                                            <DataTrigger
+                                                                                Binding="{Binding Source={RelativeSource AncestorType={x:Type vm:VocabularyDetailViewModel}}, Path=SelectedPartOfSpeech}"
+                                                                                TargetType="Button"
+                                                                                Value="{Binding .}">
+                                                                                <Setter Property="BackgroundColor" Value="#6366F1" />
+                                                                                <Setter Property="TextColor" Value="#FFFFFF" />
+                                                                                <Setter Property="BorderWidth" Value="0" />
+                                                                                <Setter Property="FontSize" Value="13" />
+                                                                                <Setter Property="Shadow">
+                                                                                    <Shadow
+                                                                                        Brush="#6366F1"
+                                                                                        Opacity="0.3"
+                                                                                        Radius="8"
+                                                                                        Offset="0,2" />
+                                                                                </Setter>
+                                                                            </DataTrigger>
+                                                                        </Style.Triggers>
+                                                                    </Style>
+                                                                </Button.Style>
+                                                            </Button>
+                                                        </DataTemplate>
+                                                    </CollectionView.ItemTemplate>
+                                                </CollectionView>
+                                            </ScrollView>
+
+                                            <!--  Selected Filter Indicator  -->
+                                            <HorizontalStackLayout IsVisible="{Binding SelectedPartOfSpeech, Converter={StaticResource StringNotNullOrEmptyConverter}}" Spacing="8">
+                                                <Label
+                                                    FontSize="12"
+                                                    Text="✓ Đang lọc:"
+                                                    TextColor="#10B981"
+                                                    VerticalOptions="Center" />
+                                                <Border
+                                                    Padding="8,4"
+                                                    BackgroundColor="#10B981"
+                                                    StrokeShape="{RoundRectangle CornerRadius=12}"
+                                                    StrokeThickness="0">
+                                                    <Label
+                                                        FontAttributes="Bold"
+                                                        FontSize="11"
+                                                        Text="{Binding SelectedPartOfSpeech}"
+                                                        TextColor="White" />
+                                                </Border>
+                                            </HorizontalStackLayout>
+                                        </VerticalStackLayout>
+                                    </Border>
+                                </VerticalStackLayout>
+
+                                <!--  Meanings List  -->
+                                <CollectionView ItemsSource="{Binding Meanings}">
+                                    <CollectionView.ItemTemplate>
+                                        <DataTemplate>
+                                            <Border Style="{StaticResource MeaningCard}">
+                                                <VerticalStackLayout Spacing="16">
+
+                                                    <!--  Part of Speech  -->
+                                                    <Border Style="{StaticResource PartOfSpeechBadge}">
+                                                        <Label
+                                                            FontAttributes="Bold"
+                                                            FontSize="12"
+                                                            Text="{Binding PartOfSpeech}"
+                                                            TextColor="#6366F1" />
+                                                    </Border>
+
+                                                    <!--  Meanings  -->
+                                                    <VerticalStackLayout Spacing="8">
+                                                        <Label
+                                                            FontSize="16"
+                                                            LineBreakMode="WordWrap"
+                                                            Text="{Binding Meaning}"
+                                                            TextColor="#1F2937" />
+                                                        <Label
+                                                            FontSize="14"
+                                                            LineBreakMode="WordWrap"
+                                                            Opacity="0.7"
+                                                            Text="{Binding TranslatedMeaning}"
+                                                            TextColor="#6B7280" />
+                                                    </VerticalStackLayout>
+                                                </VerticalStackLayout>
+                                            </Border>
+                                        </DataTemplate>
+                                    </CollectionView.ItemTemplate>
+                                </CollectionView>
+
+                                <!--  Empty State for Meanings  -->
+                                <Border Style="{StaticResource EmptyStateCard}">
+                                    <Border.IsVisible>
+                                        <Binding Path="Meanings.Count">
+                                            <Binding.Converter>
+                                                <converters:CountToBoolConverter />
+                                            </Binding.Converter>
+                                        </Binding>
+                                    </Border.IsVisible>
+                                    <VerticalStackLayout HorizontalOptions="Center" Spacing="16">
+                                        <Label
+                                            FontSize="48"
+                                            HorizontalTextAlignment="Center"
+                                            Opacity="0.3"
+                                            Text="📖" />
+                                        <Label
+                                            FontAttributes="Bold"
+                                            FontSize="18"
+                                            HorizontalTextAlignment="Center"
+                                            Text="Không có nghĩa"
+                                            TextColor="#6B7280" />
+                                        <Label
+                                            FontSize="14"
+                                            HorizontalTextAlignment="Center"
+                                            Opacity="0.7"
+                                            Text="Từ này chưa có thông tin nghĩa được cập nhật hoặc không có nghĩa nào khớp với bộ lọc"
+                                            TextColor="#9CA3AF" />
+                                    </VerticalStackLayout>
+                                </Border>
+                            </StackLayout>
+
+                            <!--  Examples Content  -->
+                            <StackLayout
+                                x:Name="ExamplesView"
+                                IsVisible="False"
+                                Spacing="0">
+                                <!--  Examples List  -->
+                                <CollectionView ItemsSource="{Binding Examples}">
+                                    <CollectionView.ItemTemplate>
+                                        <DataTemplate>
+                                            <Border Style="{StaticResource MeaningCard}">
+                                                <VerticalStackLayout Spacing="16">
+
+                                                    <!--  Part of Speech for Examples  -->
+                                                    <Border BackgroundColor="#FEF3C7" Style="{StaticResource PartOfSpeechBadge}">
+                                                        <Label
+                                                            FontAttributes="Bold"
+                                                            FontSize="12"
+                                                            Text="{Binding PartOfSpeech}"
+                                                            TextColor="#D97706" />
+                                                    </Border>
+
+                                                    <!--  Example Content  -->
+                                                    <Border
+                                                        Padding="16"
+                                                        BackgroundColor="#F8FAFC"
+                                                        StrokeShape="{RoundRectangle CornerRadius=12}"
+                                                        StrokeThickness="0">
+                                                        <VerticalStackLayout Spacing="8">
+                                                            <Label
+                                                                FontAttributes="Italic"
+                                                                FontSize="16"
+                                                                LineBreakMode="WordWrap"
+                                                                Text="{Binding ExampleSentence}"
+                                                                TextColor="#1F2937" />
+                                                            <Label
+                                                                FontSize="14"
+                                                                LineBreakMode="WordWrap"
+                                                                Opacity="0.7"
+                                                                Text="{Binding TranslatedExampleSentence}"
+                                                                TextColor="#6B7280" />
+                                                        </VerticalStackLayout>
+                                                    </Border>
+                                                </VerticalStackLayout>
+                                            </Border>
+                                        </DataTemplate>
+                                    </CollectionView.ItemTemplate>
+                                </CollectionView>
+
+                                <!--  Empty State for Examples  -->
+                                <Border Style="{StaticResource EmptyStateCard}">
+                                    <Border.IsVisible>
+                                        <Binding Path="Examples.Count">
+                                            <Binding.Converter>
+                                                <converters:CountToBoolConverter />
+                                            </Binding.Converter>
+                                        </Binding>
+                                    </Border.IsVisible>
+                                    <VerticalStackLayout HorizontalOptions="Center" Spacing="16">
+                                        <Label
+                                            FontSize="48"
+                                            HorizontalTextAlignment="Center"
+                                            Opacity="0.3"
+                                            Text="💬" />
+                                        <Label
+                                            FontAttributes="Bold"
+                                            FontSize="18"
+                                            HorizontalTextAlignment="Center"
+                                            Text="Không có ví dụ"
+                                            TextColor="#6B7280" />
+                                        <Label
+                                            FontSize="14"
+                                            HorizontalTextAlignment="Center"
+                                            Opacity="0.7"
+                                            Text="Từ này chưa có câu ví dụ được cập nhật"
+                                            TextColor="#9CA3AF" />
+                                    </VerticalStackLayout>
+                                </Border>
+                            </StackLayout>
+
+                            <!--  Additional Info Content  -->
+                            <StackLayout
+                                x:Name="AdditionalView"
+                                IsVisible="False"
+                                Spacing="16">
+                                <Border Style="{StaticResource MeaningCard}">
+                                    <VerticalStackLayout Spacing="20">
+
+                                        <!--  Header  -->
+                                        <Label
+                                            FontAttributes="Bold"
+                                            FontSize="20"
+                                            Text="📚 Thông tin bổ sung"
+                                            TextColor="#6366F1" />
+
+                                        <!--  Info Grid  -->
+                                        <Grid
+                                            ColumnDefinitions="Auto,*"
+                                            RowDefinitions="Auto,Auto,Auto"
+                                            RowSpacing="12">
+
+                                            <Label
+                                                Grid.Row="0"
+                                                Grid.Column="0"
+                                                FontAttributes="Bold"
+                                                Text="Ngày thêm:"
+                                                TextColor="#6B7280" />
+                                            <Label
+                                                Grid.Row="0"
+                                                Grid.Column="1"
+                                                Text="{Binding VocabularyWithMeanings.CreatedAt, StringFormat='{0:dd/MM/yyyy HH:mm}'}"
+                                                TextColor="#1F2937" />
+
+                                            <Label
+                                                Grid.Row="1"
+                                                Grid.Column="0"
+                                                FontAttributes="Bold"
+                                                Text="Số nghĩa:"
+                                                TextColor="#6B7280" />
+                                            <Label
+                                                Grid.Row="1"
+                                                Grid.Column="1"
+                                                Text="{Binding Meanings.Count}"
+                                                TextColor="#1F2937" />
+
+                                            <Label
+                                                Grid.Row="2"
+                                                Grid.Column="0"
+                                                FontAttributes="Bold"
+                                                Text="Số ví dụ:"
+                                                TextColor="#6B7280" />
+                                            <Label
+                                                Grid.Row="2"
+                                                Grid.Column="1"
+                                                Text="{Binding Examples.Count}"
+                                                TextColor="#1F2937" />
+                                        </Grid>
+
+                                        <!--  Action Buttons  -->
+                                        <Grid ColumnDefinitions="*,*" ColumnSpacing="12" />
+                                    </VerticalStackLayout>
+                                </Border>
+                            </StackLayout>
+                        </VerticalStackLayout>
+                    </VerticalStackLayout>
+                </Border>
+            </VerticalStackLayout>
+        </ScrollView>
+    </Grid>
+</ContentPage>

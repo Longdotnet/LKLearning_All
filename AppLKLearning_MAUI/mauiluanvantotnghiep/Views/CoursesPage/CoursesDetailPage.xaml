@@ -1,0 +1,411 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    x:Class="mauiluanvantotnghiep.Views.CoursesPage.CoursesDetailPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:behaviors="clr-namespace:mauiluanvantotnghiep.Behaviors"
+    xmlns:conv="clr-namespace:mauiluanvantotnghiep.Converters"
+    xmlns:local="clr-namespace:mauiluanvantotnghiep.Converters"
+    Title="Chi tiết khóa học"
+    BackgroundColor="White"
+    NavigationPage.HasBackButton="True"
+    Shell.BackgroundColor="White">
+
+    <ContentPage.Resources>
+        <!--  Pastel Purple Theme Styles  -->
+        <Style x:Key="HeaderTitleStyle" TargetType="Label">
+            <Setter Property="FontSize" Value="24" />
+            <Setter Property="FontAttributes" Value="Bold" />
+            <Setter Property="TextColor" Value="White" />
+            <Setter Property="LineBreakMode" Value="WordWrap" />
+        </Style>
+
+        <Style x:Key="SectionTitleStyle" TargetType="Label">
+            <Setter Property="FontSize" Value="18" />
+            <Setter Property="FontAttributes" Value="Bold" />
+            <Setter Property="TextColor" Value="#7F55B1" />
+            <Setter Property="Margin" Value="0,0,0,8" />
+        </Style>
+
+        <Style x:Key="BodyTextStyle" TargetType="Label">
+            <Setter Property="FontSize" Value="14" />
+            <Setter Property="TextColor" Value="#6A1B9A" />
+            <Setter Property="LineBreakMode" Value="WordWrap" />
+        </Style>
+
+        <Style x:Key="CardFrameStyle" TargetType="Frame">
+            <Setter Property="BackgroundColor" Value="White" />
+            <Setter Property="CornerRadius" Value="12" />
+            <Setter Property="HasShadow" Value="True" />
+            <Setter Property="Padding" Value="16" />
+            <Setter Property="Margin" Value="16,8" />
+        </Style>
+
+        <conv:HtmlWrapperConverter x:Key="HtmlWrapperConverter" />
+        <local:StarConverter x:Key="StarConverter" />
+    </ContentPage.Resources>
+
+    <Grid>
+        <ScrollView>
+            <VerticalStackLayout Spacing="0">
+
+                <!--  HERO SECTION - Custom Purple Pastel Theme  -->
+                <Grid RowDefinitions="250,Auto" RowSpacing="0">
+                    <!--  Background Image  -->
+                    <Image
+                        Grid.RowSpan="2"
+                        Aspect="AspectFill"
+                        Source="{Binding Course.UrlImage, TargetNullValue='brokenimage.png', FallbackValue='brokenimage.png'}" />
+
+                    <!--  Purple Gradient Overlay - Từ trong suốt đến tím đậm  -->
+                    <Border Grid.RowSpan="2" StrokeThickness="0">
+                        <Border.Background>
+                            <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                                <GradientStop Offset="0.0" Color="#00000000" />
+                                <GradientStop Offset="0.3" Color="#209B7EBD" />
+                                <GradientStop Offset="0.6" Color="#609B7EBD" />
+                                <GradientStop Offset="0.8" Color="#807F55B1" />
+                                <GradientStop Offset="1.0" Color="WhiteSmoke" />
+                            </LinearGradientBrush>
+                        </Border.Background>
+                    </Border>
+
+                    <!--  Hero Content  -->
+                    <VerticalStackLayout
+                        Grid.Row="1"
+                        Padding="20,24"
+                        Spacing="12"
+                        VerticalOptions="End">
+
+                        <!--  Course Title  -->
+                        <Label Style="{StaticResource HeaderTitleStyle}" Text="{Binding Course.CourseName}" />
+
+                        <!--  Course Info Row  -->
+                        <Grid ColumnDefinitions="*,Auto" ColumnSpacing="12">
+                            <!--  Duration  -->
+                            <HorizontalStackLayout Grid.Column="0" Spacing="6">
+                                <Label
+                                    FontSize="16"
+                                    Text="⏱️"
+                                    TextColor="White"
+                                    VerticalOptions="Center" />
+                                <Label
+                                    FontSize="14"
+                                    Text="{Binding Course.DurationInMonths, StringFormat='{0} tháng'}"
+                                    TextColor="White"
+                                    VerticalOptions="Center" />
+                            </HorizontalStackLayout>
+
+                            <!--  Rating  -->
+                            <HorizontalStackLayout
+                                Grid.Column="1"
+                                HorizontalOptions="End"
+                                Spacing="6">
+                                <Label
+                                    FontSize="16"
+                                    Text="{Binding AverageRating, Converter={StaticResource StarConverter}}"
+                                    TextColor="#FFD700"
+                                    VerticalOptions="Center" />
+                                <Label
+                                    FontAttributes="Bold"
+                                    FontSize="14"
+                                    Text="{Binding AverageRating, StringFormat='{0:F1}'}"
+                                    TextColor="White"
+                                    VerticalOptions="Center" />
+                            </HorizontalStackLayout>
+                        </Grid>
+
+                        <!--  Start Button - Purple Gradient  -->
+                        <Button
+                            Margin="0,12,0,0"
+                            Padding="16,12"
+                            Command="{Binding StartLessonCommand}"
+                            CornerRadius="20"
+                            FontAttributes="Bold"
+                            FontSize="16"
+                            HeightRequest="48"
+                            Text="🚀 Bắt đầu học ngay"
+                            TextColor="White">
+                            <Button.Background>
+                                <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+                                    <GradientStop Offset="0.0" Color="#7F55B1" />
+                                    <GradientStop Offset="1.0" Color="#9B7EBD" />
+                                </LinearGradientBrush>
+                            </Button.Background>
+                        </Button>
+                    </VerticalStackLayout>
+                </Grid>
+
+                <!--  CONTENT SECTION - Custom Purple Pastel Theme  -->
+                <VerticalStackLayout Spacing="16">
+
+                    <!--  Course Description Card  -->
+                    <Frame Style="{StaticResource CardFrameStyle}">
+                        <VerticalStackLayout Spacing="12">
+                            <HorizontalStackLayout Spacing="8">
+                                <Frame
+                                    Padding="6"
+                                    BackgroundColor="#FFE1E0"
+                                    CornerRadius="8"
+                                    HasShadow="False"
+                                    HeightRequest="32"
+                                    WidthRequest="32">
+                                    <Label
+                                        FontSize="16"
+                                        HorizontalOptions="Center"
+                                        Text="📄"
+                                        TextColor="#7F55B1"
+                                        VerticalOptions="Center" />
+                                </Frame>
+                                <Label
+                                    Style="{StaticResource SectionTitleStyle}"
+                                    Text="Mô tả khóa học"
+                                    VerticalOptions="Center" />
+                            </HorizontalStackLayout>
+
+                            <WebView
+                                BackgroundColor="Transparent"
+                                HorizontalOptions="FillAndExpand"
+                                Source="{Binding Course.Description, Converter={StaticResource HtmlWrapperConverter}}"
+                                VerticalOptions="FillAndExpand">
+                                <WebView.Behaviors>
+                                    <behaviors:WebViewScrollBehavior />
+                                </WebView.Behaviors>
+                            </WebView>
+                        </VerticalStackLayout>
+                    </Frame>
+
+                    <!--  SIMPLE LESSONS LIST CARD  -->
+                    <Frame Style="{StaticResource CardFrameStyle}">
+                        <VerticalStackLayout Spacing="16">
+                            <!--  Simple Header  -->
+                            <HorizontalStackLayout Spacing="12">
+                                <!--  Icon  -->
+                                <Frame
+                                    Padding="8"
+                                    BackgroundColor="#F3E5F5"
+                                    CornerRadius="12"
+                                    HasShadow="False">
+                                    <Label
+                                        FontSize="20"
+                                        HorizontalOptions="Center"
+                                        Text="📚"
+                                        TextColor="#9B7EBD"
+                                        VerticalOptions="Center" />
+                                </Frame>
+
+                                <!--  Title and count  -->
+                                <VerticalStackLayout Spacing="2" VerticalOptions="Center">
+                                    <Label
+                                        FontAttributes="Bold"
+                                        FontSize="18"
+                                        Text="Nội dung khóa học"
+                                        TextColor="#7F55B1" />
+                                    <Label
+                                        FontSize="13"
+                                        Text="{Binding Lessons.Count, StringFormat='{0} bài học'}"
+                                        TextColor="#9B7EBD" />
+                                </VerticalStackLayout>
+                            </HorizontalStackLayout>
+
+                            <!--  Simple lesson list  -->
+                            <CollectionView ItemsSource="{Binding Lessons}" SelectionMode="None">
+                                <CollectionView.ItemTemplate>
+                                    <DataTemplate>
+                                        <Frame
+                                            Margin="0,4"
+                                            Padding="16,12"
+                                            BackgroundColor="#FAFAFA"
+                                            BorderColor="#F0F0F0"
+                                            CornerRadius="8"
+                                            HasShadow="False">
+                                            <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="12">
+                                                <!--  Lesson Number  -->
+                                                <Frame
+                                                    Grid.Column="0"
+                                                    Padding="6"
+                                                    BackgroundColor="#7F55B1"
+                                                    CornerRadius="12"
+                                                    HasShadow="False"
+                                                    HeightRequest="24"
+                                                    WidthRequest="24">
+                                                    <Label
+                                                        FontAttributes="Bold"
+                                                        FontSize="12"
+                                                        HorizontalOptions="Center"
+                                                        Text="{Binding OrderNo}"
+                                                        TextColor="White"
+                                                        VerticalOptions="Center" />
+                                                </Frame>
+
+                                                <!--  Lesson Title  -->
+                                                <Label
+                                                    Grid.Column="1"
+                                                    FontSize="15"
+                                                    LineBreakMode="WordWrap"
+                                                    Text="{Binding LessonTitle}"
+                                                    TextColor="#2D3436"
+                                                    VerticalOptions="Center" />
+
+                                                <!--  Duration  -->
+                                                <HorizontalStackLayout
+                                                    Grid.Column="2"
+                                                    Spacing="4"
+                                                    VerticalOptions="Center">
+                                                    <Label
+                                                        FontSize="12"
+                                                        Text="⏱"
+                                                        TextColor="#9B7EBD" />
+                                                    <Label
+                                                        FontSize="12"
+                                                        Text="{Binding DurationMinute, StringFormat='{0}p'}"
+                                                        TextColor="#9B7EBD" />
+                                                </HorizontalStackLayout>
+                                            </Grid>
+                                        </Frame>
+                                    </DataTemplate>
+                                </CollectionView.ItemTemplate>
+                            </CollectionView>
+                        </VerticalStackLayout>
+                    </Frame>
+
+                    <!--  Reviews Section Card  -->
+                    <Frame Style="{StaticResource CardFrameStyle}">
+                        <VerticalStackLayout Spacing="12">
+                            <!--  Section Header  -->
+                            <Grid ColumnDefinitions="*,Auto" ColumnSpacing="12">
+                                <HorizontalStackLayout Grid.Column="0" Spacing="8">
+                                    <Frame
+                                        Padding="6"
+                                        BackgroundColor="#FFE1E0"
+                                        CornerRadius="8"
+                                        HasShadow="False"
+                                        HeightRequest="32"
+                                        WidthRequest="32">
+                                        <Label
+                                            FontSize="16"
+                                            HorizontalOptions="Center"
+                                            Text="⭐"
+                                            TextColor="#F49BAB"
+                                            VerticalOptions="Center" />
+                                    </Frame>
+                                    <VerticalStackLayout Spacing="2" VerticalOptions="Center">
+                                        <Label
+                                            FontAttributes="Bold"
+                                            FontSize="16"
+                                            Text="Đánh giá"
+                                            TextColor="#F49BAB" />
+                                        <Label
+                                            FontSize="12"
+                                            Text="{Binding TotalReviews, StringFormat='{0} nhận xét'}"
+                                            TextColor="#9B7EBD" />
+                                    </VerticalStackLayout>
+                                </HorizontalStackLayout>
+
+                                <!--  Add Review Button  -->
+                                <Button
+                                    Grid.Column="1"
+                                    Padding="12,6"
+                                    BackgroundColor="#F49BAB"
+                                    Command="{Binding GoToReviewDetailCommand}"
+                                    CornerRadius="16"
+                                    FontSize="12"
+                                    Text="✍️ Viết đánh giá"
+                                    TextColor="White" />
+                            </Grid>
+
+                            <!--  Rating Summary  -->
+                            <Frame
+                                Padding="12"
+                                BackgroundColor="#FFE1E0"
+                                CornerRadius="8"
+                                HasShadow="False">
+                                <HorizontalStackLayout HorizontalOptions="Center" Spacing="12">
+                                    <Label
+                                        FontAttributes="Bold"
+                                        FontSize="28"
+                                        Text="{Binding AverageRating, StringFormat='{0:F1}'}"
+                                        TextColor="#7F55B1"
+                                        VerticalOptions="Center" />
+                                    <VerticalStackLayout Spacing="2" VerticalOptions="Center">
+                                        <Label
+                                            FontSize="16"
+                                            Text="{Binding AverageRating, Converter={StaticResource StarConverter}}"
+                                            TextColor="#FFD700" />
+                                        <Label
+                                            FontSize="12"
+                                            Text="Điểm trung bình"
+                                            TextColor="#9B7EBD" />
+                                    </VerticalStackLayout>
+                                </HorizontalStackLayout>
+                            </Frame>
+
+                            <!--  Reviews List  -->
+                            <CollectionView ItemsSource="{Binding Reviews}" SelectionMode="None">
+                                <CollectionView.ItemTemplate>
+                                    <DataTemplate>
+                                        <Frame
+                                            Margin="0,6"
+                                            Padding="12"
+                                            BackgroundColor="#FAFAFA"
+                                            BorderColor="#F49BAB"
+                                            CornerRadius="8"
+                                            HasShadow="False">
+                                            <VerticalStackLayout Spacing="8">
+                                                <!--  User Info  -->
+                                                <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="8">
+                                                    <Frame
+                                                        Grid.Column="0"
+                                                        Padding="0"
+                                                        BorderColor="#F49BAB"
+                                                        CornerRadius="16"
+                                                        HasShadow="False"
+                                                        HeightRequest="32"
+                                                        WidthRequest="32">
+                                                        <Image Aspect="AspectFill" Source="{Binding UrlAvatar, FallbackValue='https://img.icons8.com/3d-fluency/110/000000/user-male-circle.png'}" />
+                                                    </Frame>
+
+                                                    <VerticalStackLayout
+                                                        Grid.Column="1"
+                                                        Spacing="1"
+                                                        VerticalOptions="Center">
+                                                        <Label
+                                                            FontAttributes="Bold"
+                                                            FontSize="14"
+                                                            Text="{Binding Name}"
+                                                            TextColor="#6A1B9A" />
+                                                        <Label
+                                                            FontSize="11"
+                                                            Text="{Binding CreatedAt, StringFormat='{0:dd/MM/yyyy HH:mm}'}"
+                                                            TextColor="#9B7EBD" />
+                                                    </VerticalStackLayout>
+
+                                                    <Label
+                                                        Grid.Column="2"
+                                                        FontSize="14"
+                                                        Text="{Binding Rating, Converter={StaticResource StarConverter}}"
+                                                        TextColor="#FFD700"
+                                                        VerticalOptions="Center" />
+                                                </Grid>
+
+                                                <!--  Comment  -->
+                                                <Label
+                                                    FontSize="13"
+                                                    LineBreakMode="WordWrap"
+                                                    Text="{Binding Comment}"
+                                                    TextColor="#7F55B1" />
+                                            </VerticalStackLayout>
+                                        </Frame>
+                                    </DataTemplate>
+                                </CollectionView.ItemTemplate>
+                            </CollectionView>
+                        </VerticalStackLayout>
+                    </Frame>
+
+                    <!--  Bottom spacing for mobile  -->
+                    <BoxView BackgroundColor="Transparent" HeightRequest="20" />
+                </VerticalStackLayout>
+            </VerticalStackLayout>
+        </ScrollView>
+    </Grid>
+</ContentPage>

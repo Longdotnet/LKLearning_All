@@ -1,0 +1,537 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    x:Class="mauiluanvantotnghiep.Views.CoursesPage.CoursesPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:vm="clr-namespace:mauiluanvantotnghiep.ViewModels"
+    x:Name="ParentPage"
+    Title="Khóa Học"
+    BackgroundColor="#F8F6FF"
+    Shell.NavBarIsVisible="False">
+
+    <ContentPage.BindingContext>
+        <vm:CoursePageViewModel />
+    </ContentPage.BindingContext>
+
+    <Grid>
+        <!--  Background gradient  -->
+        <Rectangle>
+            <Rectangle.Fill>
+                <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                    <GradientStop Offset="0" Color="#F8F6FF" />
+                    <GradientStop Offset="0.3" Color="#F1F3F4" />
+                    <GradientStop Offset="1" Color="#E8E0FF" />
+                </LinearGradientBrush>
+            </Rectangle.Fill>
+        </Rectangle>
+
+        <ScrollView x:Name="MainScrollView">
+            <VerticalStackLayout Padding="0" Spacing="0">
+
+                <!--  COMPACT Header Section  -->
+                <Border
+                    Padding="15,25,15,20"
+                    BackgroundColor="Transparent"
+                    StrokeShape="{RoundRectangle CornerRadius='0,0,30,30'}"
+                    StrokeThickness="0">
+                    <Border.Background>
+                        <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                            <GradientStop Offset="0" Color="#9C88FF" />
+                            <GradientStop Offset="0.5" Color="#B19CD9" />
+                            <GradientStop Offset="1" Color="#E6B3E8" />
+                        </LinearGradientBrush>
+                    </Border.Background>
+                    <Border.Shadow>
+                        <Shadow
+                            Brush="Black"
+                            Opacity="0.2"
+                            Radius="15"
+                            Offset="0,5" />
+                    </Border.Shadow>
+
+                    <VerticalStackLayout Spacing="15">
+                        <!--  Compact Welcome Text with Logo  -->
+                        <HorizontalStackLayout HorizontalOptions="Center" Spacing="12">
+                            <Label
+                                FontAttributes="Bold"
+                                FontSize="24"
+                                Text="Choose your"
+                                TextColor="White"
+                                VerticalOptions="Center" />
+                            <Border
+                                Padding="8,4"
+                                BackgroundColor="#50FFFFFF"
+                                StrokeShape="{RoundRectangle CornerRadius='12'}"
+                                StrokeThickness="0">
+                                <Image
+                                    HeightRequest="28"
+                                    IsAnimationPlaying="True"
+                                    Source="logo.gif"
+                                    WidthRequest="84" />
+                            </Border>
+                            <Label
+                                FontAttributes="Bold"
+                                FontSize="24"
+                                Text="Course"
+                                TextColor="White"
+                                VerticalOptions="Center" />
+                        </HorizontalStackLayout>
+
+                        <!--  Compact Search Bar  -->
+                        <Border
+                            Padding="12,10"
+                            BackgroundColor="White"
+                            StrokeShape="{RoundRectangle CornerRadius='20'}"
+                            StrokeThickness="0">
+                            <Border.Shadow>
+                                <Shadow
+                                    Brush="#9C88FF"
+                                    Opacity="0.2"
+                                    Radius="8"
+                                    Offset="0,3" />
+                            </Border.Shadow>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+
+                                <Label
+                                    Grid.Column="0"
+                                    FontSize="16"
+                                    Text="🔍"
+                                    VerticalOptions="Center" />
+                                <Entry
+                                    Grid.Column="1"
+                                    Margin="8,0"
+                                    BackgroundColor="Transparent"
+                                    FontSize="14"
+                                    Placeholder="Tìm kiếm khóa học..."
+                                    PlaceholderColor="#999"
+                                    Text="{Binding SearchText, Mode=TwoWay}"
+                                    TextColor="#333" />
+                                <Button
+                                    Grid.Column="2"
+                                    Padding="8,6"
+                                    BackgroundColor="#9C88FF"
+                                    Command="{Binding SearchCommand}"
+                                    CornerRadius="12"
+                                    FontAttributes="Bold"
+                                    FontSize="12"
+                                    Text="Tìm"
+                                    TextColor="White" />
+                            </Grid>
+                        </Border>
+                    </VerticalStackLayout>
+                </Border>
+
+                <!--  COMPACT Banner Carousel  -->
+                <VerticalStackLayout
+                    Margin="15,15,15,0"
+                    IsVisible="{Binding ShowBanner}"
+                    Spacing="12">
+                    <Border
+                        Padding="12,8"
+                        BackgroundColor="White"
+                        StrokeShape="{RoundRectangle CornerRadius='12'}"
+                        StrokeThickness="0">
+                        <StackLayout Orientation="Horizontal" Spacing="10">
+                            <Border
+                                Padding="6"
+                                BackgroundColor="#F8F6FF"
+                                StrokeShape="{RoundRectangle CornerRadius='8'}"
+                                StrokeThickness="0">
+                                <Label FontSize="16" Text="🎯" />
+                            </Border>
+                            <StackLayout VerticalOptions="Center">
+                                <Label
+                                    FontAttributes="Bold"
+                                    FontSize="16"
+                                    Text="Khuyến mãi đặc biệt"
+                                    TextColor="#6B46C1" />
+                                <Label
+                                    FontSize="12"
+                                    Text="Cơ hội học tập tuyệt vời"
+                                    TextColor="#8B5CF6" />
+                            </StackLayout>
+                        </StackLayout>
+                    </Border>
+
+                    <!--  Compact CarouselView  -->
+                    <VerticalStackLayout Spacing="10">
+                        <CarouselView
+                            x:Name="BannerCarousel"
+                            HeightRequest="160"
+                            ItemsSource="{Binding Banners}"
+                            Loop="True"
+                            PeekAreaInsets="20"
+                            Position="{Binding CurrentBannerPosition}">
+                            <CarouselView.ItemTemplate>
+                                <DataTemplate>
+                                    <Border
+                                        Margin="6"
+                                        BackgroundColor="White"
+                                        StrokeShape="{RoundRectangle CornerRadius='15'}"
+                                        StrokeThickness="0">
+                                        <Border.Shadow>
+                                            <Shadow
+                                                Brush="#9C88FF"
+                                                Opacity="0.15"
+                                                Radius="10"
+                                                Offset="0,4" />
+                                        </Border.Shadow>
+                                        <Image
+                                            Aspect="AspectFill"
+                                            HeightRequest="160"
+                                            Source="{Binding BannerImageUrl, TargetNullValue='brokenimg.png', FallbackValue='brokenimg.png'}" />
+                                    </Border>
+                                </DataTemplate>
+                            </CarouselView.ItemTemplate>
+                        </CarouselView>
+
+                        <!--  Compact Indicator  -->
+                        <IndicatorView
+                            HorizontalOptions="Center"
+                            IndicatorColor="#D1C4E9"
+                            ItemsSource="{Binding Banners}"
+                            Position="{Binding CurrentBannerPosition}"
+                            SelectedIndicatorColor="#9C88FF" />
+                    </VerticalStackLayout>
+                </VerticalStackLayout>
+
+                <!--  SECTION TIỆN ÍCH - COMPACT (Dưới banner)  -->
+                <Border
+                    Margin="15,15,15,10"
+                    Padding="12,10"
+                    BackgroundColor="White"
+                    StrokeShape="{RoundRectangle CornerRadius='16'}"
+                    StrokeThickness="0">
+                    <Border.Shadow>
+                        <Shadow
+                            Brush="#9C88FF"
+                            Opacity="0.1"
+                            Radius="6"
+                            Offset="0,2" />
+                    </Border.Shadow>
+
+                    <VerticalStackLayout Spacing="12">
+                        <!--  Compact Header  -->
+                        <StackLayout Orientation="Horizontal" Spacing="8">
+                            <Label FontSize="16" Text="🛠️" />
+                            <StackLayout VerticalOptions="Center">
+                                <Label
+                                    FontAttributes="Bold"
+                                    FontSize="14"
+                                    Text="Tiện ích"
+                                    TextColor="#6B46C1" />
+                                <Label
+                                    FontSize="10"
+                                    Text="Các chức năng hỗ trợ học tập"
+                                    TextColor="#8B5CF6" />
+                            </StackLayout>
+                        </StackLayout>
+
+                        <!--  Utility Buttons Grid - 2 rows  -->
+                        <Grid
+                            ColumnDefinitions="*,*,*"
+                            ColumnSpacing="12"
+                            RowDefinitions="Auto,Auto"
+                            RowSpacing="12">
+
+                            <!--  Chat Hỗ Trợ - Row 0, Column 0  -->
+                            <Border
+                                Grid.Row="0"
+                                Grid.Column="0"
+                                Padding="8,12"
+                                BackgroundColor="#9C88FF"
+                                StrokeShape="{RoundRectangle CornerRadius='12'}"
+                                StrokeThickness="0">
+                                <Border.GestureRecognizers>
+                                    <TapGestureRecognizer Command="{Binding NavigateToChatUtilityCommand}" />
+                                </Border.GestureRecognizers>
+
+                                <VerticalStackLayout HorizontalOptions="Center" Spacing="4">
+                                    <Label
+                                        FontSize="18"
+                                        HorizontalOptions="Center"
+                                        Text="💬"
+                                        TextColor="White" />
+                                    <Label
+                                        FontAttributes="Bold"
+                                        FontSize="10"
+                                        HorizontalOptions="Center"
+                                        Text="Chat Hỗ Trợ"
+                                        TextColor="White" />
+                                </VerticalStackLayout>
+                            </Border>
+
+                            <!--  Câu Chuyện - Row 0, Column 1  -->
+                            <Border
+                                Grid.Row="0"
+                                Grid.Column="1"
+                                Padding="8,12"
+                                BackgroundColor="#10B981"
+                                StrokeShape="{RoundRectangle CornerRadius='12'}"
+                                StrokeThickness="0">
+                                <Border.GestureRecognizers>
+                                    <TapGestureRecognizer Command="{Binding NavigateToStoryCommand}" />
+                                </Border.GestureRecognizers>
+
+                                <VerticalStackLayout HorizontalOptions="Center" Spacing="4">
+                                    <Label
+                                        FontSize="18"
+                                        HorizontalOptions="Center"
+                                        Text="📖"
+                                        TextColor="White" />
+                                    <Label
+                                        FontAttributes="Bold"
+                                        FontSize="10"
+                                        HorizontalOptions="Center"
+                                        Text="Câu Chuyện"
+                                        TextColor="White" />
+                                </VerticalStackLayout>
+                            </Border>
+
+                            <!--  Hồ Sơ - Row 0, Column 2  -->
+                            <Border
+                                Grid.Row="0"
+                                Grid.Column="2"
+                                Padding="8,12"
+                                BackgroundColor="#F59E0B"
+                                StrokeShape="{RoundRectangle CornerRadius='12'}"
+                                StrokeThickness="0">
+                                <Border.GestureRecognizers>
+                                    <TapGestureRecognizer Command="{Binding NavigateToProfileCommand}" />
+                                </Border.GestureRecognizers>
+
+                                <VerticalStackLayout HorizontalOptions="Center" Spacing="4">
+                                    <Label
+                                        FontSize="18"
+                                        HorizontalOptions="Center"
+                                        Text="👤"
+                                        TextColor="White" />
+                                    <Label
+                                        FontAttributes="Bold"
+                                        FontSize="10"
+                                        HorizontalOptions="Center"
+                                        Text="Hồ Sơ"
+                                        TextColor="White" />
+                                </VerticalStackLayout>
+                            </Border>
+
+                            <!--  Chứng Chỉ - Row 1, Column 0  -->
+                            <Border
+                                Grid.Row="1"
+                                Grid.Column="0"
+                                Padding="8,12"
+                                BackgroundColor="#DC2626"
+                                StrokeShape="{RoundRectangle CornerRadius='12'}"
+                                StrokeThickness="0">
+                                <Border.GestureRecognizers>
+                                    <TapGestureRecognizer Command="{Binding NavigateToCertificatesCommand}" />
+                                </Border.GestureRecognizers>
+
+                                <VerticalStackLayout HorizontalOptions="Center" Spacing="4">
+                                    <Label
+                                        FontSize="18"
+                                        HorizontalOptions="Center"
+                                        Text="🏆"
+                                        TextColor="White" />
+                                    <Label
+                                        FontAttributes="Bold"
+                                        FontSize="10"
+                                        HorizontalOptions="Center"
+                                        Text="Chứng Chỉ"
+                                        TextColor="White" />
+                                </VerticalStackLayout>
+                            </Border>
+
+                        </Grid>
+                    </VerticalStackLayout>
+                </Border>
+
+                <!--  COMPACT Courses Section  -->
+                <VerticalStackLayout Margin="15,10,15,25" Spacing="15">
+                    <!--  Search Result Header  -->
+                    <Border
+                        Padding="12,8"
+                        BackgroundColor="White"
+                        IsVisible="{Binding IsSearching}"
+                        StrokeShape="{RoundRectangle CornerRadius='12'}"
+                        StrokeThickness="0">
+                        <StackLayout Orientation="Horizontal" Spacing="10">
+                            <Label FontSize="16" Text="🔍" />
+                            <StackLayout VerticalOptions="Center">
+                                <Label
+                                    FontAttributes="Bold"
+                                    FontSize="16"
+                                    Text="Kết quả tìm kiếm"
+                                    TextColor="#6B46C1" />
+                                <Label
+                                    FontSize="12"
+                                    Text="{Binding SearchText, StringFormat='Từ khóa: {0}'}"
+                                    TextColor="#8B5CF6" />
+                            </StackLayout>
+                        </StackLayout>
+                    </Border>
+
+                    <!--  Phần courses giữ nguyên như cũ  -->
+                    <CollectionView ItemsSource="{Binding FilteredPackagesWithCourses}">
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate>
+                                <VerticalStackLayout Spacing="12">
+                                    <!--  COMPACT Package Header  -->
+                                    <Border
+                                        Padding="15,12"
+                                        BackgroundColor="White"
+                                        StrokeShape="{RoundRectangle CornerRadius='12'}"
+                                        StrokeThickness="0">
+                                        <Border.Shadow>
+                                            <Shadow
+                                                Brush="#B19CD9"
+                                                Opacity="0.1"
+                                                Radius="6"
+                                                Offset="0,2" />
+                                        </Border.Shadow>
+
+                                        <VerticalStackLayout Spacing="8">
+                                            <!--  Package Info  -->
+                                            <StackLayout Orientation="Horizontal" Spacing="10">
+                                                <Border
+                                                    Padding="6"
+                                                    BackgroundColor="#F8F6FF"
+                                                    StrokeShape="{RoundRectangle CornerRadius='8'}"
+                                                    StrokeThickness="0">
+                                                    <Label FontSize="16" Text="📚" />
+                                                </Border>
+                                                <StackLayout HorizontalOptions="FillAndExpand" VerticalOptions="Center">
+                                                    <Label
+                                                        FontAttributes="Bold"
+                                                        FontSize="16"
+                                                        Text="{Binding Package.PackageName}"
+                                                        TextColor="#6B46C1" />
+                                                    <Label
+                                                        FontSize="12"
+                                                        Text="Khám phá các khóa học hấp dẫn"
+                                                        TextColor="#8B5CF6" />
+                                                </StackLayout>
+                                            </StackLayout>
+
+                                            <!--  View All Button  -->
+                                            <Border
+                                                Padding="10,6"
+                                                BackgroundColor="#9C88FF"
+                                                HorizontalOptions="End"
+                                                StrokeShape="{RoundRectangle CornerRadius='15'}"
+                                                StrokeThickness="0">
+                                                <Border.GestureRecognizers>
+                                                    <TapGestureRecognizer Command="{Binding BindingContext.ShowAllCoursesCommand, Source={x:Reference ParentPage}}" CommandParameter="{Binding Package.PackageId}" />
+                                                </Border.GestureRecognizers>
+                                                <StackLayout Orientation="Horizontal" Spacing="5">
+                                                    <Label
+                                                        FontAttributes="Bold"
+                                                        FontSize="12"
+                                                        Text="Xem tất cả"
+                                                        TextColor="White" />
+                                                    <Label
+                                                        FontSize="12"
+                                                        Text="→"
+                                                        TextColor="White" />
+                                                </StackLayout>
+                                            </Border>
+                                        </VerticalStackLayout>
+                                    </Border>
+
+                                    <!--  OPTIMIZED Courses List for 9:16 Images  -->
+                                    <CollectionView
+                                        HeightRequest="280"
+                                        ItemsLayout="HorizontalList"
+                                        ItemsSource="{Binding Courses}"
+                                        SelectionMode="None">
+                                        <CollectionView.ItemTemplate>
+                                            <DataTemplate>
+                                                <Border
+                                                    Margin="8,5"
+                                                    BackgroundColor="White"
+                                                    StrokeShape="{RoundRectangle CornerRadius='15'}"
+                                                    StrokeThickness="0"
+                                                    WidthRequest="160">
+                                                    <Border.Shadow>
+                                                        <Shadow
+                                                            Brush="#9C88FF"
+                                                            Opacity="0.12"
+                                                            Radius="8"
+                                                            Offset="0,3" />
+                                                    </Border.Shadow>
+                                                    <Border.GestureRecognizers>
+                                                        <TapGestureRecognizer Command="{Binding BindingContext.CourseSelectedCommand, Source={x:Reference ParentPage}}" CommandParameter="{Binding CourseId}" />
+                                                    </Border.GestureRecognizers>
+                                                    <Grid>
+                                                        <!--  PERFECT for 9:16 aspect ratio  -->
+                                                        <Border StrokeShape="{RoundRectangle CornerRadius='15'}" StrokeThickness="0">
+                                                            <Image
+                                                                Aspect="AspectFit"
+                                                                BackgroundColor="#F5F5F5"
+                                                                HeightRequest="280"
+                                                                Source="{Binding UrlImage, TargetNullValue='brokenimg.png', FallbackValue='brokenimg.png'}"
+                                                                WidthRequest="160" />
+                                                        </Border>
+
+                                                        <!--  Compact Overlay at bottom  -->
+                                                        <Border
+                                                            Padding="8,6"
+                                                            StrokeShape="{RoundRectangle CornerRadius='0,0,15,15'}"
+                                                            StrokeThickness="0"
+                                                            VerticalOptions="End">
+                                                            <Border.Background>
+                                                                <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                                                                    <GradientStop Offset="0" Color="Transparent" />
+                                                                    <GradientStop Offset="0.3" Color="#40000000" />
+                                                                    <GradientStop Offset="1" Color="#90000000" />
+                                                                </LinearGradientBrush>
+                                                            </Border.Background>
+                                                            <Label
+                                                                FontAttributes="Bold"
+                                                                FontSize="12"
+                                                                LineBreakMode="TailTruncation"
+                                                                MaxLines="2"
+                                                                Text="{Binding CourseName}"
+                                                                TextColor="White" />
+                                                        </Border>
+
+                                                        <!--  Compact Play Icon  -->
+                                                        <Border
+                                                            Padding="6"
+                                                            BackgroundColor="#90FFFFFF"
+                                                            HorizontalOptions="Center"
+                                                            StrokeShape="{RoundRectangle CornerRadius='12'}"
+                                                            StrokeThickness="0"
+                                                            VerticalOptions="Center">
+                                                            <Border.Shadow>
+                                                                <Shadow
+                                                                    Brush="Black"
+                                                                    Opacity="0.15"
+                                                                    Radius="4"
+                                                                    Offset="0,2" />
+                                                            </Border.Shadow>
+                                                            <Label
+                                                                FontSize="16"
+                                                                Text="▶"
+                                                                TextColor="#6B46C1" />
+                                                        </Border>
+                                                    </Grid>
+                                                </Border>
+                                            </DataTemplate>
+                                        </CollectionView.ItemTemplate>
+                                    </CollectionView>
+                                </VerticalStackLayout>
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+                    </CollectionView>
+
+                </VerticalStackLayout>
+            </VerticalStackLayout>
+        </ScrollView>
+    </Grid>
+</ContentPage>

@@ -1,0 +1,399 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    x:Class="mauiluanvantotnghiep.Views.CertificatesPage.CertificatesPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:converters="clr-namespace:mauiluanvantotnghiep.Converters"
+    xmlns:vm="clr-namespace:mauiluanvantotnghiep.ViewModels.CertificatesPageViewModel"
+    x:Name="ParentPage"
+    Title="Chứng Chỉ"
+    BackgroundColor="#F8F6FF"
+    Shell.NavBarIsVisible="True">
+
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <converters:IsNotNullConverter x:Key="IsNotNullConverter" />
+        </ResourceDictionary>
+    </ContentPage.Resources>
+
+    <ContentPage.BindingContext>
+        <vm:CertificatesPageViewModel />
+    </ContentPage.BindingContext>
+
+    <Grid>
+        <!--  Background gradient  -->
+        <Rectangle>
+            <Rectangle.Fill>
+                <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                    <GradientStop Offset="0" Color="#F8F6FF" />
+                    <GradientStop Offset="0.3" Color="#F1F3F4" />
+                    <GradientStop Offset="1" Color="#E8E0FF" />
+                </LinearGradientBrush>
+            </Rectangle.Fill>
+        </Rectangle>
+
+        <ScrollView>
+            <VerticalStackLayout Padding="20" Spacing="20">
+
+                <!--  Header Section  -->
+                <Border
+                    Padding="20,25"
+                    BackgroundColor="Transparent"
+                    StrokeShape="{RoundRectangle CornerRadius='20'}"
+                    StrokeThickness="0">
+                    <Border.Background>
+                        <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                            <GradientStop Offset="0" Color="#DC2626" />
+                            <GradientStop Offset="0.5" Color="#EF4444" />
+                            <GradientStop Offset="1" Color="#F87171" />
+                        </LinearGradientBrush>
+                    </Border.Background>
+                    <Border.Shadow>
+                        <Shadow
+                            Brush="Black"
+                            Opacity="0.2"
+                            Radius="15"
+                            Offset="0,5" />
+                    </Border.Shadow>
+
+                    <VerticalStackLayout HorizontalOptions="Center" Spacing="15">
+                        <Label
+                            FontSize="20"
+                            HorizontalOptions="Center"
+                            Text="🏆" />
+                        <Label
+                            FontAttributes="Bold"
+                            FontSize="28"
+                            HorizontalOptions="Center"
+                            Text="Chứng Chỉ Của Bạn"
+                            TextColor="White" />
+                        <Label
+                            FontSize="16"
+                            HorizontalOptions="Center"
+                            Opacity="0.9"
+                            Text="Những thành tựu học tập đã đạt được"
+                            TextColor="White" />
+                    </VerticalStackLayout>
+                </Border>
+
+                <!--  Certificate Verification Section  -->
+                <Border
+                    Padding="20,18"
+                    BackgroundColor="White"
+                    StrokeShape="{RoundRectangle CornerRadius='16'}"
+                    StrokeThickness="0">
+                    <Border.Shadow>
+                        <Shadow
+                            Brush="#9C88FF"
+                            Opacity="0.1"
+                            Radius="8"
+                            Offset="0,3" />
+                    </Border.Shadow>
+
+                    <VerticalStackLayout Spacing="15">
+                        <!--  Verification Header  -->
+                        <HorizontalStackLayout HorizontalOptions="Center" Spacing="10">
+                            <Label FontSize="18" Text="🔍" />
+                            <Label
+                                FontAttributes="Bold"
+                                FontSize="18"
+                                Text="Xác Thực Chứng Chỉ"
+                                TextColor="#6B46C1" />
+                        </HorizontalStackLayout>
+
+                        <Label
+                            FontSize="14"
+                            HorizontalTextAlignment="Center"
+                            Text="Nhập mã xác thực để kiểm tra tính hợp lệ của chứng chỉ"
+                            TextColor="#6B7280" />
+
+                        <!--  Verification Code Input  -->
+                        <Border
+                            Padding="15,12"
+                            BackgroundColor="#F8F6FF"
+                            Stroke="#DC2626"
+                            StrokeShape="{RoundRectangle CornerRadius='12'}"
+                            StrokeThickness="1">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+
+                                <Entry
+                                    Grid.Column="0"
+                                    BackgroundColor="Transparent"
+                                    FontSize="12"
+                                    Placeholder="Nhập mã xác thực"
+                                    PlaceholderColor="#9CA3AF"
+                                    Text="{Binding VerificationCode, Mode=TwoWay}"
+                                    TextColor="#1F2937" />
+
+                                <Button
+                                    Grid.Column="1"
+                                    Margin="5,0"
+                                    Padding="8,6"
+                                    BackgroundColor="#9C88FF"
+                                    Command="{Binding PasteFromClipboardCommand}"
+                                    CornerRadius="8"
+                                    FontSize="12"
+                                    Text="📋"
+                                    TextColor="White"
+                                    ToolTipProperties.Text="Paste from clipboard" />
+
+                                <Button
+                                    Grid.Column="2"
+                                    Padding="12,8"
+                                    BackgroundColor="#DC2626"
+                                    Command="{Binding VerifyCertificateCommand}"
+                                    CornerRadius="10"
+                                    FontAttributes="Bold"
+                                    FontSize="14"
+                                    IsEnabled="{Binding IsVerificationLoading, Converter={StaticResource IsNotNullConverter}}"
+                                    Text="Xác Thực"
+                                    TextColor="White" />
+                            </Grid>
+                        </Border>
+
+                        <!--  Verification Loading  -->
+                        <ActivityIndicator
+                            HorizontalOptions="Center"
+                            IsRunning="{Binding IsVerificationLoading}"
+                            IsVisible="{Binding IsVerificationLoading}"
+                            Color="#DC2626" />
+
+                        <!--  Verification Result  -->
+                        <Border
+                            Padding="15,12"
+                            BackgroundColor="#F0FDF4"
+                            IsVisible="{Binding HasVerificationResult}"
+                            Stroke="#10B981"
+                            StrokeShape="{RoundRectangle CornerRadius='12'}"
+                            StrokeThickness="1">
+                            <VerticalStackLayout Spacing="12">
+                                <HorizontalStackLayout HorizontalOptions="Center" Spacing="8">
+                                    <Label FontSize="18" Text="✅" />
+                                    <Label
+                                        FontAttributes="Bold"
+                                        FontSize="16"
+                                        Text="Chứng Chỉ Hợp Lệ"
+                                        TextColor="#059669" />
+                                </HorizontalStackLayout>
+
+                                <Label
+                                    FontSize="14"
+                                    HorizontalTextAlignment="Center"
+                                    LineBreakMode="WordWrap"
+                                    Text="{Binding VerificationResult.Message}"
+                                    TextColor="#065F46" />
+
+                                <HorizontalStackLayout HorizontalOptions="Center" Spacing="8">
+                                    <Label
+                                        FontSize="14"
+                                        Text="⏳ Thời hạn:"
+                                        TextColor="#065F46" />
+                                    <Label
+                                        FontAttributes="Bold"
+                                        FontSize="14"
+                                        Text="{Binding VerificationResult.Expiration}"
+                                        TextColor="#059669" />
+                                </HorizontalStackLayout>
+
+                                <!--  Certificate Image Preview  -->
+                                <Border
+                                    Padding="0"
+                                    BackgroundColor="White"
+                                    StrokeShape="{RoundRectangle CornerRadius='10'}"
+                                    StrokeThickness="0">
+                                    <Image
+                                        Aspect="AspectFit"
+                                        HeightRequest="150"
+                                        Source="{Binding VerificationResult.ImageUrl, TargetNullValue='brokenimg.png', FallbackValue='brokenimg.png'}" />
+                                </Border>
+
+                                <Button
+                                    Padding="10,6"
+                                    BackgroundColor="#6B7280"
+                                    Command="{Binding ClearVerificationCommand}"
+                                    CornerRadius="8"
+                                    FontSize="12"
+                                    HorizontalOptions="Center"
+                                    Text="Xóa kết quả"
+                                    TextColor="White" />
+                            </VerticalStackLayout>
+                        </Border>
+                    </VerticalStackLayout>
+                </Border>
+
+                <!--  Loading Indicator  -->
+                <ActivityIndicator
+                    HorizontalOptions="Center"
+                    IsRunning="{Binding IsLoading}"
+                    IsVisible="{Binding IsLoading}"
+                    VerticalOptions="Center"
+                    Color="#DC2626" />
+
+                <!--  No Certificates Message  -->
+                <Border
+                    Padding="30,40"
+                    BackgroundColor="White"
+                    IsVisible="{Binding HasNoCertificates}"
+                    StrokeShape="{RoundRectangle CornerRadius='15'}"
+                    StrokeThickness="0">
+                    <Border.Shadow>
+                        <Shadow
+                            Brush="#DC2626"
+                            Opacity="0.1"
+                            Radius="8"
+                            Offset="0,3" />
+                    </Border.Shadow>
+
+                    <VerticalStackLayout HorizontalOptions="Center" Spacing="15">
+                        <Label
+                            FontSize="48"
+                            HorizontalOptions="Center"
+                            Opacity="0.5"
+                            Text="📜" />
+                        <Label
+                            FontAttributes="Bold"
+                            FontSize="18"
+                            HorizontalOptions="Center"
+                            Text="Chưa có chứng chỉ nào"
+                            TextColor="#6B7280" />
+                        <Label
+                            FontSize="14"
+                            HorizontalOptions="Center"
+                            Text="Hoàn thành các khóa học để nhận chứng chỉ"
+                            TextColor="#9CA3AF" />
+                    </VerticalStackLayout>
+                </Border>
+
+                <!--  Certificates List  -->
+                <CollectionView IsVisible="{Binding HasCertificates}" ItemsSource="{Binding Certificates}">
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate>
+                            <Border
+                                Margin="0,0,0,20"
+                                Padding="0"
+                                BackgroundColor="White"
+                                StrokeShape="{RoundRectangle CornerRadius='20'}"
+                                StrokeThickness="0">
+                                <Border.Shadow>
+                                    <Shadow
+                                        Brush="#DC2626"
+                                        Opacity="0.15"
+                                        Radius="12"
+                                        Offset="0,5" />
+                                </Border.Shadow>
+                                <Border.GestureRecognizers>
+                                    <TapGestureRecognizer Command="{Binding BindingContext.ViewCertificateCommand, Source={x:Reference ParentPage}}" CommandParameter="{Binding}" />
+                                </Border.GestureRecognizers>
+
+                                <Grid>
+                                    <!--  Certificate Image  -->
+                                    <Border StrokeShape="{RoundRectangle CornerRadius='20'}" StrokeThickness="0">
+                                        <Image
+                                            Aspect="AspectFit"
+                                            BackgroundColor="#F5F5F5"
+                                            HeightRequest="250"
+                                            Source="{Binding ImageUrl, TargetNullValue='brokenimg.png', FallbackValue='brokenimg.png'}" />
+                                    </Border>
+
+                                    <!--  Overlay Information  -->
+                                    <Border
+                                        Padding="20,15"
+                                        StrokeShape="{RoundRectangle CornerRadius='0,0,20,20'}"
+                                        StrokeThickness="0"
+                                        VerticalOptions="End">
+                                        <Border.Background>
+                                            <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                                                <GradientStop Offset="0" Color="Transparent" />
+                                                <GradientStop Offset="0.3" Color="#80000000" />
+                                                <GradientStop Offset="1" Color="#B0000000" />
+                                            </LinearGradientBrush>
+                                        </Border.Background>
+
+                                        <VerticalStackLayout Spacing="8">
+                                            <Label
+                                                FontAttributes="Bold"
+                                                FontSize="18"
+                                                LineBreakMode="TailTruncation"
+                                                MaxLines="2"
+                                                Text="{Binding CourseName}"
+                                                TextColor="White" />
+
+                                            <HorizontalStackLayout Spacing="10">
+                                                <Label
+                                                    FontSize="12"
+                                                    Text="📅"
+                                                    TextColor="White" />
+                                                <Label
+                                                    FontSize="12"
+                                                    Text="{Binding CreatedAt, StringFormat='{0:dd/MM/yyyy}'}"
+                                                    TextColor="White" />
+                                            </HorizontalStackLayout>
+
+                                            <HorizontalStackLayout Spacing="10">
+                                                <Label
+                                                    FontSize="12"
+                                                    Text="🔢"
+                                                    TextColor="White" />
+                                                <Label
+                                                    FontSize="12"
+                                                    Text="{Binding VerificationCode}"
+                                                    TextColor="White" />
+                                            </HorizontalStackLayout>
+
+                                            <HorizontalStackLayout IsVisible="{Binding CertificateTypeName, Converter={StaticResource IsNotNullConverter}}" Spacing="10">
+                                                <Label
+                                                    FontSize="12"
+                                                    Text="🏷️"
+                                                    TextColor="White" />
+                                                <Label
+                                                    FontSize="12"
+                                                    LineBreakMode="TailTruncation"
+                                                    Text="{Binding CertificateTypeName}"
+                                                    TextColor="White" />
+                                            </HorizontalStackLayout>
+                                        </VerticalStackLayout>
+                                    </Border>
+
+                                    <!--  View Certificate Icon  -->
+                                    <Border
+                                        Margin="15"
+                                        Padding="12,8"
+                                        BackgroundColor="#90FFFFFF"
+                                        HorizontalOptions="End"
+                                        StrokeShape="{RoundRectangle CornerRadius='15'}"
+                                        StrokeThickness="0"
+                                        VerticalOptions="Start">
+                                        <Border.Shadow>
+                                            <Shadow
+                                                Brush="Black"
+                                                Opacity="0.15"
+                                                Radius="6"
+                                                Offset="0,2" />
+                                        </Border.Shadow>
+                                        <HorizontalStackLayout Spacing="5">
+                                            <Label
+                                                FontSize="14"
+                                                Text="👁️"
+                                                TextColor="#DC2626" />
+                                            <Label
+                                                FontAttributes="Bold"
+                                                FontSize="12"
+                                                Text="Xem"
+                                                TextColor="#DC2626" />
+                                        </HorizontalStackLayout>
+                                    </Border>
+                                </Grid>
+                            </Border>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
+
+            </VerticalStackLayout>
+        </ScrollView>
+    </Grid>
+</ContentPage>

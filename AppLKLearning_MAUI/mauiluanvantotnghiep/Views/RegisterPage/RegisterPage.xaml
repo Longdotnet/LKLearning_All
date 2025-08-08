@@ -1,0 +1,182 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    x:Class="mauiluanvantotnghiep.Views.RegisterPage.RegisterPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:vm="clr-namespace:mauiluanvantotnghiep.ViewModels"
+    Title="RegisterPage"
+    Shell.NavBarIsVisible="False">
+
+    <!--  Gán BindingContext từ ViewModel  -->
+    <ContentPage.BindingContext>
+        <vm:SignUpViewModel />
+    </ContentPage.BindingContext>
+
+    <Grid RowDefinitions="1*,8*,1*">
+
+        <Image
+            Margin="10,30,10,10"
+            HeightRequest="300"
+            HorizontalOptions="Start"
+            IsAnimationPlaying="True"
+            Source="logo.gif"
+            WidthRequest="220" />
+        <Frame
+            Grid.Row="0"
+            Margin="0,-80,-80,0"
+            Padding="0"
+            BackgroundColor="#cfd0d8"
+            CornerRadius="125"
+            HeightRequest="250"
+            HorizontalOptions="EndAndExpand"
+            WidthRequest="250" />
+
+        <Frame
+            Grid.Row="0"
+            Margin="0,-120,-120,0"
+            Padding="0"
+            BackgroundColor="{x:StaticResource Primary}"
+            CornerRadius="125"
+            HeightRequest="250"
+            HorizontalOptions="EndAndExpand"
+            WidthRequest="250" />
+
+        <Frame
+            Grid.Row="1"
+            Margin="20,25,20,0"
+            BackgroundColor="White"
+            CornerRadius="0"
+            VerticalOptions="CenterAndExpand"
+            ZIndex="1">
+            <ScrollView>
+                <VerticalStackLayout Spacing="25">
+                    <Label
+                        FontAttributes="Bold"
+                        FontSize="28"
+                        Text="Đăng Ký" />
+
+                    <!--  Email Input  -->
+                    <Frame
+                        Padding="10"
+                        BorderColor="Transparent"
+                        CornerRadius="0">
+                        <Grid ColumnDefinitions="25,*" ColumnSpacing="10">
+                            <Image
+                                HeightRequest="25"
+                                Source="email.png"
+                                VerticalOptions="Center"
+                                WidthRequest="25" />
+                            <Entry
+                                Grid.Column="1"
+                                Placeholder="Email"
+                                Text="{Binding Email}"
+                                VerticalOptions="Center" />
+                        </Grid>
+                    </Frame>
+
+
+
+                    <!--  Password Input  -->
+                    <Frame
+                        Padding="10"
+                        BorderColor="Transparent"
+                        CornerRadius="0">
+                        <Grid ColumnDefinitions="25,*" ColumnSpacing="10">
+                            <Image
+                                HeightRequest="25"
+                                Source="password.png"
+                                VerticalOptions="Center"
+                                WidthRequest="25" />
+                            <Entry
+                                Grid.Column="1"
+                                IsPassword="True"
+                                Placeholder="Mật Khẩu"
+                                Text="{Binding Password}"
+                                VerticalOptions="Center" />
+                        </Grid>
+                    </Frame>
+
+
+
+
+                    <!--  Confirm Password Input  -->
+                    <Frame
+                        Padding="10"
+                        BorderColor="Transparent"
+                        CornerRadius="0">
+                        <Grid ColumnDefinitions="25,*" ColumnSpacing="10">
+                            <!--  Dùng icon phù hợp cho xác nhận mật khẩu, bạn có thể thay đổi  -->
+                            <Image
+                                HeightRequest="25"
+                                Source="mobile.png"
+                                VerticalOptions="Center"
+                                WidthRequest="25" />
+                            <Entry
+                                Grid.Column="1"
+                                IsPassword="True"
+                                Placeholder="Xác Nhận Mật Khẩu"
+                                Text="{Binding ConfirmPassword}"
+                                VerticalOptions="Center" />
+                        </Grid>
+                    </Frame>
+
+                    <!--  Registration message  -->
+                    <Label
+                        FontAttributes="Bold"
+                        HorizontalOptions="Start"
+                        Text="{Binding RegistrationMessage}"
+                        TextColor="Red" />
+
+                    <!--  SIGN UP Button  -->
+                    <Button
+                        Command="{Binding SignUpCommand}"
+                        CornerRadius="0"
+                        FontAttributes="Bold"
+                        FontSize="20"
+                        HeightRequest="60"
+                        Text="SIGN UP" />
+
+                    <HorizontalStackLayout Margin="30,10,10,10" Spacing="10">
+                        <Label
+                            FontAttributes="Bold"
+                            Text="already have an account?"
+                            TextColor="Gray"
+                            VerticalTextAlignment="Center" />
+                        <Label
+                            FontAttributes="Bold"
+                            FontSize="18"
+                            Text="SIGN IN"
+                            TextColor="{x:StaticResource Primary}">
+                            <Label.GestureRecognizers>
+                                <TapGestureRecognizer Tapped="SignInTapper" />
+                            </Label.GestureRecognizers>
+                        </Label>
+                    </HorizontalStackLayout>
+                </VerticalStackLayout>
+            </ScrollView>
+        </Frame>
+
+        <Frame
+            Grid.Row="2"
+            Margin="0,0,0,-180"
+            Padding="0"
+            BackgroundColor="#cfd0d8"
+            CornerRadius="125"
+            HeightRequest="250"
+            HorizontalOptions="StartAndExpand"
+            VerticalOptions="EndAndExpand"
+            WidthRequest="250" />
+
+        <Frame
+            Grid.Row="2"
+            Margin="0,0,0,-200"
+            Padding="0"
+            BackgroundColor="{x:StaticResource Primary}"
+            CornerRadius="125"
+            HeightRequest="250"
+            HorizontalOptions="StartAndExpand"
+            VerticalOptions="EndAndExpand"
+            WidthRequest="250" />
+    </Grid>
+
+</ContentPage>

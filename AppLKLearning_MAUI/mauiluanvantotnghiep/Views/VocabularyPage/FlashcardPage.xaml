@@ -1,0 +1,273 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    x:Class="mauiluanvantotnghiep.Views.VocabularyPage.FlashcardPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:local="clr-namespace:mauiluanvantotnghiep.Converters"
+    xmlns:tookit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+    xmlns:vm="clr-namespace:mauiluanvantotnghiep.ViewModels.VocabularyViewModel"
+    Shell.BackgroundColor="#7F55B1">
+
+
+    <ContentPage.Resources>
+        <local:InverseBooleanConverter x:Key="InverseBooleanConverter" />
+        <local:StringNotNullOrEmptyConverter x:Key="StringNotNullOrEmptyConverter" />
+        <local:HtmlWrapperConverter x:Key="HtmlWrapperConverter" />
+    </ContentPage.Resources>
+
+
+
+    <ScrollView>
+        <StackLayout Padding="0,0,0,0">
+
+            <!--  Frame trên cùng  -->
+            <Border
+                Padding="20"
+                BackgroundColor="#E6F0FA"
+                StrokeShape="{RoundRectangle CornerRadius='0,0,70,70'}"
+                StrokeThickness="0">
+                <Border.Background>
+                    <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                        <GradientStop Offset="0" Color="#7F55B1" />
+                        <GradientStop Offset="1" Color="#9B7EBD" />
+                    </LinearGradientBrush>
+                </Border.Background>
+
+                <VerticalStackLayout>
+
+
+                    <!--  Package title and details  -->
+                    <Label
+                        x:Name="PackageTitle"
+                        Margin="0,0,0,10"
+                        FontAttributes="Bold"
+                        FontSize="30"
+                        HorizontalOptions="Center"
+                        Text="VOCAULARY FOR"
+                        TextColor="#F49BAB" />
+                    <Label
+                        Margin="0,0,0,50"
+                        FontAttributes="Bold"
+                        FontSize="25"
+                        HorizontalOptions="Center"
+                        Text="TOPIC"
+                        TextColor="#FFE1E0" />
+
+                </VerticalStackLayout>
+            </Border>
+
+            <!--  Card container  -->
+            <Grid ColumnDefinitions="*" RowDefinitions="*,Auto,auto,auto">
+
+                <!--  Row 0: CardContainer để chứa front & back  -->
+                <Grid
+                    x:Name="CardContainer"
+                    Grid.Row="0"
+                    Margin="0,-30,0,0"
+                    AnchorX="0.5"
+                    AnchorY="0.5"
+                    HeightRequest="400"
+                    WidthRequest="300">
+                    <!--  Front side  -->
+                    <Border
+                        x:Name="FlashcardFront"
+                        Padding="10"
+                        BackgroundColor="White"
+                        HeightRequest="400"
+                        HorizontalOptions="Center"
+                        IsVisible="{Binding IsFlipped, Converter={StaticResource InverseBooleanConverter}}"
+                        Stroke="Black"
+                        StrokeShape="RoundRectangle 10"
+                        StrokeThickness="2"
+                        VerticalOptions="Center"
+                        WidthRequest="300">
+                        <!--  Dùng StackLayout để chứa nhiều Label  -->
+                        <StackLayout
+                            HorizontalOptions="Center"
+                            Spacing="10"
+                            VerticalOptions="Center">
+
+                            <!--  Error / status  -->
+                            <Label
+                                Margin="0"
+                                FontSize="25"
+                                HorizontalOptions="Center"
+                                HorizontalTextAlignment="Center"
+                                Text="{Binding ErrorMessage}"
+                                TextColor="Red"
+                                VerticalTextAlignment="Center" />
+                            <!--  Dòng chính: từ vựng  -->
+                            <Label
+                                FontAttributes="Bold"
+                                FontSize="40"
+                                HorizontalOptions="Center"
+                                Text="{Binding CurrentWord}" />
+
+                            <!--  Dòng 2: Hiển thị pronun  -->
+                            <Label
+                                FontSize="30"
+                                HorizontalOptions="Center"
+                                Text="{Binding CurrentPronunciation}"
+                                TextColor="Gray" />
+
+                            <!--  Dòng 3: Hiển thị loại từ  -->
+                            <Label
+                                FontSize="20"
+                                HorizontalOptions="Center"
+                                Text="{Binding CurrentPartOfSpeech}"
+                                TextColor="Gray" />
+
+                            <!--  🔘 2 ImageButton bên dưới  -->
+                            <HorizontalStackLayout Margin="0,20,0,0" Spacing="10">
+                                <ImageButton
+                                    BackgroundColor="Transparent"
+                                    Clicked="OnPlayClickedItemLisstUk"
+                                    CommandParameter="{Binding CurrentAudioUrlUk}"
+                                    HeightRequest="30"
+                                    IsVisible="{Binding CurrentAudioUrlUk, Converter={StaticResource StringNotNullOrEmptyConverter}}"
+                                    Source="play.png"
+                                    WidthRequest="30" />
+                                <Label
+                                    FontSize="16"
+                                    IsVisible="{Binding CurrentAudioUrlUk, Converter={StaticResource StringNotNullOrEmptyConverter}}"
+                                    Text="UK"
+                                    TextColor="#333"
+                                    VerticalOptions="Center" />
+                                <ImageButton
+                                    BackgroundColor="Transparent"
+                                    Clicked="OnPlayClickedItemLisstUs"
+                                    CommandParameter="{Binding CurrentAudioUrlUs}"
+                                    HeightRequest="30"
+                                    IsVisible="{Binding CurrentAudioUrlUs, Converter={StaticResource StringNotNullOrEmptyConverter}}"
+                                    Source="play.png"
+                                    WidthRequest="30" />
+                                <Label
+                                    FontSize="16"
+                                    IsVisible="{Binding CurrentAudioUrlUs, Converter={StaticResource StringNotNullOrEmptyConverter}}"
+                                    Text="US"
+                                    TextColor="#333"
+                                    VerticalOptions="Center" />
+                                <!--  media của listnew  -->
+                                <tookit:MediaElement
+                                    x:Name="mediaPlayerlistUk"
+                                    HeightRequest="0"
+                                    ShouldAutoPlay="False"
+                                    ShouldShowPlaybackControls="False"
+                                    WidthRequest="0" />
+
+                                <tookit:MediaElement
+                                    x:Name="mediaPlayerlistUs"
+                                    HeightRequest="0"
+                                    ShouldAutoPlay="False"
+                                    ShouldShowPlaybackControls="False"
+                                    WidthRequest="0" />
+
+
+                            </HorizontalStackLayout>
+
+                        </StackLayout>
+                    </Border>
+
+                    <!--  Back side  -->
+                    <Border
+                        x:Name="FlashcardBack"
+                        Padding="10"
+                        BackgroundColor="White"
+                        HeightRequest="400"
+                        HorizontalOptions="Center"
+                        IsVisible="{Binding IsFlipped}"
+                        Stroke="Black"
+                        StrokeShape="RoundRectangle 10"
+                        StrokeThickness="2"
+                        WidthRequest="300">
+                        <StackLayout>
+
+                            <Label
+                                FontSize="30"
+                                HorizontalOptions="Center"
+                                Text="Giải Thích" />
+                            <WebView
+                                Margin="0"
+                                HeightRequest="150"
+                                Source="{Binding CurrentMeaning, Converter={StaticResource HtmlWrapperConverter}}" />
+
+
+
+
+                            <WebView
+                                Margin="0"
+                                HeightRequest="150"
+                                Source="{Binding CurrentTranslatedMeaning, Converter={StaticResource HtmlWrapperConverter}}" />
+
+                        </StackLayout>
+                    </Border>
+
+                </Grid>
+                <ProgressBar
+                    Grid.Row="1"
+                    Margin="0,10"
+                    HeightRequest="12"
+                    Progress="{Binding Progress}"
+                    WidthRequest="160" />
+
+
+                <!--  Buttons  -->
+                <StackLayout
+                    Grid.Row="2"
+                    Margin="0,20,0,0"
+                    HorizontalOptions="Center"
+                    Orientation="Horizontal">
+
+
+                    <Button
+                        Margin="0,0,10,0"
+                        BackgroundColor="Transparent"
+                        BorderColor="#800080"
+                        BorderWidth="2"
+                        Clicked="OnFlipButtonClicked"
+                        CornerRadius="5"
+                        Text="Flip Card"
+                        TextColor="Black" />
+
+                    <Button
+                        BackgroundColor="Transparent"
+                        BorderColor="#800080"
+                        BorderWidth="2"
+                        Command="{Binding NextCommand}"
+                        CornerRadius="5"
+                        Text="Next Card"
+                        TextColor="Black" />
+                </StackLayout>
+
+                <!--  Row 2: Loại bỏ / Reset  -->
+                <StackLayout
+                    Grid.Row="3"
+                    Margin="0,15,0,0"
+                    HorizontalOptions="Center"
+                    Orientation="Horizontal"
+                    Spacing="10">
+
+                    <Button
+                        BackgroundColor="Transparent"
+                        BorderColor="#D9534F"
+                        BorderWidth="1"
+                        Clicked="OnRemoveButtonClicked"
+                        CornerRadius="5"
+                        Text="Loại bỏ từ này"
+                        TextColor="#D9534F" />
+
+                    <Button
+                        BackgroundColor="Transparent"
+                        BorderColor="#0275D8"
+                        BorderWidth="1"
+                        Command="{Binding ResetCommand}"
+                        CornerRadius="5"
+                        Text="Reset danh sách"
+                        TextColor="#0275D8" />
+                </StackLayout>
+            </Grid>
+
+
+        </StackLayout>
+    </ScrollView>
+</ContentPage>

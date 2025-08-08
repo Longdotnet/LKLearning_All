@@ -1,0 +1,381 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    x:Class="mauiluanvantotnghiep.Views.ReportPage.ReportPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:vm="clr-namespace:mauiluanvantotnghiep.ViewModels.ReviewViewModel"
+    Title="Báo cáo bài học"
+    BackgroundColor="#F8F9FA">
+
+    <ContentPage.BindingContext>
+        <vm:ReportViewModel />
+    </ContentPage.BindingContext>
+
+    <ScrollView>
+        <StackLayout Padding="16" Spacing="20">
+
+            <!--  Header Section  -->
+            <Frame
+                Padding="20"
+                BackgroundColor="White"
+                CornerRadius="16"
+                HasShadow="True">
+                <Grid ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto,Auto">
+
+                    <!--  Icon  -->
+                    <Frame
+                        Grid.Row="0"
+                        Grid.RowSpan="2"
+                        Grid.Column="0"
+                        Padding="12"
+                        BackgroundColor="#E3F2FD"
+                        BorderColor="#2196F3"
+                        CornerRadius="25"
+                        HasShadow="False"
+                        HeightRequest="50"
+                        VerticalOptions="Center"
+                        WidthRequest="50">
+                        <Label
+                            FontSize="24"
+                            HorizontalOptions="Center"
+                            Text="📝"
+                            TextColor="#2196F3"
+                            VerticalOptions="Center" />
+                    </Frame>
+
+                    <!--  Title  -->
+                    <Label
+                        Grid.Row="0"
+                        Grid.Column="1"
+                        Margin="16,0,0,0"
+                        FontAttributes="Bold"
+                        FontSize="20"
+                        Text="Báo cáo &amp; Góp ý"
+                        TextColor="#333"
+                        VerticalOptions="Center" />
+
+                    <!--  Subtitle  -->
+                    <Label
+                        Grid.Row="1"
+                        Grid.Column="1"
+                        Margin="16,4,0,0"
+                        FontSize="14"
+                        Text="Chia sẻ ý kiến của bạn để cải thiện bài học"
+                        TextColor="#666"
+                        VerticalOptions="Center" />
+
+                    <!--  Course and Lesson Info  -->
+                    <StackLayout
+                        Grid.Row="2"
+                        Grid.Column="0"
+                        Grid.ColumnSpan="2"
+                        Margin="0,16,0,0"
+                        Orientation="Horizontal"
+                        Spacing="20">
+
+                        <Frame
+                            Padding="8,4"
+                            BackgroundColor="#F5F5F5"
+                            BorderColor="#E0E0E0"
+                            CornerRadius="8"
+                            HasShadow="False">
+                            <StackLayout Orientation="Horizontal" Spacing="4">
+                                <Label
+                                    FontSize="12"
+                                    Text="Khóa học:"
+                                    TextColor="#666" />
+                                <Label
+                                    FontAttributes="Bold"
+                                    FontSize="12"
+                                    Text="{Binding CourseId}"
+                                    TextColor="#333" />
+                            </StackLayout>
+                        </Frame>
+
+                        <Frame
+                            Padding="8,4"
+                            BackgroundColor="#F5F5F5"
+                            BorderColor="#E0E0E0"
+                            CornerRadius="8"
+                            HasShadow="False">
+                            <StackLayout Orientation="Horizontal" Spacing="4">
+                                <Label
+                                    FontSize="12"
+                                    Text="Bài học:"
+                                    TextColor="#666" />
+                                <Label
+                                    FontAttributes="Bold"
+                                    FontSize="12"
+                                    Text="{Binding LessonId}"
+                                    TextColor="#333" />
+                            </StackLayout>
+                        </Frame>
+                    </StackLayout>
+                </Grid>
+            </Frame>
+
+            <!--  Previous Reports Section  -->
+            <Frame
+                Padding="0"
+                BackgroundColor="White"
+                CornerRadius="16"
+                HasShadow="True">
+
+                <StackLayout>
+                    <!--  Section Header  -->
+                    <Grid Padding="20,16,20,0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+
+                        <Frame
+                            Grid.Column="0"
+                            Padding="8"
+                            BackgroundColor="#FFF3E0"
+                            BorderColor="#FF9800"
+                            CornerRadius="12"
+                            HasShadow="False"
+                            HeightRequest="24"
+                            WidthRequest="24">
+                            <Label
+                                FontSize="12"
+                                HorizontalOptions="Center"
+                                Text="📋"
+                                VerticalOptions="Center" />
+                        </Frame>
+
+                        <Label
+                            Grid.Column="1"
+                            Margin="12,0,0,0"
+                            FontAttributes="Bold"
+                            FontSize="16"
+                            Text="Lịch sử báo cáo"
+                            TextColor="#333"
+                            VerticalOptions="Center" />
+
+                        <Label
+                            Grid.Column="2"
+                            FontAttributes="Bold"
+                            FontSize="14"
+                            Text="{Binding Reports.Count, StringFormat='{0} báo cáo'}"
+                            TextColor="#666"
+                            VerticalOptions="Center" />
+                    </Grid>
+
+                    <!--  Reports List  -->
+                    <CollectionView
+                        Margin="20,16,20,20"
+                        ItemsSource="{Binding Reports}"
+                        SelectionMode="None">
+
+                        <CollectionView.EmptyView>
+                            <StackLayout Padding="20" Spacing="12">
+                                <Label
+                                    FontSize="48"
+                                    HorizontalOptions="Center"
+                                    Text="📝"
+                                    TextColor="#E0E0E0" />
+                                <Label
+                                    FontSize="16"
+                                    HorizontalOptions="Center"
+                                    Text="Chưa có báo cáo nào"
+                                    TextColor="#999" />
+                                <Label
+                                    FontSize="14"
+                                    HorizontalOptions="Center"
+                                    Text="Hãy là người đầu tiên gửi báo cáo cho bài học này"
+                                    TextColor="#999" />
+                            </StackLayout>
+                        </CollectionView.EmptyView>
+
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate>
+                                <Frame
+                                    Margin="0,4"
+                                    Padding="16"
+                                    BackgroundColor="#FAFAFA"
+                                    BorderColor="#E0E0E0"
+                                    CornerRadius="12"
+                                    HasShadow="False">
+
+                                    <Grid ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto,Auto">
+
+                                        <!--  Avatar placeholder  -->
+                                        <Frame
+                                            Grid.Row="0"
+                                            Grid.RowSpan="2"
+                                            Grid.Column="0"
+                                            Padding="8"
+                                            BackgroundColor="#E8F5E8"
+                                            BorderColor="#4CAF50"
+                                            CornerRadius="20"
+                                            HasShadow="False"
+                                            HeightRequest="40"
+                                            VerticalOptions="Start"
+                                            WidthRequest="40">
+                                            <Label
+                                                FontSize="16"
+                                                HorizontalOptions="Center"
+                                                Text="👤"
+                                                VerticalOptions="Center" />
+                                        </Frame>
+
+                                        <!--  Content  -->
+                                        <Label
+                                            Grid.Row="0"
+                                            Grid.Column="1"
+                                            Margin="12,0,0,0"
+                                            FontSize="14"
+                                            LineBreakMode="WordWrap"
+                                            Text="{Binding Comment}"
+                                            TextColor="#333" />
+
+                                        <!--  Date and Time  -->
+                                        <StackLayout
+                                            Grid.Row="1"
+                                            Grid.Column="1"
+                                            Margin="12,8,0,0"
+                                            Orientation="Horizontal"
+                                            Spacing="12">
+
+                                            <Frame
+                                                Padding="6,2"
+                                                BackgroundColor="#E3F2FD"
+                                                BorderColor="#2196F3"
+                                                CornerRadius="4"
+                                                HasShadow="False">
+                                                <Label
+                                                    FontSize="10"
+                                                    Text="{Binding CreatedAt, StringFormat='{0:dd/MM/yyyy}'}"
+                                                    TextColor="#2196F3" />
+                                            </Frame>
+
+                                            <Frame
+                                                Padding="6,2"
+                                                BackgroundColor="#F3E5F5"
+                                                BorderColor="#9C27B0"
+                                                CornerRadius="4"
+                                                HasShadow="False">
+                                                <Label
+                                                    FontSize="10"
+                                                    Text="{Binding CreatedAt, StringFormat='{0:HH:mm}'}"
+                                                    TextColor="#9C27B0" />
+                                            </Frame>
+                                        </StackLayout>
+                                    </Grid>
+                                </Frame>
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+                    </CollectionView>
+                </StackLayout>
+            </Frame>
+
+            <!--  New Report Section  -->
+            <Frame
+                Padding="20"
+                BackgroundColor="White"
+                CornerRadius="16"
+                HasShadow="True">
+
+                <StackLayout Spacing="16">
+
+                    <!--  Section Header  -->
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+
+                        <Frame
+                            Grid.Column="0"
+                            Padding="8"
+                            BackgroundColor="#E8F5E8"
+                            BorderColor="#4CAF50"
+                            CornerRadius="12"
+                            HasShadow="False"
+                            HeightRequest="24"
+                            WidthRequest="24">
+                            <Label
+                                FontSize="12"
+                                HorizontalOptions="Center"
+                                Text="✏️"
+                                VerticalOptions="Center" />
+                        </Frame>
+
+                        <Label
+                            Grid.Column="1"
+                            Margin="12,0,0,0"
+                            FontAttributes="Bold"
+                            FontSize="16"
+                            Text="Viết báo cáo mới"
+                            TextColor="#333"
+                            VerticalOptions="Center" />
+                    </Grid>
+
+                    <!--  Input Section  -->
+                    <StackLayout Spacing="12">
+                        <Label
+                            FontAttributes="Bold"
+                            FontSize="14"
+                            Text="Nội dung góp ý"
+                            TextColor="#333" />
+
+                        <!--  Editor Container với Margin thay vì Padding  -->
+                        <Frame
+                            Padding="16"
+                            BorderColor="#E0E0E0"
+                            CornerRadius="12"
+                            HasShadow="False">
+                            <Editor
+                                AutoSize="TextChanges"
+                                BackgroundColor="Transparent"
+                                FontSize="14"
+                                HeightRequest="120"
+                                Placeholder="Hãy chia sẻ ý kiến, đề xuất hoặc phản hồi của bạn về bài học này..."
+                                PlaceholderColor="#999"
+                                Text="{Binding Comment}"
+                                TextColor="#333" />
+                        </Frame>
+
+                        <Label
+                            FontSize="12"
+                            Text="💡 Góp ý của bạn sẽ giúp chúng tôi cải thiện chất lượng bài học"
+                            TextColor="#666" />
+                    </StackLayout>
+
+                    <!--  Action Buttons  -->
+                    <Grid Margin="0,8,0,0" ColumnDefinitions="*,12,*">
+                        <Button
+                            Grid.Column="0"
+                            Padding="0,12"
+                            BackgroundColor="#4CAF50"
+                            Command="{Binding SubmitReportCommand}"
+                            CornerRadius="12"
+                            FontAttributes="Bold"
+                            FontSize="16"
+                            Text="📤 Gửi báo cáo"
+                            TextColor="White" />
+
+                        <Button
+                            Grid.Column="2"
+                            Padding="0,12"
+                            BackgroundColor="#F5F5F5"
+                            BorderColor="#E0E0E0"
+                            BorderWidth="1"
+                            Command="{Binding CancelCommand}"
+                            CornerRadius="12"
+                            FontAttributes="Bold"
+                            FontSize="16"
+                            Text="❌ Hủy"
+                            TextColor="#666" />
+                    </Grid>
+                </StackLayout>
+            </Frame>
+
+            <!--  Bottom spacing  -->
+            <BoxView HeightRequest="20" Color="Transparent" />
+        </StackLayout>
+    </ScrollView>
+</ContentPage>

@@ -1,0 +1,344 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    x:Class="mauiluanvantotnghiep.Views.ReviewPage.ReviewDetailPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:conv="clr-namespace:mauiluanvantotnghiep.Converters"
+    xmlns:models="clr-namespace:mauiluanvantotnghiep.Models"
+    Title="Đánh giá khóa học"
+    BackgroundColor="#F5F7FA">
+
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <conv:StarConverter x:Key="StarConverter" />
+
+            <!--  Modern Filter Button Style  -->
+            <Style x:Key="FilterButtonStyle" TargetType="Button">
+                <Setter Property="BackgroundColor" Value="White" />
+                <Setter Property="TextColor" Value="#6B7280" />
+                <Setter Property="FontAttributes" Value="Bold" />
+                <Setter Property="FontSize" Value="14" />
+                <Setter Property="BorderColor" Value="#E5E7EB" />
+                <Setter Property="BorderWidth" Value="1" />
+                <Setter Property="CornerRadius" Value="25" />
+                <Setter Property="Padding" Value="20,10" />
+                <Setter Property="HeightRequest" Value="40" />
+                <Setter Property="MinimumWidthRequest" Value="100" />
+            </Style>
+        </ResourceDictionary>
+    </ContentPage.Resources>
+
+    <ScrollView>
+        <StackLayout Padding="20" Spacing="24">
+
+            <!--  Hero Rating Section  -->
+            <Frame
+                Padding="30"
+                BackgroundColor="White"
+                CornerRadius="20"
+                HasShadow="True">
+
+                <StackLayout Spacing="16">
+                    <!--  Rating Circle  -->
+                    <Frame
+                        Padding="20"
+                        BackgroundColor="#F8FAFC"
+                        BorderColor="#E2E8F0"
+                        CornerRadius="60"
+                        HasShadow="False"
+                        HeightRequest="120"
+                        HorizontalOptions="Center"
+                        WidthRequest="120">
+
+                        <StackLayout HorizontalOptions="Center" VerticalOptions="Center">
+                            <Label
+                                FontAttributes="Bold"
+                                FontSize="32"
+                                HorizontalOptions="Center"
+                                Text="{Binding AverageRating, StringFormat='{0:F1}'}"
+                                TextColor="#1E293B" />
+                            <Label
+                                FontSize="10"
+                                HorizontalOptions="Center"
+                                Text="/ 5.0"
+                                TextColor="#64748B" />
+                        </StackLayout>
+                    </Frame>
+
+                    <!--  Stars  -->
+                    <Label
+                        FontSize="28"
+                        HorizontalOptions="Center"
+                        Text="{Binding AverageRating, Converter={StaticResource StarConverter}}"
+                        TextColor="#F59E0B" />
+
+                    <!--  Reviews Count  -->
+                    <Label
+                        FontSize="16"
+                        HorizontalOptions="Center"
+                        Text="{Binding TotalReviews, StringFormat='Dựa trên {0} đánh giá'}"
+                        TextColor="#6B7280" />
+                </StackLayout>
+            </Frame>
+
+            <!--  Filter Section  -->
+            <StackLayout Spacing="16">
+                <Label
+                    FontAttributes="Bold"
+                    FontSize="18"
+                    Text="🔍 Lọc đánh giá"
+                    TextColor="#1E293B" />
+
+                <ScrollView HorizontalScrollBarVisibility="Never" Orientation="Horizontal">
+                    <StackLayout Orientation="Horizontal" Spacing="12">
+
+                        <Button
+                            Command="{Binding SetFilterCommand}"
+                            CommandParameter="{x:Static models:ReviewFilter.All}"
+                            Style="{StaticResource FilterButtonStyle}"
+                            Text="Tất cả">
+                            <Button.Triggers>
+                                <DataTrigger
+                                    Binding="{Binding SelectedFilter}"
+                                    TargetType="Button"
+                                    Value="{x:Static models:ReviewFilter.All}">
+                                    <Setter Property="BackgroundColor" Value="#3B82F6" />
+                                    <Setter Property="TextColor" Value="White" />
+                                    <Setter Property="BorderColor" Value="#3B82F6" />
+                                </DataTrigger>
+                            </Button.Triggers>
+                        </Button>
+
+                        <Button
+                            Command="{Binding SetFilterCommand}"
+                            CommandParameter="{x:Static models:ReviewFilter.Newest}"
+                            Style="{StaticResource FilterButtonStyle}"
+                            Text="Mới nhất">
+                            <Button.Triggers>
+                                <DataTrigger
+                                    Binding="{Binding SelectedFilter}"
+                                    TargetType="Button"
+                                    Value="{x:Static models:ReviewFilter.Newest}">
+                                    <Setter Property="BackgroundColor" Value="#3B82F6" />
+                                    <Setter Property="TextColor" Value="White" />
+                                    <Setter Property="BorderColor" Value="#3B82F6" />
+                                </DataTrigger>
+                            </Button.Triggers>
+                        </Button>
+
+                        <Button
+                            Command="{Binding SetFilterCommand}"
+                            CommandParameter="{x:Static models:ReviewFilter.Mine}"
+                            Style="{StaticResource FilterButtonStyle}"
+                            Text="Của tôi">
+                            <Button.Triggers>
+                                <DataTrigger
+                                    Binding="{Binding SelectedFilter}"
+                                    TargetType="Button"
+                                    Value="{x:Static models:ReviewFilter.Mine}">
+                                    <Setter Property="BackgroundColor" Value="#3B82F6" />
+                                    <Setter Property="TextColor" Value="White" />
+                                    <Setter Property="BorderColor" Value="#3B82F6" />
+                                </DataTrigger>
+                            </Button.Triggers>
+                        </Button>
+                    </StackLayout>
+                </ScrollView>
+            </StackLayout>
+
+            <!--  Review Status Message  -->
+            <Frame
+                Padding="20"
+                BackgroundColor="#DBEAFE"
+                BorderColor="#3B82F6"
+                CornerRadius="16"
+                HasShadow="False"
+                IsVisible="{Binding IsReviewStatusVisible}">
+
+                <Grid ColumnDefinitions="Auto,*">
+                    <Frame
+                        Grid.Column="0"
+                        Padding="8"
+                        BackgroundColor="#3B82F6"
+                        CornerRadius="20"
+                        HasShadow="False"
+                        HeightRequest="40"
+                        WidthRequest="40">
+                        <Label
+                            FontSize="18"
+                            HorizontalOptions="Center"
+                            Text="💡"
+                            VerticalOptions="Center" />
+                    </Frame>
+
+                    <Label
+                        Grid.Column="1"
+                        Margin="16,0,0,0"
+                        FontSize="15"
+                        LineBreakMode="WordWrap"
+                        Text="{Binding ReviewStatusMessage}"
+                        TextColor="#1E40AF"
+                        VerticalOptions="Center" />
+                </Grid>
+            </Frame>
+
+            <!--  Add Review Button  -->
+            <Button
+                Padding="0,16"
+                BackgroundColor="#10B981"
+                Command="{Binding AddReviewCommand}"
+                CornerRadius="16"
+                FontAttributes="Bold"
+                FontSize="16"
+                IsVisible="{Binding IsAddReviewVisible}"
+                Text="{Binding AddReviewButtonText}"
+                TextColor="White">
+
+                <Button.Shadow>
+                    <Shadow
+                        Brush="#10B981"
+                        Opacity="0.25"
+                        Radius="12"
+                        Offset="0,4" />
+                </Button.Shadow>
+            </Button>
+
+            <!--  Reviews List  -->
+            <StackLayout Spacing="16">
+                <Label
+                    FontAttributes="Bold"
+                    FontSize="18"
+                    Text="💬 Đánh giá từ học viên"
+                    TextColor="#1E293B" />
+
+                <CollectionView ItemsSource="{Binding FilteredReviews}" SelectionMode="None">
+
+                    <CollectionView.EmptyView>
+                        <StackLayout Padding="40,60" Spacing="20">
+                            <Frame
+                                Padding="20"
+                                BackgroundColor="#F8FAFC"
+                                CornerRadius="40"
+                                HasShadow="False"
+                                HeightRequest="80"
+                                HorizontalOptions="Center"
+                                WidthRequest="80">
+                                <Label
+                                    FontSize="36"
+                                    HorizontalOptions="Center"
+                                    Text="💬"
+                                    TextColor="#CBD5E1"
+                                    VerticalOptions="Center" />
+                            </Frame>
+
+                            <Label
+                                FontAttributes="Bold"
+                                FontSize="20"
+                                HorizontalOptions="Center"
+                                Text="Chưa có đánh giá nào"
+                                TextColor="#64748B" />
+
+                            <Label
+                                FontSize="16"
+                                HorizontalOptions="Center"
+                                LineBreakMode="WordWrap"
+                                Text="Hãy là người đầu tiên chia sẻ trải nghiệm về khóa học này!"
+                                TextColor="#94A3B8" />
+                        </StackLayout>
+                    </CollectionView.EmptyView>
+
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate>
+                            <Frame
+                                Margin="0,0,0,16"
+                                Padding="0"
+                                BackgroundColor="White"
+                                BorderColor="#F1F5F9"
+                                CornerRadius="20"
+                                HasShadow="True">
+
+                                <StackLayout Spacing="0">
+                                    <!--  Header  -->
+                                    <Grid Padding="20,20,20,16" ColumnDefinitions="Auto,*,Auto">
+
+                                        <!--  Avatar  -->
+                                        <Frame
+                                            Grid.Column="0"
+                                            Padding="0"
+                                            BackgroundColor="#F8FAFC"
+                                            BorderColor="#E2E8F0"
+                                            CornerRadius="28"
+                                            HasShadow="False"
+                                            HeightRequest="56"
+                                            WidthRequest="56">
+                                            <Image Aspect="AspectFill" Source="{Binding UrlAvatar, FallbackValue='https://img.icons8.com/3d-fluency/110/000000/user-male-circle.png'}" />
+                                        </Frame>
+
+                                        <!--  User Info  -->
+                                        <StackLayout
+                                            Grid.Column="1"
+                                            Margin="16,0,0,0"
+                                            VerticalOptions="Center">
+                                            <Label
+                                                FontAttributes="Bold"
+                                                FontSize="16"
+                                                Text="{Binding Name}"
+                                                TextColor="#1E293B" />
+                                            <Label
+                                                FontSize="13"
+                                                Text="{Binding CreatedAt, StringFormat='{0:dd/MM/yyyy}'}"
+                                                TextColor="#64748B" />
+                                        </StackLayout>
+
+                                        <!--  Rating Badge  -->
+                                        <Frame
+                                            Grid.Column="2"
+                                            Padding="12,6"
+                                            BackgroundColor="#FEF3C7"
+                                            BorderColor="#F59E0B"
+                                            CornerRadius="16"
+                                            HasShadow="False">
+                                            <Label
+                                                FontAttributes="Bold"
+                                                FontSize="14"
+                                                HorizontalOptions="Center"
+                                                Text="{Binding Rating, StringFormat='{0} ⭐'}"
+                                                TextColor="#D97706"
+                                                VerticalOptions="Center" />
+                                        </Frame>
+                                    </Grid>
+
+                                    <!--  Stars  -->
+                                    <StackLayout Padding="20,0,20,16">
+                                        <Label
+                                            FontSize="20"
+                                            Text="{Binding Rating, Converter={StaticResource StarConverter}}"
+                                            TextColor="#F59E0B" />
+                                    </StackLayout>
+
+                                    <!--  Comment  -->
+                                    <Frame
+                                        Margin="20,0,20,20"
+                                        Padding="20"
+                                        BackgroundColor="#F8FAFC"
+                                        BorderColor="#E2E8F0"
+                                        CornerRadius="16"
+                                        HasShadow="False">
+                                        <Label
+                                            FontSize="15"
+                                            LineBreakMode="WordWrap"
+                                            LineHeight="1.4"
+                                            Text="{Binding Comment}"
+                                            TextColor="#374151" />
+                                    </Frame>
+                                </StackLayout>
+                            </Frame>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
+            </StackLayout>
+
+
+        </StackLayout>
+    </ScrollView>
+</ContentPage>

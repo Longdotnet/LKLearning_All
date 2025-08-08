@@ -1,0 +1,345 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    x:Class="mauiluanvantotnghiep.Views.PaymentPage.PaymentgatewayPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    Title="Thanh toán"
+    BackgroundColor="#F5F7FA">
+
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <!--  Modern Card Style  -->
+            <Style x:Key="PaymentCardStyle" TargetType="Frame">
+                <Setter Property="BackgroundColor" Value="White" />
+                <Setter Property="CornerRadius" Value="20" />
+                <Setter Property="HasShadow" Value="True" />
+                <Setter Property="Padding" Value="0" />
+                <Setter Property="BorderColor" Value="#E5E7EB" />
+                <Setter Property="Margin" Value="0,8" />
+            </Style>
+
+            <!--  Payment Button Style  -->
+            <Style x:Key="PaymentButtonStyle" TargetType="Button">
+                <Setter Property="FontAttributes" Value="Bold" />
+                <Setter Property="FontSize" Value="16" />
+                <Setter Property="CornerRadius" Value="16" />
+                <Setter Property="TextColor" Value="White" />
+                <Setter Property="Padding" Value="24,16" />
+                <Setter Property="HeightRequest" Value="56" />
+            </Style>
+
+            <!--  Info Label Style  -->
+            <Style x:Key="InfoLabelStyle" TargetType="Label">
+                <Setter Property="FontSize" Value="16" />
+                <Setter Property="TextColor" Value="#374151" />
+                <Setter Property="LineBreakMode" Value="WordWrap" />
+            </Style>
+
+            <!--  Title Style  -->
+            <Style x:Key="TitleStyle" TargetType="Label">
+                <Setter Property="FontAttributes" Value="Bold" />
+                <Setter Property="FontSize" Value="20" />
+                <Setter Property="TextColor" Value="#1F2937" />
+                <Setter Property="HorizontalOptions" Value="Center" />
+            </Style>
+        </ResourceDictionary>
+    </ContentPage.Resources>
+
+    <ScrollView>
+        <StackLayout Padding="20" Spacing="24">
+
+            <!--  Header Section  -->
+            <Frame Style="{StaticResource PaymentCardStyle}">
+                <StackLayout Padding="24" Spacing="16">
+                    <!--  Payment Icon  -->
+                    <Frame
+                        Padding="16"
+                        BackgroundColor="#F0F9FF"
+                        BorderColor="#0EA5E9"
+                        CornerRadius="50"
+                        HasShadow="False"
+                        HeightRequest="80"
+                        HorizontalOptions="Center"
+                        WidthRequest="80">
+                        <Label
+                            FontSize="32"
+                            HorizontalOptions="Center"
+                            Text="💳"
+                            TextColor="#0EA5E9"
+                            VerticalOptions="Center" />
+                    </Frame>
+
+                    <!--  Title & Description  -->
+                    <StackLayout Spacing="8">
+                        <Label Style="{StaticResource TitleStyle}" Text="Chọn phương thức thanh toán" />
+                        <Label
+                            FontSize="16"
+                            HorizontalOptions="Center"
+                            LineBreakMode="WordWrap"
+                            Text="Chọn cổng thanh toán phù hợp để hoàn tất giao dịch"
+                            TextColor="#6B7280" />
+                    </StackLayout>
+                </StackLayout>
+            </Frame>
+
+            <!--  Order Summary Section  -->
+            <Frame Style="{StaticResource PaymentCardStyle}">
+                <StackLayout Padding="24" Spacing="16">
+                    <Label
+                        FontAttributes="Bold"
+                        FontSize="18"
+                        Text="📋 Thông tin đơn hàng"
+                        TextColor="#1F2937" />
+
+                    <Grid ColumnDefinitions="*,Auto" RowDefinitions="Auto,Auto,Auto">
+                        <!--  Package Info  -->
+                        <Label
+                            Grid.Row="0"
+                            Grid.Column="0"
+                            FontSize="16"
+                            Text="Gói cước:"
+                            TextColor="#6B7280" />
+                        <Label
+                            Grid.Row="0"
+                            Grid.Column="1"
+                            FontAttributes="Bold"
+                            FontSize="16"
+                            Text="{Binding PackageId, StringFormat='Gói #{0}'}"
+                            TextColor="#1F2937" />
+
+                        <!--  Separator  -->
+                        <BoxView
+                            Grid.Row="1"
+                            Grid.ColumnSpan="2"
+                            Margin="0,8"
+                            BackgroundColor="#E5E7EB"
+                            HeightRequest="1" />
+
+                        <!--  Total Amount  -->
+                        <Label
+                            Grid.Row="2"
+                            Grid.Column="0"
+                            FontAttributes="Bold"
+                            FontSize="18"
+                            Text="Tổng cộng:"
+                            TextColor="#1F2937" />
+                        <Label
+                            Grid.Row="2"
+                            Grid.Column="1"
+                            FontAttributes="Bold"
+                            FontSize="18"
+                            Text="{Binding Price, StringFormat='{0:N0} VNĐ'}"
+                            TextColor="#DC2626" />
+                    </Grid>
+                </StackLayout>
+            </Frame>
+
+            <!--  Payment Methods Section  -->
+            <StackLayout Spacing="16">
+                <Label
+                    Margin="0,0,0,8"
+                    FontAttributes="Bold"
+                    FontSize="18"
+                    Text="💸 Phương thức thanh toán"
+                    TextColor="#1F2937" />
+
+                <!--  VnPay Option  -->
+                <Frame Style="{StaticResource PaymentCardStyle}">
+                    <StackLayout Padding="0" Spacing="0">
+                        <!--  VnPay Background Image Section  -->
+                        <Grid HeightRequest="200">
+                            <Image Aspect="AspectFill" Source="vnpaybg2.jpg" />
+                            <!--  Gradient Overlay  -->
+                            <BoxView BackgroundColor="#000000" Opacity="0.3" />
+                            <!--  VnPay Logo/Text  -->
+                            <StackLayout
+                                Padding="24"
+                                HorizontalOptions="Start"
+                                VerticalOptions="End">
+                                <Label
+                                    FontAttributes="Bold"
+                                    FontSize="24"
+                                    Text="VnPay"
+                                    TextColor="White" />
+                                <Label
+                                    FontSize="14"
+                                    Opacity="0.9"
+                                    Text="Ví điện tử hàng đầu Việt Nam"
+                                    TextColor="White" />
+                            </StackLayout>
+                        </Grid>
+
+                        <!--  VnPay Action Section  -->
+                        <StackLayout Padding="24,20" Spacing="12">
+                            <StackLayout Orientation="Horizontal" Spacing="12">
+                                <Label
+                                    FontSize="16"
+                                    Text="✅"
+                                    VerticalOptions="Center" />
+                                <Label
+                                    FontSize="14"
+                                    Text="Thanh toán nhanh chóng và bảo mật"
+                                    TextColor="#6B7280"
+                                    VerticalOptions="Center" />
+                            </StackLayout>
+                            <StackLayout Orientation="Horizontal" Spacing="12">
+                                <Label
+                                    FontSize="16"
+                                    Text="🏦"
+                                    VerticalOptions="Center" />
+                                <Label
+                                    FontSize="14"
+                                    Text="Hỗ trợ thẻ ATM, Visa, Mastercard"
+                                    TextColor="#6B7280"
+                                    VerticalOptions="Center" />
+                            </StackLayout>
+
+                            <Button
+                                BackgroundColor="#8B5CF6"
+                                Command="{Binding SelectVnPayCommand}"
+                                Style="{StaticResource PaymentButtonStyle}"
+                                Text="Thanh toán với VnPay">
+                                <Button.Shadow>
+                                    <Shadow
+                                        Brush="#8B5CF6"
+                                        Opacity="0.3"
+                                        Radius="12"
+                                        Offset="0,4" />
+                                </Button.Shadow>
+                            </Button>
+                        </StackLayout>
+                    </StackLayout>
+                </Frame>
+
+                <!--  ZaloPay Option  -->
+                <Frame Style="{StaticResource PaymentCardStyle}">
+                    <StackLayout Padding="0" Spacing="0">
+                        <!--  ZaloPay Background Image Section  -->
+                        <Grid HeightRequest="200">
+                            <Image Aspect="AspectFill" Source="zalopaybg.png" />
+                            <!--  Gradient Overlay  -->
+                            <BoxView BackgroundColor="#000000" Opacity="0.3" />
+                            <!--  ZaloPay Logo/Text  -->
+                            <StackLayout
+                                Padding="24"
+                                HorizontalOptions="Start"
+                                VerticalOptions="End">
+                                <Label
+                                    FontAttributes="Bold"
+                                    FontSize="24"
+                                    Text="ZaloPay"
+                                    TextColor="White" />
+                                <Label
+                                    FontSize="14"
+                                    Opacity="0.9"
+                                    Text="Ví điện tử thông minh"
+                                    TextColor="White" />
+                            </StackLayout>
+                        </Grid>
+
+                        <!--  ZaloPay Action Section  -->
+                        <StackLayout Padding="24,20" Spacing="12">
+                            <StackLayout Orientation="Horizontal" Spacing="12">
+                                <Label
+                                    FontSize="16"
+                                    Text="⚡"
+                                    VerticalOptions="Center" />
+                                <Label
+                                    FontSize="14"
+                                    Text="Thanh toán siêu tốc trong 3 giây"
+                                    TextColor="#6B7280"
+                                    VerticalOptions="Center" />
+                            </StackLayout>
+                            <StackLayout Orientation="Horizontal" Spacing="12">
+                                <Label
+                                    FontSize="16"
+                                    Text="🎁"
+                                    VerticalOptions="Center" />
+                                <Label
+                                    FontSize="14"
+                                    Text="Nhiều ưu đãi và hoàn tiền hấp dẫn"
+                                    TextColor="#6B7280"
+                                    VerticalOptions="Center" />
+                            </StackLayout>
+
+                            <Button
+                                BackgroundColor="#0066CC"
+                                Command="{Binding SelectZaloPayCommand}"
+                                Style="{StaticResource PaymentButtonStyle}"
+                                Text="Thanh toán với ZaloPay">
+                                <Button.Shadow>
+                                    <Shadow
+                                        Brush="#0066CC"
+                                        Opacity="0.3"
+                                        Radius="12"
+                                        Offset="0,4" />
+                                </Button.Shadow>
+                            </Button>
+                        </StackLayout>
+                    </StackLayout>
+                </Frame>
+            </StackLayout>
+
+            <!--  Security Notice  -->
+            <Frame Style="{StaticResource PaymentCardStyle}">
+                <StackLayout Padding="20" Spacing="12">
+                    <Grid ColumnDefinitions="Auto,*">
+                        <Frame
+                            Grid.Column="0"
+                            Padding="8"
+                            BackgroundColor="#10B981"
+                            CornerRadius="20"
+                            HasShadow="False"
+                            HeightRequest="40"
+                            WidthRequest="40">
+                            <Label
+                                FontSize="16"
+                                HorizontalOptions="Center"
+                                Text="🔒"
+                                TextColor="White"
+                                VerticalOptions="Center" />
+                        </Frame>
+
+                        <StackLayout Grid.Column="1" Margin="16,0,0,0">
+                            <Label
+                                FontAttributes="Bold"
+                                FontSize="16"
+                                Text="Thanh toán an toàn"
+                                TextColor="#1F2937" />
+                            <Label
+                                FontSize="14"
+                                LineBreakMode="WordWrap"
+                                Text="Thông tin thanh toán được mã hóa SSL 256-bit và tuân thủ tiêu chuẩn bảo mật quốc tế"
+                                TextColor="#6B7280" />
+                        </StackLayout>
+                    </Grid>
+                </StackLayout>
+            </Frame>
+
+            <!--  Support Contact  -->
+            <Frame
+                Padding="20"
+                BackgroundColor="#FEF3C7"
+                BorderColor="#F59E0B"
+                CornerRadius="16"
+                HasShadow="False">
+                <StackLayout Spacing="8">
+                    <Label
+                        FontAttributes="Bold"
+                        FontSize="16"
+                        HorizontalOptions="Center"
+                        Text="📞 Cần hỗ trợ?"
+                        TextColor="#D97706" />
+                    <Label
+                        FontSize="14"
+                        HorizontalOptions="Center"
+                        LineBreakMode="WordWrap"
+                        Text="Liên hệ hỗ trợ qua email: LKlearing@gmail.com"
+                        TextColor="#92400E" />
+                </StackLayout>
+            </Frame>
+
+
+        </StackLayout>
+    </ScrollView>
+</ContentPage>

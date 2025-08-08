@@ -1,0 +1,274 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    x:Class="mauiluanvantotnghiep.Views.ChatDashboardPage.ChatDashboardPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:converters="clr-namespace:mauiluanvantotnghiep.Converters"
+    xmlns:vm="clr-namespace:mauiluanvantotnghiep.ViewModels.ChatDashboardViewModel"
+    x:Name="ChatPage"
+    Title="Chat Hỗ Trợ"
+    BackgroundColor="#F8F6FF">
+
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <converters:MessageVisibilityConverter x:Key="MessageVisibilityConverter" />
+        </ResourceDictionary>
+    </ContentPage.Resources>
+
+    <ContentPage.BindingContext>
+        <vm:ChatDashboardViewModel />
+    </ContentPage.BindingContext>
+
+    <Grid RowDefinitions="Auto,*,Auto">
+
+        <!--  HEADER với nút refresh  -->
+        <Border
+            Grid.Row="0"
+            Padding="20,15"
+            BackgroundColor="#9C88FF"
+            StrokeThickness="0">
+
+            <StackLayout Spacing="8">
+                <Grid ColumnDefinitions="*,Auto">
+                    <Label
+                        Grid.Column="0"
+                        FontAttributes="Bold"
+                        FontSize="18"
+                        HorizontalOptions="Center"
+                        Text="💬 Chat Hỗ Trợ"
+                        TextColor="White" />
+
+                    <!--  NÚT REFRESH  -->
+                    <Button
+                        Grid.Column="1"
+                        Padding="8"
+                        BackgroundColor="Transparent"
+                        Command="{Binding RefreshConnectionCommand}"
+                        CornerRadius="15"
+                        FontSize="16"
+                        HeightRequest="30"
+                        Text="🔄"
+                        TextColor="White"
+                        WidthRequest="30" />
+                </Grid>
+
+                <Label
+                    FontSize="12"
+                    HorizontalOptions="Center"
+                    IsVisible="{Binding StatusMessage, Converter={StaticResource StringIsNotNullOrEmptyConverter}}"
+                    Text="{Binding StatusMessage}"
+                    TextColor="White" />
+
+                <!--  Loading  -->
+                <ActivityIndicator
+                    IsRunning="{Binding IsLoading}"
+                    IsVisible="{Binding IsLoading}"
+                    Color="White" />
+
+                <!--  Connection Status  -->
+                <Border
+                    Padding="8,4"
+                    BackgroundColor="{Binding IsConnected, Converter={StaticResource BoolToConnectionColorConverter}}"
+                    HorizontalOptions="Center"
+                    StrokeShape="{RoundRectangle CornerRadius='12'}"
+                    StrokeThickness="0">
+                    <Label
+                        FontSize="10"
+                        Text="{Binding IsConnected, Converter={StaticResource BoolToConnectionStatusConverter}}"
+                        TextColor="White" />
+                </Border>
+
+                <!--  Conversation Info  -->
+                <Border
+                    Padding="12,8"
+                    BackgroundColor="#80FFFFFF"
+                    IsVisible="{Binding Conversation, Converter={StaticResource IsNotNullConverter}}"
+                    StrokeShape="{RoundRectangle CornerRadius='15'}"
+                    StrokeThickness="0">
+
+                    <StackLayout>
+                        <Label
+                            FontAttributes="Bold"
+                            FontSize="13"
+                            HorizontalOptions="Center"
+                            Text="{Binding Conversation.AdminName, StringFormat='Đang chat với: {0}'}"
+                            TextColor="#333" />
+                        <Label
+                            FontSize="11"
+                            HorizontalOptions="Center"
+                            Text="{Binding Conversation.CreatedAt, StringFormat='{0:dd/MM/yyyy HH:mm}'}"
+                            TextColor="#666" />
+                    </StackLayout>
+                </Border>
+            </StackLayout>
+        </Border>
+
+        <!--  MESSAGES - FIXED LAYOUT  -->
+        <CollectionView
+            x:Name="MessagesCollectionView"
+            Grid.Row="1"
+            Margin="15,10"
+            BackgroundColor="Transparent"
+            ItemsSource="{Binding Messages}">
+
+            <CollectionView.ItemTemplate>
+                <DataTemplate>
+                    <Grid Margin="0,8" BackgroundColor="Transparent">
+
+                        <!--  Tin nhắn của Admin (bên trái)  -->
+                        <StackLayout Margin="10,0,50,0" HorizontalOptions="Start">
+
+                            <StackLayout.IsVisible>
+                                <MultiBinding Converter="{StaticResource MessageVisibilityConverter}" ConverterParameter="admin">
+                                    <Binding Path="BindingContext.CurrentUserId" Source="{x:Reference ChatPage}" />
+                                    <Binding Path="SenderID" />
+                                </MultiBinding>
+                            </StackLayout.IsVisible>
+
+                            <!--  Tên người gửi  -->
+                            <Label
+                                Margin="12,0,0,2"
+                                FontAttributes="Bold"
+                                FontSize="11"
+                                Text="{Binding SenderName}"
+                                TextColor="#9C88FF" />
+
+                            <Border
+                                Padding="12,8"
+                                BackgroundColor="White"
+                                Stroke="#E0E0E0"
+                                StrokeShape="{RoundRectangle CornerRadius='18,18,18,5'}"
+                                StrokeThickness="1">
+
+                                <StackLayout Spacing="4">
+                                    <Label
+                                        FontSize="14"
+                                        LineBreakMode="WordWrap"
+                                        Text="{Binding Content}"
+                                        TextColor="#333" />
+                                    <Label
+                                        FontSize="10"
+                                        HorizontalOptions="Start"
+                                        Text="{Binding SentAt, StringFormat='{0:HH:mm}'}"
+                                        TextColor="#999" />
+                                </StackLayout>
+                            </Border>
+                        </StackLayout>
+
+                        <!--  Tin nhắn của người dùng (bên phải)  -->
+                        <StackLayout Margin="50,0,10,0" HorizontalOptions="End">
+
+                            <StackLayout.IsVisible>
+                                <MultiBinding Converter="{StaticResource MessageVisibilityConverter}" ConverterParameter="user">
+                                    <Binding Path="BindingContext.CurrentUserId" Source="{x:Reference ChatPage}" />
+                                    <Binding Path="SenderID" />
+                                </MultiBinding>
+                            </StackLayout.IsVisible>
+
+                            <Border
+                                Padding="12,8"
+                                BackgroundColor="#9C88FF"
+                                StrokeShape="{RoundRectangle CornerRadius='18,18,5,18'}"
+                                StrokeThickness="0">
+
+                                <StackLayout Spacing="4">
+                                    <Label
+                                        FontSize="14"
+                                        LineBreakMode="WordWrap"
+                                        Text="{Binding Content}"
+                                        TextColor="White" />
+                                    <Label
+                                        FontSize="10"
+                                        HorizontalOptions="End"
+                                        Text="{Binding SentAt, StringFormat='{0:HH:mm}'}"
+                                        TextColor="#E8E0FF" />
+                                </StackLayout>
+                            </Border>
+                        </StackLayout>
+                    </Grid>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+
+        <!--  INPUT  -->
+        <Border
+            Grid.Row="2"
+            Padding="15,10"
+            BackgroundColor="White"
+            IsVisible="{Binding Conversation, Converter={StaticResource IsNotNullConverter}}"
+            Stroke="#E0E0E0"
+            StrokeShape="{RoundRectangle CornerRadius='20,20,0,0'}"
+            StrokeThickness="1">
+
+            <Grid ColumnDefinitions="*,Auto">
+                <Border
+                    Grid.Column="0"
+                    Padding="15,8"
+                    BackgroundColor="#F8F6FF"
+                    Stroke="#E0E0E0"
+                    StrokeShape="{RoundRectangle CornerRadius='20'}"
+                    StrokeThickness="1">
+
+                    <Entry
+                        x:Name="MessageEntry"
+                        BackgroundColor="Transparent"
+                        FontSize="14"
+                        Placeholder="Nhập tin nhắn..."
+                        ReturnCommand="{Binding SendMessageCommand}"
+                        ReturnType="Send"
+                        Text="{Binding NewMessage, Mode=TwoWay}" />
+                </Border>
+
+                <Button
+                    Grid.Column="1"
+                    Margin="10,0,0,0"
+                    Padding="12"
+                    BackgroundColor="#9C88FF"
+                    Command="{Binding SendMessageCommand}"
+                    CornerRadius="20"
+                    HeightRequest="44"
+                    Text="📤"
+                    TextColor="White"
+                    WidthRequest="44" />
+            </Grid>
+        </Border>
+
+        <!--  EMPTY STATE - Khi chưa có conversation  -->
+        <StackLayout
+            Grid.Row="1"
+            HorizontalOptions="Center"
+            IsVisible="{Binding Conversation, Converter={StaticResource IsNullConverter}}"
+            Spacing="20"
+            VerticalOptions="Center">
+
+            <Label
+                FontSize="60"
+                HorizontalOptions="Center"
+                Text="💬" />
+
+            <Label
+                FontAttributes="Bold"
+                FontSize="18"
+                HorizontalOptions="Center"
+                Text="Chat Hỗ Trợ"
+                TextColor="#9C88FF" />
+
+            <Label
+                FontSize="14"
+                HorizontalOptions="Center"
+                Text="Đang kết nối với admin..."
+                TextColor="#6B7280" />
+
+            <Button
+                BackgroundColor="#9C88FF"
+                Command="{Binding CreateConversationCommand}"
+                CornerRadius="25"
+                FontAttributes="Bold"
+                FontSize="16"
+                HeightRequest="50"
+                Text="Bắt đầu trò chuyện"
+                TextColor="White"
+                WidthRequest="200" />
+        </StackLayout>
+    </Grid>
+</ContentPage>

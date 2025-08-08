@@ -1,0 +1,457 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    x:Class="mauiluanvantotnghiep.Views.CertificatesPage.CertificateDetailPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:converters="clr-namespace:mauiluanvantotnghiep.Converters"
+    xmlns:vm="clr-namespace:mauiluanvantotnghiep.ViewModels.CertificatesPageViewModel"
+    x:Name="ParentPage"
+    Title="Chi Tiết Chứng Chỉ"
+    BackgroundColor="#F8F6FF"
+    Shell.NavBarIsVisible="True">
+
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <converters:IsNotNullConverter x:Key="IsNotNullConverter" />
+        </ResourceDictionary>
+    </ContentPage.Resources>
+
+    <ContentPage.BindingContext>
+        <vm:CertificateDetailViewModel />
+    </ContentPage.BindingContext>
+
+    <Grid>
+        <!--  Background gradient  -->
+        <Rectangle>
+            <Rectangle.Fill>
+                <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                    <GradientStop Offset="0" Color="#F8F6FF" />
+                    <GradientStop Offset="0.3" Color="#F1F3F4" />
+                    <GradientStop Offset="1" Color="#E8E0FF" />
+                </LinearGradientBrush>
+            </Rectangle.Fill>
+        </Rectangle>
+
+        <ScrollView>
+            <VerticalStackLayout Padding="20" Spacing="25">
+
+                <!--  Loading Indicator  -->
+                <ActivityIndicator
+                    HorizontalOptions="Center"
+                    IsRunning="{Binding IsLoading}"
+                    IsVisible="{Binding IsLoading}"
+                    VerticalOptions="Center"
+                    Color="#DC2626" />
+
+                <!--  Certificate Image Section  -->
+                <Border
+                    Padding="0"
+                    BackgroundColor="White"
+                    IsVisible="{Binding IsLoading, Converter={StaticResource IsNotNullConverter}}"
+                    StrokeShape="{RoundRectangle CornerRadius='20'}"
+                    StrokeThickness="0">
+                    <Border.Shadow>
+                        <Shadow
+                            Brush="#DC2626"
+                            Opacity="0.15"
+                            Radius="15"
+                            Offset="0,5" />
+                    </Border.Shadow>
+
+                    <Image
+                        Aspect="AspectFit"
+                        BackgroundColor="#F5F5F5"
+                        HeightRequest="300"
+                        Source="{Binding Certificate.ImageUrl, TargetNullValue='brokenimg.png', FallbackValue='brokenimg.png'}" />
+                </Border>
+
+                <!--  Certificate Information Section  -->
+                <Border
+                    Padding="25,20"
+                    BackgroundColor="White"
+                    IsVisible="{Binding IsLoading, Converter={StaticResource IsNotNullConverter}}"
+                    StrokeShape="{RoundRectangle CornerRadius='20'}"
+                    StrokeThickness="0">
+                    <Border.Shadow>
+                        <Shadow
+                            Brush="#DC2626"
+                            Opacity="0.1"
+                            Radius="12"
+                            Offset="0,3" />
+                    </Border.Shadow>
+
+                    <VerticalStackLayout Spacing="20">
+                        <!--  Course Name  -->
+                        <VerticalStackLayout Spacing="8">
+                            <Label
+                                FontAttributes="Bold"
+                                FontSize="16"
+                                Text="Khóa Học"
+                                TextColor="#6B46C1" />
+                            <Label
+                                FontAttributes="Bold"
+                                FontSize="22"
+                                LineBreakMode="WordWrap"
+                                Text="{Binding Certificate.CourseName}"
+                                TextColor="#1F2937" />
+                        </VerticalStackLayout>
+
+                        <!--  Student Name  -->
+                        <VerticalStackLayout Spacing="8">
+                            <Label
+                                FontAttributes="Bold"
+                                FontSize="16"
+                                Text="Sinh Viên"
+                                TextColor="#6B46C1" />
+                            <Label
+                                FontSize="18"
+                                Text="{Binding Certificate.Fullname}"
+                                TextColor="#1F2937" />
+                        </VerticalStackLayout>
+
+                        <!--  Creation Date  -->
+                        <VerticalStackLayout Spacing="8">
+                            <Label
+                                FontAttributes="Bold"
+                                FontSize="16"
+                                Text="Ngày Cấp"
+                                TextColor="#6B46C1" />
+                            <HorizontalStackLayout Spacing="8">
+                                <Label
+                                    FontSize="16"
+                                    Text="📅"
+                                    VerticalOptions="Center" />
+                                <Label
+                                    FontSize="18"
+                                    Text="{Binding Certificate.CreatedAt, StringFormat='{0:dd/MM/yyyy HH:mm}'}"
+                                    TextColor="#1F2937"
+                                    VerticalOptions="Center" />
+                            </HorizontalStackLayout>
+                        </VerticalStackLayout>
+
+                        <!--  Certificate Type - SIMPLIFIED LAYOUT  -->
+                        <VerticalStackLayout IsVisible="{Binding Certificate.CertificateTypeName, Converter={StaticResource IsNotNullConverter}}" Spacing="8">
+                            <Label
+                                FontAttributes="Bold"
+                                FontSize="16"
+                                Text="Loại Chứng Chỉ"
+                                TextColor="#6B46C1" />
+                            <Border
+                                Padding="15,12"
+                                BackgroundColor="#F0F9FF"
+                                Stroke="#6B46C1"
+                                StrokeShape="{RoundRectangle CornerRadius='12'}"
+                                StrokeThickness="1">
+                                <StackLayout Orientation="Horizontal" Spacing="10">
+                                    <Label
+                                        FontSize="16"
+                                        Text="🏷️"
+                                        VerticalOptions="Start" />
+                                    <Label
+                                        FontAttributes="Bold"
+                                        FontSize="15"
+                                        HorizontalOptions="FillAndExpand"
+                                        LineBreakMode="WordWrap"
+                                        MaxLines="3"
+                                        Text="{Binding Certificate.CertificateTypeName}"
+                                        TextColor="#1F2937"
+                                        VerticalOptions="Start" />
+                                </StackLayout>
+                            </Border>
+
+
+                        </VerticalStackLayout>
+
+                        <!--  Verification Code  -->
+                        <VerticalStackLayout Spacing="8">
+                            <Label
+                                FontAttributes="Bold"
+                                FontSize="16"
+                                Text="Mã Xác Thực"
+                                TextColor="#6B46C1" />
+                            <Border
+                                Padding="15,10"
+                                BackgroundColor="#F8F6FF"
+                                Stroke="#DC2626"
+                                StrokeShape="{RoundRectangle CornerRadius='12'}"
+                                StrokeThickness="1">
+                                <VerticalStackLayout Spacing="10">
+                                    <HorizontalStackLayout Spacing="10">
+                                        <Label
+                                            FontSize="16"
+                                            Text="🔢"
+                                            VerticalOptions="Center" />
+                                        <Label
+                                            FontFamily="Courier"
+                                            FontSize="16"
+                                            HorizontalOptions="FillAndExpand"
+                                            Text="{Binding Certificate.VerificationCode}"
+                                            TextColor="#1F2937"
+                                            VerticalOptions="Center" />
+                                        <Button
+                                            Padding="8,4"
+                                            BackgroundColor="#DC2626"
+                                            Command="{Binding CopyVerificationCodeCommand}"
+                                            CornerRadius="8"
+                                            FontSize="12"
+                                            Text="📋 Copy"
+                                            TextColor="White" />
+                                    </HorizontalStackLayout>
+
+                                    <!--  Verification Info  -->
+                                    <Border
+                                        Padding="12,8"
+                                        BackgroundColor="#EEF2FF"
+                                        StrokeShape="{RoundRectangle CornerRadius='8'}"
+                                        StrokeThickness="0">
+                                        <VerticalStackLayout Spacing="6">
+                                            <HorizontalStackLayout Spacing="6">
+                                                <Label
+                                                    FontSize="12"
+                                                    Text="💡"
+                                                    VerticalOptions="Center" />
+                                                <Label
+                                                    FontAttributes="Bold"
+                                                    FontSize="12"
+                                                    Text="Cách xác thực chứng chỉ:"
+                                                    TextColor="#4338CA"
+                                                    VerticalOptions="Center" />
+                                            </HorizontalStackLayout>
+
+                                            <Label
+                                                Margin="16,0,0,0"
+                                                FontSize="11"
+                                                Text="• Sử dụng ứng dụng LK Learning để xác thực ngay"
+                                                TextColor="#4338CA" />
+
+                                            <Label
+                                                Margin="16,0,0,0"
+                                                FontSize="11"
+                                                Text="• Truy cập website LK Learning để kiểm tra online"
+                                                TextColor="#4338CA" />
+
+                                            <Label
+                                                Margin="16,0,0,0"
+                                                FontSize="11"
+                                                Text="• Sử dụng chữ ký blockchain bên dưới để xác minh"
+                                                TextColor="#4338CA" />
+                                        </VerticalStackLayout>
+                                    </Border>
+                                </VerticalStackLayout>
+                            </Border>
+                        </VerticalStackLayout>
+                    </VerticalStackLayout>
+                </Border>
+
+                <!--  Solana Signature Section  -->
+                <Border
+                    Padding="25,20"
+                    BackgroundColor="White"
+                    IsVisible="{Binding IsLoading, Converter={StaticResource IsNotNullConverter}}"
+                    StrokeShape="{RoundRectangle CornerRadius='20'}"
+                    StrokeThickness="0">
+                    <Border.Shadow>
+                        <Shadow
+                            Brush="#9C88FF"
+                            Opacity="0.15"
+                            Radius="12"
+                            Offset="0,3" />
+                    </Border.Shadow>
+
+                    <VerticalStackLayout Spacing="20">
+                        <!--  Blockchain Section Header with Solana Logo  -->
+                        <VerticalStackLayout HorizontalOptions="Center" Spacing="12">
+                            <!--  Solana Logo and Title  -->
+                            <HorizontalStackLayout HorizontalOptions="Center" Spacing="12">
+                                <Border
+                                    Padding="8"
+                                    BackgroundColor="#1A1A1A"
+                                    StrokeShape="{RoundRectangle CornerRadius='12'}"
+                                    StrokeThickness="0">
+                                    <Image
+                                        Aspect="AspectFit"
+                                        HeightRequest="32"
+                                        Source="https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/So11111111111111111111111111111111111111112/logo.png"
+                                        WidthRequest="32" />
+                                    <Border.Shadow>
+                                        <Shadow
+                                            Brush="#14F195"
+                                            Opacity="0.3"
+                                            Radius="6"
+                                            Offset="0,2" />
+                                    </Border.Shadow>
+                                </Border>
+                                <Label
+                                    FontAttributes="Bold"
+                                    FontSize="20"
+                                    Text="Solana Blockchain"
+                                    TextColor="#6B46C1"
+                                    VerticalOptions="Center" />
+                            </HorizontalStackLayout>
+
+                            <!--  Powered by Solana badge  -->
+                            <Border
+                                Padding="8,4"
+                                BackgroundColor="#14F195"
+                                HorizontalOptions="Center"
+                                StrokeShape="{RoundRectangle CornerRadius='15'}"
+                                StrokeThickness="0">
+                                <HorizontalStackLayout Spacing="6">
+                                    <Label
+                                        FontSize="12"
+                                        Text="⚡"
+                                        TextColor="Black"
+                                        VerticalOptions="Center" />
+                                    <Label
+                                        FontAttributes="Bold"
+                                        FontSize="12"
+                                        Text="Powered by Solana"
+                                        TextColor="Black"
+                                        VerticalOptions="Center" />
+                                </HorizontalStackLayout>
+                            </Border>
+                        </VerticalStackLayout>
+
+                        <Label
+                            FontSize="14"
+                            HorizontalTextAlignment="Center"
+                            LineBreakMode="WordWrap"
+                            Text="Chứng chỉ này được bảo vệ bởi công nghệ blockchain để đảm bảo tính xác thực và chống giả mạo."
+                            TextColor="#6B7280" />
+
+                        <!--  Solana Signature  -->
+                        <VerticalStackLayout Spacing="12">
+                            <HorizontalStackLayout Spacing="8">
+                                <Label
+                                    FontAttributes="Bold"
+                                    FontSize="16"
+                                    Text="Chữ Ký Bảo Mật"
+                                    TextColor="#6B46C1"
+                                    VerticalOptions="Center" />
+                                <Border
+                                    Padding="4"
+                                    BackgroundColor="#F0F9FF"
+                                    StrokeShape="{RoundRectangle CornerRadius='6'}"
+                                    StrokeThickness="0">
+                                    <Image
+                                        Aspect="AspectFit"
+                                        HeightRequest="16"
+                                        Source="https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/So11111111111111111111111111111111111111112/logo.png"
+                                        WidthRequest="16" />
+                                </Border>
+                            </HorizontalStackLayout>
+
+                            <Border
+                                Padding="15,12"
+                                BackgroundColor="#F0F9FF"
+                                Stroke="#9C88FF"
+                                StrokeShape="{RoundRectangle CornerRadius='12'}"
+                                StrokeThickness="1">
+
+                                <VerticalStackLayout Spacing="10">
+                                    <ScrollView HorizontalScrollBarVisibility="Never" Orientation="Horizontal">
+                                        <Label
+                                            FontFamily="Courier"
+                                            FontSize="12"
+                                            Text="{Binding Certificate.Signature}"
+                                            TextColor="#1F2937"
+                                            VerticalOptions="Center" />
+                                    </ScrollView>
+
+                                    <Button
+                                        Padding="12,8"
+                                        BackgroundColor="#9C88FF"
+                                        Command="{Binding CopySignatureCommand}"
+                                        CornerRadius="10"
+                                        FontAttributes="Bold"
+                                        FontSize="14"
+                                        HorizontalOptions="Center"
+                                        Text="📋 Copy Signature"
+                                        TextColor="White" />
+                                </VerticalStackLayout>
+                            </Border>
+                        </VerticalStackLayout>
+
+                        <!--  Verify on Solana Button  -->
+                        <Button
+                            Padding="15,12"
+                            BackgroundColor="#14F195"
+                            Command="{Binding VerifyOnSolanaCommand}"
+                            CornerRadius="15"
+                            FontAttributes="Bold"
+                            FontSize="16"
+                            HorizontalOptions="FillAndExpand"
+                            TextColor="Black">
+                            <Button.Shadow>
+                                <Shadow
+                                    Brush="#14F195"
+                                    Opacity="0.3"
+                                    Radius="8"
+                                    Offset="0,3" />
+                            </Button.Shadow>
+                            <Button.Text>
+                                <![CDATA[🔍 Verify on Solana Explorer]]>
+                            </Button.Text>
+                        </Button>
+
+                        <!--  Certificate Security Benefits  -->
+                        <Border
+                            Padding="15,12"
+                            BackgroundColor="#FEF3C7"
+                            StrokeShape="{RoundRectangle CornerRadius='10'}"
+                            StrokeThickness="0">
+                            <VerticalStackLayout Spacing="8">
+                                <!--  Header with security shield  -->
+                                <HorizontalStackLayout Spacing="8">
+                                    <Border
+                                        Padding="2"
+                                        BackgroundColor="#1A1A1A"
+                                        StrokeShape="{RoundRectangle CornerRadius='4'}"
+                                        StrokeThickness="0"
+                                        VerticalOptions="Start">
+                                        <Image
+                                            Aspect="AspectFit"
+                                            HeightRequest="12"
+                                            Source="https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/So11111111111111111111111111111111111111112/logo.png"
+                                            WidthRequest="12" />
+                                    </Border>
+                                    <Label
+                                        FontAttributes="Bold"
+                                        FontSize="12"
+                                        HorizontalOptions="FillAndExpand"
+                                        Text="Bảo mật chứng chỉ blockchain:"
+                                        TextColor="#92400E"
+                                        VerticalOptions="Center" />
+                                </HorizontalStackLayout>
+
+                                <!--  Security benefits list  -->
+                                <VerticalStackLayout Margin="20,0,0,0" Spacing="4">
+                                    <Label
+                                        FontSize="11"
+                                        Text="• Chống giả mạo - Không thể sửa đổi sau khi phát hành"
+                                        TextColor="#92400E" />
+
+                                    <Label
+                                        FontSize="11"
+                                        Text="• Xác thực tức thì - Kiểm tra tính hợp lệ bất cứ lúc nào"
+                                        TextColor="#92400E" />
+
+                                    <Label
+                                        FontSize="11"
+                                        Text="• Lưu trữ vĩnh viễn - Dữ liệu được bảo vệ mãi mãi"
+                                        TextColor="#92400E" />
+
+                                    <Label
+                                        FontSize="11"
+                                        Text="• Minh bạch hoàn toàn - Mọi người đều có thể xác minh"
+                                        TextColor="#92400E" />
+                                </VerticalStackLayout>
+                            </VerticalStackLayout>
+                        </Border>
+                    </VerticalStackLayout>
+                </Border>
+
+            </VerticalStackLayout>
+        </ScrollView>
+    </Grid>
+</ContentPage>

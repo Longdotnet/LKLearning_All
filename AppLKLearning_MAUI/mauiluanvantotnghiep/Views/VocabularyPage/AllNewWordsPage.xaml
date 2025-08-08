@@ -1,0 +1,263 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    x:Class="mauiluanvantotnghiep.Views.VocabularyPage.AllNewWordsPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:converters="clr-namespace:mauiluanvantotnghiep.Converters"
+    xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+    xmlns:vm="clr-namespace:mauiluanvantotnghiep.ViewModels"
+    BackgroundColor="#F5F6FA"
+    Shell.NavBarIsVisible="False">
+
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <converters:StringNotNullOrEmptyConverter x:Key="StringNotNullOrEmptyConverter" />
+
+            <Style x:Key="VocabCard" TargetType="Frame">
+                <Setter Property="BackgroundColor" Value="White" />
+                <Setter Property="CornerRadius" Value="12" />
+                <Setter Property="HasShadow" Value="True" />
+                <Setter Property="Margin" Value="0,4" />
+                <Setter Property="Padding" Value="12" />
+            </Style>
+        </ResourceDictionary>
+    </ContentPage.Resources>
+
+    <ContentPage.BindingContext>
+        <vm:AllNewWordsViewModel />
+    </ContentPage.BindingContext>
+
+    <Grid>
+        <!--  Gradient Background  -->
+        <Frame
+            Padding="0"
+            BackgroundColor="Transparent"
+            HasShadow="False">
+            <Frame.Background>
+                <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                    <GradientStop Offset="0.0" Color="#6366F1" />
+                    <GradientStop Offset="0.4" Color="#8B5CF6" />
+                    <GradientStop Offset="1.0" Color="#F5F6FA" />
+                </LinearGradientBrush>
+            </Frame.Background>
+        </Frame>
+
+        <Grid
+            Padding="12,16"
+            RowDefinitions="Auto,Auto,Auto,Auto,*"
+            RowSpacing="16">
+            <!--  Header with Back Button  -->
+            <HorizontalStackLayout
+                Grid.Row="0"
+                Spacing="12"
+                VerticalOptions="Start">
+                <ImageButton
+                    BackgroundColor="White"
+                    Command="{Binding GoBackCommand}"
+                    CornerRadius="20"
+                    HeightRequest="40"
+                    Source="https://img.icons8.com/color-glass/48/back.png"
+                    WidthRequest="40" />
+
+                <VerticalStackLayout Spacing="4" VerticalOptions="Center">
+                    <Label
+                        FontAttributes="Bold"
+                        FontSize="20"
+                        Text="Tất cả từ mới"
+                        TextColor="White" />
+                    <Label
+                        FontSize="12"
+                        Opacity="0.9"
+                        Text="Danh sách từ vựng mới tháng này"
+                        TextColor="White" />
+                </VerticalStackLayout>
+            </HorizontalStackLayout>
+
+            <!--  Loading Indicator  -->
+            <Frame
+                Grid.Row="1"
+                Padding="12"
+                BackgroundColor="White"
+                CornerRadius="20"
+                HasShadow="True"
+                IsVisible="{Binding IsLoading}">
+                <HorizontalStackLayout HorizontalOptions="Center" Spacing="8">
+                    <ActivityIndicator IsRunning="{Binding IsLoading}" Color="#6366F1" />
+                    <Label
+                        FontSize="14"
+                        Text="Đang tải từ mới..."
+                        TextColor="#6366F1"
+                        VerticalOptions="Center" />
+                </HorizontalStackLayout>
+            </Frame>
+
+            <!--  Error Message  -->
+            <Frame
+                Grid.Row="2"
+                Padding="12"
+                BackgroundColor="#FEF2F2"
+                BorderColor="#EF4444"
+                CornerRadius="12"
+                HasShadow="False"
+                IsVisible="{Binding GeneralError, Converter={StaticResource StringNotNullOrEmptyConverter}}">
+                <HorizontalStackLayout HorizontalOptions="Center" Spacing="6">
+                    <Label
+                        FontSize="14"
+                        Text="⚠️"
+                        VerticalOptions="Center" />
+                    <Label
+                        FontSize="13"
+                        Text="{Binding GeneralError}"
+                        TextColor="#DC2626"
+                        VerticalOptions="Center" />
+                </HorizontalStackLayout>
+            </Frame>
+
+            <!--  Vocabulary Count  -->
+            <Frame
+                Grid.Row="3"
+                Padding="12,8"
+                BackgroundColor="White"
+                CornerRadius="16"
+                HasShadow="True"
+                IsVisible="{Binding AllNewVocabularies.Count}">
+                <HorizontalStackLayout HorizontalOptions="Center" Spacing="6">
+                    <Label
+                        FontAttributes="Bold"
+                        FontSize="14"
+                        Text="📚 Tổng số từ mới:"
+                        TextColor="#374151"
+                        VerticalOptions="Center" />
+                    <Frame
+                        Padding="8,4"
+                        BackgroundColor="#10B981"
+                        CornerRadius="12"
+                        HasShadow="False">
+                        <Label
+                            FontAttributes="Bold"
+                            FontSize="12"
+                            Text="{Binding AllNewVocabularies.Count}"
+                            TextColor="White" />
+                    </Frame>
+                </HorizontalStackLayout>
+            </Frame>
+
+            <!--  Vocabulary List - Remove ScrollView wrapper  -->
+            <CollectionView
+                Grid.Row="4"
+                ItemsSource="{Binding AllNewVocabularies}"
+                SelectionMode="None">
+                <CollectionView.ItemTemplate>
+                    <DataTemplate>
+                        <Frame BackgroundColor="#FFFBEB" Style="{StaticResource VocabCard}">
+                            <Grid ColumnDefinitions="*, Auto" RowDefinitions="Auto">
+                                <!--  Word Info  -->
+                                <VerticalStackLayout
+                                    Grid.Column="0"
+                                    Spacing="6"
+                                    VerticalOptions="Center">
+                                    <Label
+                                        FontAttributes="Bold"
+                                        FontSize="18"
+                                        Text="{Binding Word}"
+                                        TextColor="#1F2937" />
+                                    <Label
+                                        FontAttributes="Italic"
+                                        FontSize="14"
+                                        Opacity="0.7"
+                                        Text="{Binding Pronunciation}"
+                                        TextColor="#6366F1" />
+                                    <Label
+                                        FontSize="10"
+                                        Opacity="0.6"
+                                        Text="{Binding CreatedAt, StringFormat='Được thêm: {0:dd/MM/yyyy}'}"
+                                        TextColor="#6B7280" />
+                                </VerticalStackLayout>
+
+                                <!--  Audio Controls  -->
+                                <HorizontalStackLayout
+                                    Grid.Column="1"
+                                    Spacing="8"
+                                    VerticalOptions="Center">
+                                    <!--  UK Audio  -->
+                                    <VerticalStackLayout
+                                        HorizontalOptions="Center"
+                                        IsVisible="{Binding AudioUrlUk, Converter={StaticResource StringNotNullOrEmptyConverter}}"
+                                        Spacing="2">
+                                        <Frame
+                                            Padding="6"
+                                            BackgroundColor="#2563EB"
+                                            CornerRadius="16"
+                                            HasShadow="True">
+                                            <ImageButton
+                                                BackgroundColor="Transparent"
+                                                Clicked="OnPlayClickedUk"
+                                                CommandParameter="{Binding AudioUrlUk}"
+                                                HeightRequest="16"
+                                                Source="play.png"
+                                                WidthRequest="16" />
+                                        </Frame>
+                                        <Label
+                                            FontAttributes="Bold"
+                                            FontSize="9"
+                                            HorizontalTextAlignment="Center"
+                                            Text="UK"
+                                            TextColor="#2563EB" />
+                                    </VerticalStackLayout>
+
+                                    <!--  US Audio  -->
+                                    <VerticalStackLayout
+                                        HorizontalOptions="Center"
+                                        IsVisible="{Binding AudioUrlUs, Converter={StaticResource StringNotNullOrEmptyConverter}}"
+                                        Spacing="2">
+                                        <Frame
+                                            Padding="6"
+                                            BackgroundColor="#DC2626"
+                                            CornerRadius="16"
+                                            HasShadow="True">
+                                            <ImageButton
+                                                BackgroundColor="Transparent"
+                                                Clicked="OnPlayClickedUs"
+                                                CommandParameter="{Binding AudioUrlUs}"
+                                                HeightRequest="16"
+                                                Source="play.png"
+                                                WidthRequest="16" />
+                                        </Frame>
+                                        <Label
+                                            FontAttributes="Bold"
+                                            FontSize="9"
+                                            HorizontalTextAlignment="Center"
+                                            Text="US"
+                                            TextColor="#DC2626" />
+                                    </VerticalStackLayout>
+                                </HorizontalStackLayout>
+                            </Grid>
+
+                            <!--  Tap Gesture  -->
+                            <Frame.GestureRecognizers>
+                                <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type vm:AllNewWordsViewModel}}, Path=VocabularyTappedCommand}" CommandParameter="{Binding .}" />
+                            </Frame.GestureRecognizers>
+                        </Frame>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+        </Grid>
+
+        <!--  Hidden Media Elements  -->
+        <VerticalStackLayout IsVisible="False">
+            <toolkit:MediaElement
+                x:Name="mediaPlayerUk"
+                HeightRequest="0"
+                ShouldAutoPlay="False"
+                ShouldShowPlaybackControls="False"
+                WidthRequest="0" />
+
+            <toolkit:MediaElement
+                x:Name="mediaPlayerUs"
+                HeightRequest="0"
+                ShouldAutoPlay="False"
+                ShouldShowPlaybackControls="False"
+                WidthRequest="0" />
+        </VerticalStackLayout>
+    </Grid>
+</ContentPage>

@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<toolkit:Popup
+    x:Class="mauiluanvantotnghiep.ViewsPopup.AlertLessonExamFailed"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+    Color="Transparent">
+    <Frame
+        Padding="20"
+        BackgroundColor="White"
+        BorderColor="#E74C3C"
+        CornerRadius="24"
+        HasShadow="True"
+        HorizontalOptions="Center"
+        VerticalOptions="Center"
+        WidthRequest="320">
+        <VerticalStackLayout
+            Padding="10"
+            HorizontalOptions="Center"
+            Spacing="16">
+            <!--  Warning Icon  -->
+            <Frame
+                Padding="0"
+                BackgroundColor="Transparent"
+                CornerRadius="16"
+                HasShadow="False"
+                HeightRequest="120"
+                HorizontalOptions="Center"
+                IsClippedToBounds="True"
+                VerticalOptions="Center"
+                WidthRequest="120">
+                <Image
+                    Aspect="AspectFit"
+                    HeightRequest="100"
+                    Source="failedicon.png"
+                    VerticalOptions="Center">
+                    <Image.Shadow>
+                        <Shadow
+                            Brush="#80000000"
+                            Radius="4"
+                            Offset="0,4" />
+                    </Image.Shadow>
+                </Image>
+            </Frame>
+
+            <!--  Text Content  -->
+            <Label
+                FontAttributes="Bold"
+                FontSize="24"
+                HorizontalOptions="Center"
+                Text="Chưa Đủ Điều Kiện"
+                TextColor="#E74C3C"
+                VerticalOptions="Center" />
+
+            <Label
+                FontSize="14"
+                HorizontalOptions="Center"
+                HorizontalTextAlignment="Center"
+                MaxLines="4"
+                Text="Bạn cần hoàn thành tất cả bài tập có trong bài học trước khi tham gia bài kiểm tra cuối khóa."
+                TextColor="#777777" />
+
+            <Image
+                Aspect="AspectFit"
+                HeightRequest="70"
+                HorizontalOptions="Center"
+                Source="https://img.icons8.com/pulsar-gradient/48/test-failed.png"
+                VerticalOptions="Center"
+                WidthRequest="70">
+                <Image.Shadow>
+                    <Shadow
+                        Brush="#80000000"
+                        Radius="3"
+                        Offset="0,2" />
+                </Image.Shadow>
+            </Image>
+
+            <!--  Button  -->
+            <Button
+                Margin="0,10,0,0"
+                BackgroundColor="#E74C3C"
+                Clicked="OnCloseClicked"
+                CornerRadius="20"
+                FontAttributes="Bold"
+                HeightRequest="50"
+                Text="Đã Hiểu"
+                TextColor="White" />
+        </VerticalStackLayout>
+    </Frame>
+</toolkit:Popup>

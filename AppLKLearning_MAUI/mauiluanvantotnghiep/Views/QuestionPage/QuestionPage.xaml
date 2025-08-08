@@ -1,0 +1,1485 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    x:Class="mauiluanvantotnghiep.Views.QuestionPage.QuestionPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:conv="clr-namespace:mauiluanvantotnghiep.Converters"
+    xmlns:sel="clr-namespace:mauiluanvantotnghiep.Selectors"
+    xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+    xmlns:vm="clr-namespace:mauiluanvantotnghiep.ViewModels"
+    x:Name="questionPage"
+    Title="Bài Tập">
+
+    <!--  Enhanced Gradient Background  -->
+    <ContentPage.Background>
+        <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+            <GradientStop Offset="0.0" Color="#667eea" />
+            <GradientStop Offset="0.3" Color="#764ba2" />
+            <GradientStop Offset="0.7" Color="#f093fb" />
+            <GradientStop Offset="1.0" Color="#f5576c" />
+        </LinearGradientBrush>
+    </ContentPage.Background>
+
+    <ContentPage.BindingContext>
+        <vm:QuestionPageViewModel />
+    </ContentPage.BindingContext>
+
+    <!--  Enhanced Resources với nhiều styles mới  -->
+    <ContentPage.Resources>
+        <!--  Converters  -->
+        <conv:VideoEmbedHtmlConverter x:Key="VideoEmbedHtmlConverter" />
+
+        <conv:StringNotNullOrEmptyConverter x:Key="StringNotNullOrEmptyConverter" />
+        <conv:InverseBooleanConverter x:Key="InverseBooleanConverter" />
+        <conv:HtmlWrapperConverter x:Key="HtmlWrapperConverter" />
+        <conv:IndexToDisplayConverter x:Key="IndexToDisplayConverter" />
+        <conv:ProgressConverter x:Key="ProgressConverter" />
+        <!--  Thêm converter mới  -->
+
+        <!--  Modern Styles  -->
+        <Style x:Key="QuestionTitleStyle" TargetType="Label">
+            <Setter Property="FontAttributes" Value="Bold" />
+            <Setter Property="FontSize" Value="22" />
+            <Setter Property="TextColor" Value="White" />
+            <Setter Property="LineBreakMode" Value="WordWrap" />
+            <Setter Property="HorizontalTextAlignment" Value="Center" />
+            <Setter Property="VerticalTextAlignment" Value="Center" />
+        </Style>
+
+        <Style x:Key="ModernFrameStyle" TargetType="Frame">
+            <Setter Property="BackgroundColor" Value="White" />
+            <Setter Property="BorderColor" Value="Transparent" />
+            <Setter Property="CornerRadius" Value="20" />
+            <Setter Property="HasShadow" Value="True" />
+            <Setter Property="Padding" Value="25" />
+            <Setter Property="Margin" Value="10,15" />
+        </Style>
+
+        <Style x:Key="PremiumButtonStyle" TargetType="Button">
+            <Setter Property="CornerRadius" Value="15" />
+            <Setter Property="Padding" Value="15,10" />
+            <Setter Property="FontAttributes" Value="Bold" />
+            <Setter Property="FontSize" Value="14" />
+            <Setter Property="TextTransform" Value="None" />
+        </Style>
+
+        <!--  Enhanced WebView Style - WIDER AND TALLER  -->
+        <Style x:Key="EnhancedWebViewStyle" TargetType="WebView">
+            <Setter Property="MinimumHeightRequest" Value="250" />
+            <Setter Property="HeightRequest" Value="400" />
+            <Setter Property="MaximumHeightRequest" Value="600" />
+            <Setter Property="HorizontalOptions" Value="Fill" />
+            <Setter Property="VerticalOptions" Value="Fill" />
+            <Setter Property="Margin" Value="5" />
+        </Style>
+
+        <!--  Progress Bar Style - FIXED  -->
+        <Style x:Key="ProgressBarStyle" TargetType="ProgressBar">
+            <Setter Property="ProgressColor" Value="#4CAF50" />
+            <Setter Property="BackgroundColor" Value="#E0E0E0" />
+            <Setter Property="HeightRequest" Value="8" />
+        </Style>
+
+        <!--  MCQ Template - ENHANCED VERSION với number fix  -->
+        <DataTemplate x:Key="MCQTemplate">
+            <Grid
+                Padding="10"
+                RowDefinitions="Auto,*,Auto"
+                RowSpacing="15">
+
+                <!--  Header Section với Progress  -->
+                <Frame
+                    Grid.Row="0"
+                    Margin="5,10"
+                    BackgroundColor="#6C5CE7"
+                    Style="{StaticResource ModernFrameStyle}">
+                    <Grid RowDefinitions="Auto,Auto,Auto,Auto" RowSpacing="12">
+                        <!--  Quiz Header  -->
+                        <StackLayout
+                            Grid.Row="0"
+                            HorizontalOptions="Center"
+                            Orientation="Horizontal">
+                            <Label
+                                FontSize="24"
+                                Text="🎯"
+                                VerticalOptions="Center" />
+                            <Label
+                                FontAttributes="Bold"
+                                FontSize="18"
+                                Text="BÀI TẬP TRẮC NGHIỆM"
+                                TextColor="White"
+                                VerticalOptions="Center" />
+                        </StackLayout>
+
+                        <!--  Progress Section với Độ khó - UPDATED  -->
+                        <Grid
+                            Grid.Row="1"
+                            ColumnDefinitions="*,Auto,*,Auto,*"
+                            ColumnSpacing="15">
+                            <StackLayout Grid.Column="0" HorizontalOptions="Start">
+                                <Label
+                                    FontSize="12"
+                                    Opacity="0.8"
+                                    Text="📊 Tiến độ"
+                                    TextColor="White" />
+                                <Label
+                                    FontAttributes="Bold"
+                                    FontSize="16"
+                                    Text="{Binding BindingContext.CurrentIndex, Source={x:Reference questionPage}, Converter={StaticResource IndexToDisplayConverter}, StringFormat='Câu {0}'}"
+                                    TextColor="White" />
+                            </StackLayout>
+
+                            <BoxView
+                                Grid.Column="1"
+                                BackgroundColor="White"
+                                Opacity="0.3"
+                                WidthRequest="1" />
+
+                            <!--  THÊM: Độ khó  -->
+                            <StackLayout Grid.Column="2" HorizontalOptions="Center">
+                                <Label
+                                    FontSize="12"
+                                    Opacity="0.8"
+                                    Text="🎯 Độ khó"
+                                    TextColor="White" />
+                                <Border
+                                    Padding="8,4"
+                                    BackgroundColor="#FF6B35"
+                                    Stroke="White"
+                                    StrokeThickness="1">
+                                    <Border.StrokeShape>
+                                        <RoundRectangle CornerRadius="10" />
+                                    </Border.StrokeShape>
+                                    <Label
+                                        FontAttributes="Bold"
+                                        FontSize="12"
+                                        HorizontalTextAlignment="Center"
+                                        Text="{Binding QuestionLevelName}"
+                                        TextColor="White" />
+                                </Border>
+                            </StackLayout>
+
+                            <BoxView
+                                Grid.Column="3"
+                                BackgroundColor="White"
+                                Opacity="0.3"
+                                WidthRequest="1" />
+
+                            <StackLayout Grid.Column="4" HorizontalOptions="End">
+                                <Label
+                                    FontSize="12"
+                                    Opacity="0.8"
+                                    Text="📝 Tổng số"
+                                    TextColor="White" />
+                                <Label
+                                    FontAttributes="Bold"
+                                    FontSize="16"
+                                    Text="{Binding BindingContext.Questions.Count, Source={x:Reference questionPage}, StringFormat='{0} câu'}"
+                                    TextColor="White" />
+                            </StackLayout>
+                        </Grid>
+
+                        <!--  Progress Bar - SỬA LẠI  -->
+                        <ProgressBar
+                            Grid.Row="2"
+                            BackgroundColor="#E0E0E0"
+                            HeightRequest="8"
+                            ProgressColor="#4CAF50">
+                            <ProgressBar.Progress>
+                                <MultiBinding Converter="{StaticResource ProgressConverter}">
+                                    <Binding Path="BindingContext.CurrentIndex" Source="{x:Reference questionPage}" />
+                                    <Binding Path="BindingContext.Questions.Count" Source="{x:Reference questionPage}" />
+                                </MultiBinding>
+                            </ProgressBar.Progress>
+                        </ProgressBar>
+
+                        <!--  Question Title  -->
+                        <Border
+                            Grid.Row="3"
+                            Padding="15"
+                            BackgroundColor="White"
+                            StrokeShape="RoundRectangle 12">
+                            <Label
+                                MinimumHeightRequest="50"
+                                Style="{StaticResource QuestionTitleStyle}"
+                                Text="{Binding QuestionText}"
+                                TextColor="#2C3E50" />
+                        </Border>
+                    </Grid>
+                </Frame>
+
+                <!--  Main Content Area  -->
+                <ScrollView Grid.Row="1">
+                    <StackLayout Spacing="20">
+                        <!--  Enhanced WebView Container - MUCH WIDER  -->
+                        <Frame Padding="15" Style="{StaticResource ModernFrameStyle}">
+                            <Frame
+                                Padding="0"
+                                CornerRadius="15"
+                                HasShadow="True">
+                                <Frame.Background>
+                                    <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                                        <GradientStop Offset="0.0" Color="#667eea" />
+                                        <GradientStop Offset="0.5" Color="#764ba2" />
+                                        <GradientStop Offset="1.0" Color="#f093fb" />
+                                    </LinearGradientBrush>
+                                </Frame.Background>
+                           
+                                    <WebView
+                                        x:Name="questionWebViewVideo"
+                                        HeightRequest="160"
+                                        Source="{Binding QuestionDescription, Converter={StaticResource VideoEmbedHtmlConverter}}"
+                                        Style="{StaticResource EnhancedWebViewStyle}" />
+                                                            
+                              
+
+                            </Frame>
+                        </Frame>
+
+                        <!--  Enhanced Options Container  -->
+                        <Frame Style="{StaticResource ModernFrameStyle}">
+                            <StackLayout Spacing="15">
+                                <StackLayout HorizontalOptions="Center" Orientation="Horizontal">
+                                    <Label
+                                        FontSize="18"
+                                        Text="📋"
+                                        VerticalOptions="Center" />
+                                    <Label
+                                        FontAttributes="Bold"
+                                        FontSize="16"
+                                        Text="Chọn đáp án đúng:"
+                                        TextColor="#2C3E50" />
+                                </StackLayout>
+
+                                <CollectionView ItemsSource="{Binding Options}" SelectionMode="None">
+                                    <CollectionView.ItemTemplate>
+                                        <DataTemplate>
+                                            <Border
+                                                Margin="0,8"
+                                                Padding="20"
+                                                BackgroundColor="{Binding BackgroundColor}"
+                                                Stroke="Transparent"
+                                                StrokeThickness="0">
+                                                <Border.StrokeShape>
+                                                    <RoundRectangle CornerRadius="15" />
+                                                </Border.StrokeShape>
+                                                <Border.Triggers>
+                                                    <!--  GIỮ LẠI chỉ MultiTrigger này  -->
+                                                    <MultiTrigger TargetType="Border">
+                                                        <MultiTrigger.Conditions>
+                                                            <BindingCondition Binding="{Binding IsSelected}" Value="True" />
+                                                            <BindingCondition Binding="{Binding BindingContext.IsAnswerSubmitted, Source={x:Reference questionPage}}" Value="False" />
+                                                        </MultiTrigger.Conditions>
+                                                        <MultiTrigger.Setters>
+                                                            <Setter Property="Stroke" Value="#4CAF50" />
+                                                            <Setter Property="StrokeThickness" Value="3" />
+                                                            <Setter Property="BackgroundColor" Value="#F0F8F0" />
+                                                        </MultiTrigger.Setters>
+                                                    </MultiTrigger>
+
+                                                    <!--  GIỮ LẠI DataTrigger cho submit  -->
+                                                    <DataTrigger
+                                                        Binding="{Binding BindingContext.IsAnswerSubmitted, Source={x:Reference questionPage}}"
+                                                        TargetType="Border"
+                                                        Value="True">
+                                                        <Setter Property="BackgroundColor" Value="{Binding BackgroundColor}" />
+                                                        <Setter Property="Stroke" Value="Transparent" />
+                                                        <Setter Property="StrokeThickness" Value="0" />
+                                                    </DataTrigger>
+                                                </Border.Triggers>
+                                                <RadioButton
+                                                    Content="{Binding Text}"
+                                                    FontSize="16"
+                                                    GroupName="MCQOptions"
+                                                    IsChecked="{Binding IsSelected, Mode=TwoWay}"
+                                                    TextColor="#2C3E50" />
+                                            </Border>
+                                        </DataTemplate>
+                                    </CollectionView.ItemTemplate>
+                                </CollectionView>
+                            </StackLayout>
+                        </Frame>
+
+                        <!--  Enhanced Explanation Area  -->
+                        <Frame
+                            BackgroundColor="#FFF8E1"
+                            IsVisible="{Binding IsAnswerSubmitted}"
+                            Style="{StaticResource ModernFrameStyle}">
+                            <StackLayout Spacing="12">
+                                <StackLayout HorizontalOptions="Center" Orientation="Horizontal">
+                                    <Label FontSize="20" Text="🎓" />
+                                    <Label
+                                        FontAttributes="Bold"
+                                        FontSize="16"
+                                        Text="GIẢI THÍCH CHI TIẾT"
+                                        TextColor="#F57C00" />
+                                </StackLayout>
+                                <BoxView
+                                    BackgroundColor="#FFB74D"
+                                    CornerRadius="1"
+                                    HeightRequest="2" />
+                                <Label
+                                    FontSize="16"
+                                    LineBreakMode="WordWrap"
+                                    Text="{Binding Explanation}"
+                                    TextColor="#E65100" />
+                            </StackLayout>
+                        </Frame>
+                    </StackLayout>
+                </ScrollView>
+
+                <!--  Enhanced Action Buttons - FIXED LAYOUT  -->
+                <Frame
+                    Grid.Row="2"
+                    Margin="5,10"
+                    BackgroundColor="#F8F9FA"
+                    Style="{StaticResource ModernFrameStyle}">
+                    <StackLayout Spacing="20">
+                        <!--  Submit Button  -->
+                        <Button
+                            Command="{Binding SubmitAnswerCommand}"
+                            IsVisible="{Binding IsAnswerSubmitted, Converter={StaticResource InverseBooleanConverter}}"
+                            Style="{StaticResource PremiumButtonStyle}"
+                            Text="🎯 KIỂM TRA KẾT QUẢ"
+                            TextColor="White">
+                            <Button.Background>
+                                <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+                                    <GradientStop Offset="0.0" Color="#4CAF50" />
+                                    <GradientStop Offset="1.0" Color="#45A049" />
+                                </LinearGradientBrush>
+                            </Button.Background>
+                        </Button>
+
+                        <!--  Navigation Buttons - FIXED với text ngắn hơn  -->
+                        <Grid
+                            ColumnDefinitions="*,*"
+                            ColumnSpacing="10"
+                            RowDefinitions="Auto,Auto"
+                            RowSpacing="10">
+                            <Button
+                                Grid.Row="0"
+                                Grid.Column="0"
+                                BackgroundColor="#757575"
+                                Command="{Binding BindingContext.PrevCommand, Source={x:Reference questionPage}}"
+                                IsEnabled="{Binding BindingContext.CanGoPrev, Source={x:Reference questionPage}}"
+                                Style="{StaticResource PremiumButtonStyle}"
+                                Text="◀ Trước"
+                                TextColor="White" />
+
+                            <Button
+                                Grid.Row="0"
+                                Grid.Column="1"
+                                BackgroundColor="#2196F3"
+                                Command="{Binding BindingContext.NextCommand, Source={x:Reference questionPage}}"
+                                IsEnabled="{Binding BindingContext.CanGoNext, Source={x:Reference questionPage}}"
+                                Style="{StaticResource PremiumButtonStyle}"
+                                Text="Tiếp ▶"
+                                TextColor="White" />
+
+                            <Button
+                                Grid.Row="1"
+                                Grid.Column="0"
+                                BackgroundColor="#FF9800"
+                                Command="{Binding BindingContext.CompleteLessonCommand, Source={x:Reference questionPage}}"
+                                IsVisible="{Binding BindingContext.IsLastQuestion, Source={x:Reference questionPage}}"
+                                Style="{StaticResource PremiumButtonStyle}"
+                                Text="🏆 Hoàn thành"
+                                TextColor="White" />
+
+                            <Button
+                                Grid.Row="1"
+                                Grid.Column="1"
+                                BackgroundColor="#9C27B0"
+                                Command="{Binding BindingContext.BackToLessonsCommand, Source={x:Reference questionPage}}"
+                                IsVisible="{Binding BindingContext.IsCompleted, Source={x:Reference questionPage}}"
+                                Style="{StaticResource PremiumButtonStyle}"
+                                Text="🔙 Quay về"
+                                TextColor="White" />
+                        </Grid>
+                    </StackLayout>
+                </Frame>
+            </Grid>
+        </DataTemplate>
+
+        <!--  True/False Template - UPDATED với Độ khó  -->
+        <DataTemplate x:Key="TFTemplate">
+            <Grid
+                Padding="10"
+                RowDefinitions="Auto,*,Auto"
+                RowSpacing="15">
+
+                <!--  Header Section  -->
+                <Frame
+                    Grid.Row="0"
+                    Margin="5,10"
+                    BackgroundColor="#E91E63"
+                    Style="{StaticResource ModernFrameStyle}">
+                    <Grid RowDefinitions="Auto,Auto,Auto,Auto" RowSpacing="12">
+                        <StackLayout
+                            Grid.Row="0"
+                            HorizontalOptions="Center"
+                            Orientation="Horizontal">
+                            <Label
+                                FontSize="24"
+                                Text="✅❌"
+                                VerticalOptions="Center" />
+                            <Label
+                                FontAttributes="Bold"
+                                FontSize="18"
+                                Text="CÂU HỎI ĐÚNG/SAI"
+                                TextColor="White" />
+                        </StackLayout>
+
+                        <!--  Progress Section với Độ khó - UPDATED  -->
+                        <Grid
+                            Grid.Row="1"
+                            ColumnDefinitions="*,Auto,*,Auto,*"
+                            ColumnSpacing="15">
+                            <StackLayout Grid.Column="0" HorizontalOptions="Start">
+                                <Label
+                                    FontSize="12"
+                                    Opacity="0.8"
+                                    Text="📊 Tiến độ"
+                                    TextColor="White" />
+                                <Label
+                                    FontAttributes="Bold"
+                                    FontSize="16"
+                                    Text="{Binding BindingContext.CurrentIndex, Source={x:Reference questionPage}, Converter={StaticResource IndexToDisplayConverter}, StringFormat='Câu {0}'}"
+                                    TextColor="White" />
+                            </StackLayout>
+
+                            <BoxView
+                                Grid.Column="1"
+                                BackgroundColor="White"
+                                Opacity="0.3"
+                                WidthRequest="1" />
+
+                            <!--  THÊM: Độ khó  -->
+                            <StackLayout Grid.Column="2" HorizontalOptions="Center">
+                                <Label
+                                    FontSize="12"
+                                    Opacity="0.8"
+                                    Text="🎯 Độ khó"
+                                    TextColor="White" />
+                                <Border
+                                    Padding="8,4"
+                                    BackgroundColor="#FF6B35"
+                                    Stroke="White"
+                                    StrokeThickness="1">
+                                    <Border.StrokeShape>
+                                        <RoundRectangle CornerRadius="10" />
+                                    </Border.StrokeShape>
+                                    <Label
+                                        FontAttributes="Bold"
+                                        FontSize="12"
+                                        HorizontalTextAlignment="Center"
+                                        Text="{Binding QuestionLevelName}"
+                                        TextColor="White" />
+                                </Border>
+                            </StackLayout>
+
+                            <BoxView
+                                Grid.Column="3"
+                                BackgroundColor="White"
+                                Opacity="0.3"
+                                WidthRequest="1" />
+
+                            <StackLayout Grid.Column="4" HorizontalOptions="End">
+                                <Label
+                                    FontSize="12"
+                                    Opacity="0.8"
+                                    Text="📝 Tổng số"
+                                    TextColor="White" />
+                                <Label
+                                    FontAttributes="Bold"
+                                    FontSize="16"
+                                    Text="{Binding BindingContext.Questions.Count, Source={x:Reference questionPage}, StringFormat='{0} câu'}"
+                                    TextColor="White" />
+                            </StackLayout>
+                        </Grid>
+
+                        <!--  Progress Bar - SỬA LẠI cho TFTemplate  -->
+                        <ProgressBar
+                            Grid.Row="2"
+                            BackgroundColor="#E0E0E0"
+                            HeightRequest="8"
+                            ProgressColor="#4CAF50">
+                            <ProgressBar.Progress>
+                                <MultiBinding Converter="{StaticResource ProgressConverter}">
+                                    <Binding Path="BindingContext.CurrentIndex" Source="{x:Reference questionPage}" />
+                                    <Binding Path="BindingContext.Questions.Count" Source="{x:Reference questionPage}" />
+                                </MultiBinding>
+                            </ProgressBar.Progress>
+                        </ProgressBar>
+
+                        <!--  Question Title  -->
+                        <Border
+                            Grid.Row="3"
+                            Padding="15"
+                            BackgroundColor="White"
+                            StrokeShape="RoundRectangle 12">
+                            <Label
+                                MinimumHeightRequest="50"
+                                Style="{StaticResource QuestionTitleStyle}"
+                                Text="{Binding QuestionText}"
+                                TextColor="#2C3E50" />
+                        </Border>
+                    </Grid>
+                </Frame>
+
+                <ScrollView Grid.Row="1">
+                    <StackLayout Spacing="20">
+                        <!--  Enhanced WebView - WIDER  -->
+                        <Frame Padding="15" Style="{StaticResource ModernFrameStyle}">
+                            <Frame
+                                Padding="0"
+                                CornerRadius="15"
+                                HasShadow="True">
+                                <Frame.Background>
+                                    <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                                        <GradientStop Offset="0.0" Color="#FF6B6B" />
+                                        <GradientStop Offset="0.5" Color="#EE5A24" />
+                                        <GradientStop Offset="1.0" Color="#FF9FF3" />
+                                    </LinearGradientBrush>
+                                </Frame.Background>
+                                <WebView
+                                    x:Name="questionWebViewTF"
+                                    Source="{Binding QuestionDescription, Converter={StaticResource HtmlWrapperConverter}}"
+                                    Style="{StaticResource EnhancedWebViewStyle}" />
+
+                            </Frame>
+                        </Frame>
+
+                        <!--  Options Container  -->
+                        <Frame Style="{StaticResource ModernFrameStyle}">
+                            <StackLayout Spacing="15">
+                                <StackLayout HorizontalOptions="Center" Orientation="Horizontal">
+                                    <Label FontSize="18" Text="🤔" />
+                                    <Label
+                                        FontAttributes="Bold"
+                                        FontSize="16"
+                                        Text="Phát biểu này đúng hay sai?"
+                                        TextColor="#2C3E50" />
+                                </StackLayout>
+
+                                <CollectionView ItemsSource="{Binding Options}" SelectionMode="None">
+                                    <CollectionView.ItemTemplate>
+                                        <DataTemplate>
+                                            <Border
+                                                Margin="0,8"
+                                                Padding="20"
+                                                BackgroundColor="{Binding BackgroundColor}"
+                                                Stroke="Transparent"
+                                                StrokeThickness="0">
+                                                <Border.StrokeShape>
+                                                    <RoundRectangle CornerRadius="15" />
+                                                </Border.StrokeShape>
+                                                <Border.Triggers>
+                                                    <!--  GIỮ LẠI chỉ MultiTrigger này  -->
+                                                    <MultiTrigger TargetType="Border">
+                                                        <MultiTrigger.Conditions>
+                                                            <BindingCondition Binding="{Binding IsSelected}" Value="True" />
+                                                            <BindingCondition Binding="{Binding BindingContext.IsAnswerSubmitted, Source={x:Reference questionPage}}" Value="False" />
+                                                        </MultiTrigger.Conditions>
+                                                        <MultiTrigger.Setters>
+                                                            <Setter Property="Stroke" Value="#4CAF50" />
+                                                            <Setter Property="StrokeThickness" Value="3" />
+                                                            <Setter Property="BackgroundColor" Value="#F0F8F0" />
+                                                        </MultiTrigger.Setters>
+                                                    </MultiTrigger>
+
+                                                    <!--  GIỮ LẠI DataTrigger cho submit  -->
+                                                    <DataTrigger
+                                                        Binding="{Binding BindingContext.IsAnswerSubmitted, Source={x:Reference questionPage}}"
+                                                        TargetType="Border"
+                                                        Value="True">
+                                                        <Setter Property="BackgroundColor" Value="{Binding BackgroundColor}" />
+                                                        <Setter Property="Stroke" Value="Transparent" />
+                                                        <Setter Property="StrokeThickness" Value="0" />
+                                                    </DataTrigger>
+                                                </Border.Triggers>
+                                                <RadioButton
+                                                    Content="{Binding Text}"
+                                                    FontSize="16"
+                                                    GroupName="TFOptions"
+                                                    IsChecked="{Binding IsSelected, Mode=TwoWay}"
+                                                    TextColor="#2C3E50" />
+                                            </Border>
+                                        </DataTemplate>
+                                    </CollectionView.ItemTemplate>
+                                </CollectionView>
+                            </StackLayout>
+                        </Frame>
+
+                        <!--  Explanation  -->
+                        <Frame
+                            BackgroundColor="#FFF8E1"
+                            IsVisible="{Binding IsAnswerSubmitted}"
+                            Style="{StaticResource ModernFrameStyle}">
+                            <StackLayout Spacing="12">
+                                <StackLayout HorizontalOptions="Center" Orientation="Horizontal">
+                                    <Label FontSize="20" Text="🎓" />
+                                    <Label
+                                        FontAttributes="Bold"
+                                        FontSize="16"
+                                        Text="GIẢI THÍCH CHI TIẾT"
+                                        TextColor="#F57C00" />
+                                </StackLayout>
+                                <BoxView
+                                    BackgroundColor="#FFB74D"
+                                    CornerRadius="1"
+                                    HeightRequest="2" />
+                                <Label
+                                    FontSize="16"
+                                    LineBreakMode="WordWrap"
+                                    Text="{Binding Explanation}"
+                                    TextColor="#E65100" />
+                            </StackLayout>
+                        </Frame>
+                    </StackLayout>
+                </ScrollView>
+
+                <!--  Action Buttons  -->
+                <Frame
+                    Grid.Row="2"
+                    Margin="5,10"
+                    BackgroundColor="#F8F9FA"
+                    Style="{StaticResource ModernFrameStyle}">
+                    <StackLayout Spacing="20">
+                        <Button
+                            Command="{Binding SubmitAnswerCommand}"
+                            IsVisible="{Binding IsAnswerSubmitted, Converter={StaticResource InverseBooleanConverter}}"
+                            Style="{StaticResource PremiumButtonStyle}"
+                            Text="🎯 KIỂM TRA KẾT QUẢ"
+                            TextColor="White">
+                            <Button.Background>
+                                <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+                                    <GradientStop Offset="0.0" Color="#4CAF50" />
+                                    <GradientStop Offset="1.0" Color="#45A049" />
+                                </LinearGradientBrush>
+                            </Button.Background>
+                        </Button>
+
+                        <Grid
+                            ColumnDefinitions="*,*"
+                            ColumnSpacing="10"
+                            RowDefinitions="Auto,Auto"
+                            RowSpacing="10">
+                            <Button
+                                Grid.Row="0"
+                                Grid.Column="0"
+                                BackgroundColor="#757575"
+                                Command="{Binding BindingContext.PrevCommand, Source={x:Reference questionPage}}"
+                                IsEnabled="{Binding BindingContext.CanGoPrev, Source={x:Reference questionPage}}"
+                                Style="{StaticResource PremiumButtonStyle}"
+                                Text="◀ Trước"
+                                TextColor="White" />
+                            <Button
+                                Grid.Row="0"
+                                Grid.Column="1"
+                                BackgroundColor="#2196F3"
+                                Command="{Binding BindingContext.NextCommand, Source={x:Reference questionPage}}"
+                                IsEnabled="{Binding BindingContext.CanGoNext, Source={x:Reference questionPage}}"
+                                Style="{StaticResource PremiumButtonStyle}"
+                                Text="Tiếp ▶"
+                                TextColor="White" />
+                            <Button
+                                Grid.Row="1"
+                                Grid.Column="0"
+                                BackgroundColor="#FF9800"
+                                Command="{Binding BindingContext.CompleteLessonCommand, Source={x:Reference questionPage}}"
+                                IsVisible="{Binding BindingContext.IsLastQuestion, Source={x:Reference questionPage}}"
+                                Style="{StaticResource PremiumButtonStyle}"
+                                Text="🏆 Hoàn thành"
+                                TextColor="White" />
+                            <Button
+                                Grid.Row="1"
+                                Grid.Column="1"
+                                BackgroundColor="#9C27B0"
+                                Command="{Binding BindingContext.BackToLessonsCommand, Source={x:Reference questionPage}}"
+                                IsVisible="{Binding BindingContext.IsCompleted, Source={x:Reference questionPage}}"
+                                Style="{StaticResource PremiumButtonStyle}"
+                                Text="🔙 Quay về"
+                                TextColor="White" />
+                        </Grid>
+                    </StackLayout>
+                </Frame>
+            </Grid>
+        </DataTemplate>
+
+        <!--  Fill Blank Template - UPDATED với Độ khó  -->
+        <DataTemplate x:Key="FillBlankTemplate">
+            <Grid
+                Padding="10"
+                RowDefinitions="Auto,*,Auto"
+                RowSpacing="15">
+                <Frame
+                    Grid.Row="0"
+                    Margin="5,10"
+                    BackgroundColor="#9C27B0"
+                    Style="{StaticResource ModernFrameStyle}">
+                    <Grid RowDefinitions="Auto,Auto,Auto,Auto" RowSpacing="12">
+                        <StackLayout
+                            Grid.Row="0"
+                            HorizontalOptions="Center"
+                            Orientation="Horizontal">
+                            <Label
+                                FontSize="24"
+                                Text="✏️"
+                                VerticalOptions="Center" />
+                            <Label
+                                FontAttributes="Bold"
+                                FontSize="18"
+                                Text="CÂU HỎI ĐIỀN TỪ"
+                                TextColor="White" />
+                        </StackLayout>
+
+                        <!--  Progress Section với Độ khó - UPDATED  -->
+                        <Grid
+                            Grid.Row="1"
+                            ColumnDefinitions="*,Auto,*,Auto,*"
+                            ColumnSpacing="15">
+                            <StackLayout Grid.Column="0" HorizontalOptions="Start">
+                                <Label
+                                    FontSize="12"
+                                    Opacity="0.8"
+                                    Text="📊 Tiến độ"
+                                    TextColor="White" />
+                                <Label
+                                    FontAttributes="Bold"
+                                    FontSize="16"
+                                    Text="{Binding BindingContext.CurrentIndex, Source={x:Reference questionPage}, Converter={StaticResource IndexToDisplayConverter}, StringFormat='Câu {0}'}"
+                                    TextColor="White" />
+                            </StackLayout>
+
+                            <BoxView
+                                Grid.Column="1"
+                                BackgroundColor="White"
+                                Opacity="0.3"
+                                WidthRequest="1" />
+
+                            <!--  THÊM: Độ khó  -->
+                            <StackLayout Grid.Column="2" HorizontalOptions="Center">
+                                <Label
+                                    FontSize="12"
+                                    Opacity="0.8"
+                                    Text="🎯 Độ khó"
+                                    TextColor="White" />
+                                <Border
+                                    Padding="8,4"
+                                    BackgroundColor="#FF6B35"
+                                    Stroke="White"
+                                    StrokeThickness="1">
+                                    <Border.StrokeShape>
+                                        <RoundRectangle CornerRadius="10" />
+                                    </Border.StrokeShape>
+                                    <Label
+                                        FontAttributes="Bold"
+                                        FontSize="12"
+                                        HorizontalTextAlignment="Center"
+                                        Text="{Binding QuestionLevelName}"
+                                        TextColor="White" />
+                                </Border>
+                            </StackLayout>
+
+                            <BoxView
+                                Grid.Column="3"
+                                BackgroundColor="White"
+                                Opacity="0.3"
+                                WidthRequest="1" />
+
+                            <StackLayout Grid.Column="4" HorizontalOptions="End">
+                                <Label
+                                    FontSize="12"
+                                    Opacity="0.8"
+                                    Text="📝 Tổng số"
+                                    TextColor="White" />
+                                <Label
+                                    FontAttributes="Bold"
+                                    FontSize="16"
+                                    Text="{Binding BindingContext.Questions.Count, Source={x:Reference questionPage}, StringFormat='{0} câu'}"
+                                    TextColor="White" />
+                            </StackLayout>
+                        </Grid>
+
+                        <!--  Progress Bar - SỬA LẠI cho FillBlankTemplate  -->
+                        <ProgressBar
+                            Grid.Row="2"
+                            BackgroundColor="#E0E0E0"
+                            HeightRequest="8"
+                            ProgressColor="#4CAF50">
+                            <ProgressBar.Progress>
+                                <MultiBinding Converter="{StaticResource ProgressConverter}">
+                                    <Binding Path="BindingContext.CurrentIndex" Source="{x:Reference questionPage}" />
+                                    <Binding Path="BindingContext.Questions.Count" Source="{x:Reference questionPage}" />
+                                </MultiBinding>
+                            </ProgressBar.Progress>
+                        </ProgressBar>
+
+                        <Border
+                            Grid.Row="3"
+                            Padding="15"
+                            BackgroundColor="White"
+                            StrokeShape="RoundRectangle 12">
+                            <Label
+                                MinimumHeightRequest="50"
+                                Style="{StaticResource QuestionTitleStyle}"
+                                Text="{Binding QuestionText}"
+                                TextColor="#2C3E50" />
+                        </Border>
+                    </Grid>
+                </Frame>
+
+                <ScrollView Grid.Row="1">
+                    <StackLayout Spacing="20">
+                        <!--  Enhanced WebView  -->
+                        <Frame Padding="15" Style="{StaticResource ModernFrameStyle}">
+                            <Frame
+                                Padding="0"
+                                CornerRadius="15"
+                                HasShadow="True">
+                                <Frame.Background>
+                                    <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                                        <GradientStop Offset="0.0" Color="#A8E6CF" />
+                                        <GradientStop Offset="0.5" Color="#88D8A3" />
+                                        <GradientStop Offset="1.0" Color="#9B59B6" />
+                                    </LinearGradientBrush>
+                                </Frame.Background>
+                                <WebView
+                                    x:Name="questionWebViewFB"
+                                    Source="{Binding QuestionDescription, Converter={StaticResource HtmlWrapperConverter}}"
+                                    Style="{StaticResource EnhancedWebViewStyle}" />
+                            </Frame>
+                        </Frame>
+
+                        <!--  Answer Input  -->
+                        <Frame Style="{StaticResource ModernFrameStyle}">
+                            <StackLayout Spacing="15">
+                                <StackLayout HorizontalOptions="Center" Orientation="Horizontal">
+                                    <Label FontSize="18" Text="💭" />
+                                    <Label
+                                        FontAttributes="Bold"
+                                        FontSize="16"
+                                        Text="Nhập đáp án của bạn:"
+                                        TextColor="#2C3E50" />
+                                </StackLayout>
+
+                                <Border
+                                    Padding="20"
+                                    BackgroundColor="White"
+                                    Stroke="{Binding FillBlankBorderColor}"
+                                    StrokeThickness="3">
+                                    <Border.StrokeShape>
+                                        <RoundRectangle CornerRadius="15" />
+                                    </Border.StrokeShape>
+                                    <Entry
+                                        FontSize="18"
+                                        Placeholder="💭 Điền đáp án của bạn vào đây..."
+                                        PlaceholderColor="#999999"
+                                        Text="{Binding UserAnswer, Mode=TwoWay}" />
+                                </Border>
+                            </StackLayout>
+                        </Frame>
+
+                        <!--  Explanation  -->
+                        <Frame
+                            BackgroundColor="#FFF8E1"
+                            IsVisible="{Binding IsAnswerSubmitted}"
+                            Style="{StaticResource ModernFrameStyle}">
+                            <StackLayout Spacing="12">
+                                <StackLayout HorizontalOptions="Center" Orientation="Horizontal">
+                                    <Label FontSize="20" Text="🎓" />
+                                    <Label
+                                        FontAttributes="Bold"
+                                        FontSize="16"
+                                        Text="GIẢI THÍCH CHI TIẾT"
+                                        TextColor="#F57C00" />
+                                </StackLayout>
+                                <BoxView
+                                    BackgroundColor="#FFB74D"
+                                    CornerRadius="1"
+                                    HeightRequest="2" />
+                                <Label
+                                    FontSize="16"
+                                    LineBreakMode="WordWrap"
+                                    Text="{Binding Explanation}"
+                                    TextColor="#E65100" />
+                            </StackLayout>
+                        </Frame>
+                    </StackLayout>
+                </ScrollView>
+
+                <!--  Action Buttons  -->
+                <Frame
+                    Grid.Row="2"
+                    Margin="5,10"
+                    BackgroundColor="#F8F9FA"
+                    Style="{StaticResource ModernFrameStyle}">
+                    <StackLayout Spacing="20">
+                        <Button
+                            Command="{Binding SubmitAnswerCommand}"
+                            IsVisible="{Binding IsAnswerSubmitted, Converter={StaticResource InverseBooleanConverter}}"
+                            Style="{StaticResource PremiumButtonStyle}"
+                            Text="🎯 KIỂM TRA KẾT QUẢ"
+                            TextColor="White">
+                            <Button.Background>
+                                <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+                                    <GradientStop Offset="0.0" Color="#4CAF50" />
+                                    <GradientStop Offset="1.0" Color="#45A049" />
+                                </LinearGradientBrush>
+                            </Button.Background>
+                        </Button>
+
+                        <Grid
+                            ColumnDefinitions="*,*"
+                            ColumnSpacing="10"
+                            RowDefinitions="Auto,Auto"
+                            RowSpacing="10">
+                            <Button
+                                Grid.Row="0"
+                                Grid.Column="0"
+                                BackgroundColor="#757575"
+                                Command="{Binding BindingContext.PrevCommand, Source={x:Reference questionPage}}"
+                                IsEnabled="{Binding BindingContext.CanGoPrev, Source={x:Reference questionPage}}"
+                                Style="{StaticResource PremiumButtonStyle}"
+                                Text="◀ Trước"
+                                TextColor="White" />
+                            <Button
+                                Grid.Row="0"
+                                Grid.Column="1"
+                                BackgroundColor="#2196F3"
+                                Command="{Binding BindingContext.NextCommand, Source={x:Reference questionPage}}"
+                                IsEnabled="{Binding BindingContext.CanGoNext, Source={x:Reference questionPage}}"
+                                Style="{StaticResource PremiumButtonStyle}"
+                                Text="Tiếp ▶"
+                                TextColor="White" />
+                            <Button
+                                Grid.Row="1"
+                                Grid.Column="0"
+                                BackgroundColor="#FF9800"
+                                Command="{Binding BindingContext.CompleteLessonCommand, Source={x:Reference questionPage}}"
+                                IsVisible="{Binding BindingContext.IsLastQuestion, Source={x:Reference questionPage}}"
+                                Style="{StaticResource PremiumButtonStyle}"
+                                Text="🏆 Hoàn thành"
+                                TextColor="White" />
+                            <Button
+                                Grid.Row="1"
+                                Grid.Column="1"
+                                BackgroundColor="#9C27B0"
+                                Command="{Binding BindingContext.BackToLessonsCommand, Source={x:Reference questionPage}}"
+                                IsVisible="{Binding BindingContext.IsCompleted, Source={x:Reference questionPage}}"
+                                Style="{StaticResource PremiumButtonStyle}"
+                                Text="🔙 Quay về"
+                                TextColor="White" />
+                        </Grid>
+                    </StackLayout>
+                </Frame>
+            </Grid>
+        </DataTemplate>
+
+        <!--  Audio Template - UPDATED với Độ khó  -->
+        <DataTemplate x:Key="AudioTemplate">
+            <Grid
+                Padding="10"
+                RowDefinitions="Auto,*,Auto"
+                RowSpacing="15">
+                <Frame
+                    Grid.Row="0"
+                    Margin="5,10"
+                    BackgroundColor="#FF5722"
+                    Style="{StaticResource ModernFrameStyle}">
+                    <Grid RowDefinitions="Auto,Auto,Auto,Auto" RowSpacing="12">
+                        <StackLayout
+                            Grid.Row="0"
+                            HorizontalOptions="Center"
+                            Orientation="Horizontal">
+                            <Label
+                                FontSize="24"
+                                Text="🎧"
+                                VerticalOptions="Center" />
+                            <Label
+                                FontAttributes="Bold"
+                                FontSize="18"
+                                Text="CÂU HỎI NGHE"
+                                TextColor="White" />
+                        </StackLayout>
+
+                        <!--  Progress Section với Độ khó - UPDATED  -->
+                        <Grid
+                            Grid.Row="1"
+                            ColumnDefinitions="*,Auto,*,Auto,*"
+                            ColumnSpacing="15">
+                            <StackLayout Grid.Column="0" HorizontalOptions="Start">
+                                <Label
+                                    FontSize="12"
+                                    Opacity="0.8"
+                                    Text="📊 Tiến độ"
+                                    TextColor="White" />
+                                <Label
+                                    FontAttributes="Bold"
+                                    FontSize="16"
+                                    Text="{Binding BindingContext.CurrentIndex, Source={x:Reference questionPage}, Converter={StaticResource IndexToDisplayConverter}, StringFormat='Câu {0}'}"
+                                    TextColor="White" />
+                            </StackLayout>
+
+                            <BoxView
+                                Grid.Column="1"
+                                BackgroundColor="White"
+                                Opacity="0.3"
+                                WidthRequest="1" />
+
+                            <!--  THÊM: Độ khó  -->
+                            <StackLayout Grid.Column="2" HorizontalOptions="Center">
+                                <Label
+                                    FontSize="12"
+                                    Opacity="0.8"
+                                    Text="🎯 Độ khó"
+                                    TextColor="White" />
+                                <Border
+                                    Padding="8,4"
+                                    BackgroundColor="#FF6B35"
+                                    Stroke="White"
+                                    StrokeThickness="1">
+                                    <Border.StrokeShape>
+                                        <RoundRectangle CornerRadius="10" />
+                                    </Border.StrokeShape>
+                                    <Label
+                                        FontAttributes="Bold"
+                                        FontSize="12"
+                                        HorizontalTextAlignment="Center"
+                                        Text="{Binding QuestionLevelName}"
+                                        TextColor="White" />
+                                </Border>
+                            </StackLayout>
+
+                            <BoxView
+                                Grid.Column="3"
+                                BackgroundColor="White"
+                                Opacity="0.3"
+                                WidthRequest="1" />
+
+                            <StackLayout Grid.Column="4" HorizontalOptions="End">
+                                <Label
+                                    FontSize="12"
+                                    Opacity="0.8"
+                                    Text="📝 Tổng số"
+                                    TextColor="White" />
+                                <Label
+                                    FontAttributes="Bold"
+                                    FontSize="16"
+                                    Text="{Binding BindingContext.Questions.Count, Source={x:Reference questionPage}, StringFormat='{0} câu'}"
+                                    TextColor="White" />
+                            </StackLayout>
+                        </Grid>
+
+                        <!--  Progress Bar - SỬA LẠI cho AudioTemplate  -->
+                        <ProgressBar
+                            Grid.Row="2"
+                            BackgroundColor="#E0E0E0"
+                            HeightRequest="8"
+                            ProgressColor="#4CAF50">
+                            <ProgressBar.Progress>
+                                <MultiBinding Converter="{StaticResource ProgressConverter}">
+                                    <Binding Path="BindingContext.CurrentIndex" Source="{x:Reference questionPage}" />
+                                    <Binding Path="BindingContext.Questions.Count" Source="{x:Reference questionPage}" />
+                                </MultiBinding>
+                            </ProgressBar.Progress>
+                        </ProgressBar>
+
+                        <!--  Question Title  -->
+                        <Border
+                            Grid.Row="3"
+                            Padding="15"
+                            BackgroundColor="White"
+                            StrokeShape="RoundRectangle 12">
+                            <Label
+                                MinimumHeightRequest="50"
+                                Style="{StaticResource QuestionTitleStyle}"
+                                Text="{Binding QuestionText}"
+                                TextColor="#2C3E50" />
+                        </Border>
+                    </Grid>
+                </Frame>
+
+                <ScrollView Grid.Row="1">
+                    <StackLayout Spacing="20">
+                        <!--  Enhanced WebView  -->
+                        <Frame Padding="15" Style="{StaticResource ModernFrameStyle}">
+                            <Frame
+                                Padding="0"
+                                CornerRadius="15"
+                                HasShadow="True">
+                                <Frame.Background>
+                                    <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                                        <GradientStop Offset="0.0" Color="#FFB74D" />
+                                        <GradientStop Offset="0.5" Color="#FF8A65" />
+                                        <GradientStop Offset="1.0" Color="#FF5722" />
+                                    </LinearGradientBrush>
+                                </Frame.Background>
+                                <WebView
+                                    x:Name="questionWebViewAudio"
+                                    Source="{Binding QuestionDescription, Converter={StaticResource HtmlWrapperConverter}}"
+                                    Style="{StaticResource EnhancedWebViewStyle}" />
+                            </Frame>
+                        </Frame>
+
+                        <!--  Audio Input  -->
+                        <Frame Style="{StaticResource ModernFrameStyle}">
+                            <StackLayout Spacing="15">
+                                <StackLayout HorizontalOptions="Center" Orientation="Horizontal">
+                                    <Label FontSize="18" Text="🎵" />
+                                    <Label
+                                        FontAttributes="Bold"
+                                        FontSize="16"
+                                        Text="Nhập từ bạn nghe được:"
+                                        TextColor="#2C3E50" />
+                                </StackLayout>
+
+                                <CollectionView ItemsSource="{Binding Blanks}">
+                                    <CollectionView.ItemTemplate>
+                                        <DataTemplate>
+                                            <Border
+                                                Margin="0,8"
+                                                Padding="20"
+                                                BackgroundColor="White"
+                                                Stroke="{Binding BorderColor}"
+                                                StrokeThickness="2">
+                                                <Border.StrokeShape>
+                                                    <RoundRectangle CornerRadius="15" />
+                                                </Border.StrokeShape>
+                                                <Entry
+                                                    FontSize="16"
+                                                    Placeholder="🎵 Nhập từ nghe được..."
+                                                    PlaceholderColor="#999999"
+                                                    Text="{Binding UserText, Mode=TwoWay}" />
+                                            </Border>
+                                        </DataTemplate>
+                                    </CollectionView.ItemTemplate>
+                                </CollectionView>
+                            </StackLayout>
+                        </Frame>
+
+                        <!--  Explanation  -->
+                        <Frame
+                            BackgroundColor="#FFF8E1"
+                            IsVisible="{Binding IsAnswerSubmitted}"
+                            Style="{StaticResource ModernFrameStyle}">
+                            <StackLayout Spacing="12">
+                                <StackLayout HorizontalOptions="Center" Orientation="Horizontal">
+                                    <Label FontSize="20" Text="🎓" />
+                                    <Label
+                                        FontAttributes="Bold"
+                                        FontSize="16"
+                                        Text="GIẢI THÍCH CHI TIẾT"
+                                        TextColor="#F57C00" />
+                                </StackLayout>
+                                <BoxView
+                                    BackgroundColor="#FFB74D"
+                                    CornerRadius="1"
+                                    HeightRequest="2" />
+                                <Label
+                                    FontSize="16"
+                                    LineBreakMode="WordWrap"
+                                    Text="{Binding Explanation}"
+                                    TextColor="#E65100" />
+                            </StackLayout>
+                        </Frame>
+                    </StackLayout>
+                </ScrollView>
+
+                <!--  Action Buttons  -->
+                <Frame
+                    Grid.Row="2"
+                    Margin="5,10"
+                    BackgroundColor="#F8F9FA"
+                    Style="{StaticResource ModernFrameStyle}">
+                    <StackLayout Spacing="20">
+                        <Button
+                            Command="{Binding SubmitAnswerCommand}"
+                            IsVisible="{Binding IsAnswerSubmitted, Converter={StaticResource InverseBooleanConverter}}"
+                            Style="{StaticResource PremiumButtonStyle}"
+                            Text="🎯 KIỂM TRA KẾT QUẢ"
+                            TextColor="White">
+                            <Button.Background>
+                                <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+                                    <GradientStop Offset="0.0" Color="#4CAF50" />
+                                    <GradientStop Offset="1.0" Color="#45A049" />
+                                </LinearGradientBrush>
+                            </Button.Background>
+                        </Button>
+
+                        <Grid
+                            ColumnDefinitions="*,*"
+                            ColumnSpacing="10"
+                            RowDefinitions="Auto,Auto"
+                            RowSpacing="10">
+                            <Button
+                                Grid.Row="0"
+                                Grid.Column="0"
+                                BackgroundColor="#757575"
+                                Command="{Binding BindingContext.PrevCommand, Source={x:Reference questionPage}}"
+                                IsEnabled="{Binding BindingContext.CanGoPrev, Source={x:Reference questionPage}}"
+                                Style="{StaticResource PremiumButtonStyle}"
+                                Text="◀ Trước"
+                                TextColor="White" />
+                            <Button
+                                Grid.Row="0"
+                                Grid.Column="1"
+                                BackgroundColor="#2196F3"
+                                Command="{Binding BindingContext.NextCommand, Source={x:Reference questionPage}}"
+                                IsEnabled="{Binding BindingContext.CanGoNext, Source={x:Reference questionPage}}"
+                                Style="{StaticResource PremiumButtonStyle}"
+                                Text="Tiếp ▶"
+                                TextColor="White" />
+                            <Button
+                                Grid.Row="1"
+                                Grid.Column="0"
+                                BackgroundColor="#FF9800"
+                                Command="{Binding BindingContext.CompleteLessonCommand, Source={x:Reference questionPage}}"
+                                IsVisible="{Binding BindingContext.IsLastQuestion, Source={x:Reference questionPage}}"
+                                Style="{StaticResource PremiumButtonStyle}"
+                                Text="🏆 Hoàn thành"
+                                TextColor="White" />
+                            <Button
+                                Grid.Row="1"
+                                Grid.Column="1"
+                                BackgroundColor="#9C27B0"
+                                Command="{Binding BindingContext.BackToLessonsCommand, Source={x:Reference questionPage}}"
+                                IsVisible="{Binding BindingContext.IsCompleted, Source={x:Reference questionPage}}"
+                                Style="{StaticResource PremiumButtonStyle}"
+                                Text="🔙 Quay về"
+                                TextColor="White" />
+                        </Grid>
+                    </StackLayout>
+                </Frame>
+            </Grid>
+        </DataTemplate>
+        <!-- Video Template -->
+        <DataTemplate x:Key="VideoTemplate">
+            <Grid Padding="10" RowDefinitions="Auto,*,Auto" RowSpacing="15">
+                <!-- Header Section -->
+                <Frame
+            Grid.Row="0"
+            Margin="5,10"
+            BackgroundColor="#1E88E5"
+            Style="{StaticResource ModernFrameStyle}">
+                    <Grid RowDefinitions="Auto,Auto,Auto,Auto" RowSpacing="12">
+                        <StackLayout
+                    Grid.Row="0"
+                    HorizontalOptions="Center"
+                    Orientation="Horizontal">
+                            <Label FontSize="24" Text="🎬" VerticalOptions="Center" />
+                            <Label
+                        FontAttributes="Bold"
+                        FontSize="18"
+                        Text="CÂU HỎI VIDEO"
+                        TextColor="White" />
+                        </StackLayout>
+                        <!-- Progress Section -->
+                        <Grid
+                    Grid.Row="1"
+                    ColumnDefinitions="*,Auto,*,Auto,*"
+                    ColumnSpacing="15">
+                            <StackLayout Grid.Column="0" HorizontalOptions="Start">
+                                <Label FontSize="12" Opacity="0.8" Text="📊 Tiến độ" TextColor="White" />
+                                <Label
+                            FontAttributes="Bold"
+                            FontSize="16"
+                            Text="{Binding BindingContext.CurrentIndex, Source={x:Reference questionPage}, Converter={StaticResource IndexToDisplayConverter}, StringFormat='Câu {0}'}"
+                            TextColor="White" />
+                            </StackLayout>
+                            <BoxView Grid.Column="1" BackgroundColor="White" Opacity="0.3" WidthRequest="1" />
+                            <StackLayout Grid.Column="2" HorizontalOptions="Center">
+                                <Label FontSize="12" Opacity="0.8" Text="🎯 Độ khó" TextColor="White" />
+                                <Border Padding="8,4" BackgroundColor="#FF6B35" Stroke="White" StrokeThickness="1">
+                                    <Border.StrokeShape>
+                                        <RoundRectangle CornerRadius="10" />
+                                    </Border.StrokeShape>
+                                    <Label
+                                FontAttributes="Bold"
+                                FontSize="12"
+                                HorizontalTextAlignment="Center"
+                                Text="{Binding QuestionLevelName}"
+                                TextColor="White" />
+                                </Border>
+                            </StackLayout>
+                            <BoxView Grid.Column="3" BackgroundColor="White" Opacity="0.3" WidthRequest="1" />
+                            <StackLayout Grid.Column="4" HorizontalOptions="End">
+                                <Label FontSize="12" Opacity="0.8" Text="📝 Tổng số" TextColor="White" />
+                                <Label
+                            FontAttributes="Bold"
+                            FontSize="16"
+                            Text="{Binding BindingContext.Questions.Count, Source={x:Reference questionPage}, StringFormat='{0} câu'}"
+                            TextColor="White" />
+                            </StackLayout>
+                        </Grid>
+                        <!-- Progress Bar -->
+                        <ProgressBar
+                    Grid.Row="2"
+                    BackgroundColor="#E0E0E0"
+                    HeightRequest="8"
+                    ProgressColor="#4CAF50">
+                            <ProgressBar.Progress>
+                                <MultiBinding Converter="{StaticResource ProgressConverter}">
+                                    <Binding Path="BindingContext.CurrentIndex" Source="{x:Reference questionPage}" />
+                                    <Binding Path="BindingContext.Questions.Count" Source="{x:Reference questionPage}" />
+                                </MultiBinding>
+                            </ProgressBar.Progress>
+                        </ProgressBar>
+                        <!-- Question Title -->
+                        <Border
+                    Grid.Row="3"
+                    Padding="15"
+                    BackgroundColor="White"
+                    StrokeShape="RoundRectangle 12">
+                            <Label
+                        MinimumHeightRequest="50"
+                        Style="{StaticResource QuestionTitleStyle}"
+                        Text="{Binding QuestionText}"
+                        TextColor="#2C3E50" />
+                        </Border>
+                    </Grid>
+                </Frame>
+                <!-- Main Content Area -->
+                <ScrollView Grid.Row="1">
+                    <StackLayout Spacing="20">
+                        <!-- Video WebView -->
+                        <Frame Padding="15" Style="{StaticResource ModernFrameStyle}">
+                            <Frame
+                        Padding="0"
+                        CornerRadius="15"
+                        HasShadow="True">
+                                <Frame.Background>
+                                    <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                                        <GradientStop Offset="0.0" Color="#667eea" />
+                                        <GradientStop Offset="0.5" Color="#764ba2" />
+                                        <GradientStop Offset="1.0" Color="#f093fb" />
+                                    </LinearGradientBrush>
+                                </Frame.Background>
+                                <Grid>
+                                    <WebView
+                                        x:Name="questionWebViewVideo"
+                                                HeightRequest="160"
+                                        Source="{Binding QuestionDescription, Converter={StaticResource VideoEmbedHtmlConverter}}"
+                                        Style="{StaticResource EnhancedWebViewStyle}" />
+                                                                        <Button
+                                            Text="⛶"
+                                            BackgroundColor="#80000000"
+                                            TextColor="White"
+                                            FontSize="24"
+                                            WidthRequest="48"
+                                            HeightRequest="48"
+                                            CornerRadius="24"
+                                            HorizontalOptions="End"
+                                            VerticalOptions="Start"
+                                            Margin="10"
+                                            Clicked="OnFullScreenClicked"
+                                            CommandParameter="{Binding QuestionDescription}" /> 
+                                </Grid>
+                              
+                            </Frame>
+                        </Frame>
+                    </StackLayout>
+                </ScrollView>
+                <!-- Action Buttons -->
+                <Frame
+            Grid.Row="2"
+            Margin="5,10"
+            BackgroundColor="#F8F9FA"
+            Style="{StaticResource ModernFrameStyle}">
+                    <StackLayout Spacing="20">
+                        <Grid
+                    ColumnDefinitions="*,*"
+                    ColumnSpacing="10"
+                    RowDefinitions="Auto,Auto"
+                    RowSpacing="10">
+                            <Button
+                        Grid.Row="0"
+                        Grid.Column="0"
+                        BackgroundColor="#757575"
+                        Command="{Binding BindingContext.PrevCommand, Source={x:Reference questionPage}}"
+                        IsEnabled="{Binding BindingContext.CanGoPrev, Source={x:Reference questionPage}}"
+                        Style="{StaticResource PremiumButtonStyle}"
+                        Text="◀ Trước"
+                        TextColor="White" />
+                            <Button
+                        Grid.Row="0"
+                        Grid.Column="1"
+                        BackgroundColor="#2196F3"
+                        Command="{Binding BindingContext.NextCommand, Source={x:Reference questionPage}}"
+                        IsEnabled="{Binding BindingContext.CanGoNext, Source={x:Reference questionPage}}"
+                        Style="{StaticResource PremiumButtonStyle}"
+                        Text="Tiếp ▶"
+                        TextColor="White" />
+                            <Button
+                        Grid.Row="1"
+                        Grid.Column="0"
+                        BackgroundColor="#FF9800"
+                        Command="{Binding BindingContext.CompleteLessonCommand, Source={x:Reference questionPage}}"
+                        IsVisible="{Binding BindingContext.IsLastQuestion, Source={x:Reference questionPage}}"
+                        Style="{StaticResource PremiumButtonStyle}"
+                        Text="🏆 Hoàn thành"
+                        TextColor="White" />
+                            <Button
+                        Grid.Row="1"
+                        Grid.Column="1"
+                        BackgroundColor="#9C27B0"
+                        Command="{Binding BindingContext.BackToLessonsCommand, Source={x:Reference questionPage}}"
+                        IsVisible="{Binding BindingContext.IsCompleted, Source={x:Reference questionPage}}"
+                        Style="{StaticResource PremiumButtonStyle}"
+                        Text="🔙 Quay về"
+                        TextColor="White" />
+                        </Grid>
+                    </StackLayout>
+                </Frame>
+            </Grid>
+        </DataTemplate>
+
+        <!--  TextTemplate & BlankTemplate không đổi  -->
+        <DataTemplate x:Key="TextTemplate">
+            <Label
+                FontSize="18"
+                LineBreakMode="WordWrap"
+                Text="{Binding .}"
+                TextColor="#2C3E50"
+                VerticalOptions="Center" />
+        </DataTemplate>
+        <DataTemplate x:Key="BlankTemplate">
+            <Border
+                Margin="0,0,4,0"
+                Padding="0"
+                BackgroundColor="White"
+                Stroke="{Binding BorderColor}"
+                StrokeThickness="1">
+                <Border.StrokeShape>
+                    <RoundRectangle CornerRadius="8" />
+                </Border.StrokeShape>
+                <Entry
+                    Placeholder="___"
+                    Text="{Binding UserText, Mode=TwoWay}"
+                    WidthRequest="80" />
+            </Border>
+        </DataTemplate>
+        <sel:SegmentTemplateSelector
+            x:Key="SegmentTemplateSelector"
+            BlankTemplate="{StaticResource BlankTemplate}"
+            TextTemplate="{StaticResource TextTemplate}" />
+
+        <!--  Selector  -->
+        <sel:QuestionTemplateSelector
+            x:Key="QuestionSelector"
+            AudioTemplate="{StaticResource AudioTemplate}"
+            FillBlankTemplate="{StaticResource FillBlankTemplate}"
+            MCQTemplate="{StaticResource MCQTemplate}"
+            TrueFalseTemplate="{StaticResource TFTemplate}"
+            VideoTemplate="{StaticResource VideoTemplate}" />
+    </ContentPage.Resources>
+
+    <ScrollView x:Name="MainScrollView">
+        <VerticalStackLayout
+            Padding="5"
+            BindableLayout.ItemTemplateSelector="{StaticResource QuestionSelector}"
+            BindableLayout.ItemsSource="{Binding CurrentQuestionCollection}"
+            Spacing="10" />
+    </ScrollView>
+</ContentPage>

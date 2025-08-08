@@ -1,0 +1,197 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<toolkit:Popup
+    x:Class="mauiluanvantotnghiep.ViewsPopup.CertificateViewPopup"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+    CanBeDismissedByTappingOutsideOfPopup="True"
+    Color="Transparent">
+
+    <Border
+        Padding="0"
+        BackgroundColor="White"
+        MaximumHeightRequest="450"
+        Stroke="#E0E0E0"
+        StrokeThickness="1"
+        WidthRequest="320">
+        <Border.StrokeShape>
+            <RoundRectangle CornerRadius="16" />
+        </Border.StrokeShape>
+
+        <Grid RowDefinitions="Auto,*,Auto">
+
+            <!--  Header  -->
+            <Grid
+                Grid.Row="0"
+                Padding="16,12"
+                BackgroundColor="#4CAF50"
+                ColumnDefinitions="*,Auto">
+                <Grid.Clip>
+                    <RoundRectangleGeometry CornerRadius="16,16,0,0" Rect="0,0,320,50" />
+                </Grid.Clip>
+
+                <StackLayout Grid.Column="0" VerticalOptions="Center">
+                    <Label
+                        FontAttributes="Bold"
+                        FontSize="16"
+                        Text="🏆 Chứng chỉ hoàn thành"
+                        TextColor="White" />
+                    <Label
+                        FontSize="12"
+                        LineBreakMode="TailTruncation"
+                        Text="{Binding CourseName}"
+                        TextColor="#E8F5E8" />
+                </StackLayout>
+
+                <Button
+                    Grid.Column="1"
+                    Padding="6"
+                    BackgroundColor="Transparent"
+                    BorderWidth="0"
+                    Clicked="OnCloseClicked"
+                    FontAttributes="Bold"
+                    FontSize="14"
+                    HeightRequest="28"
+                    Text="✕"
+                    TextColor="White"
+                    WidthRequest="28" />
+            </Grid>
+
+            <!--  Content - Loại bỏ ScrollView để tránh khoảng trắng  -->
+            <StackLayout
+                Grid.Row="1"
+                Padding="16"
+                Spacing="10">
+
+                <!--  Certificate Image  -->
+                <Frame
+                    Padding="0"
+                    BackgroundColor="#F5F5F5"
+                    BorderColor="#E0E0E0"
+                    CornerRadius="8"
+                    HasShadow="False">
+                    <Image
+                        Aspect="AspectFit"
+                        HeightRequest="120"
+                        Source="{Binding ImageUrl}" />
+                </Frame>
+
+                <!--  Certificate Info  -->
+                <Grid
+                    ColumnDefinitions="80,*"
+                    RowDefinitions="Auto,Auto,Auto,Auto"
+                    RowSpacing="6">
+
+                    <Label
+                        Grid.Row="0"
+                        Grid.Column="0"
+                        FontAttributes="Bold"
+                        FontSize="12"
+                        Text="Người nhận:"
+                        TextColor="#666" />
+                    <Label
+                        Grid.Row="0"
+                        Grid.Column="1"
+                        FontSize="12"
+                        LineBreakMode="TailTruncation"
+                        Text="{Binding Fullname}"
+                        TextColor="#333" />
+
+                    <Label
+                        Grid.Row="1"
+                        Grid.Column="0"
+                        FontAttributes="Bold"
+                        FontSize="12"
+                        Text="Mã xác minh:"
+                        TextColor="#666" />
+                    <Frame
+                        Grid.Row="1"
+                        Grid.Column="1"
+                        Padding="6,3"
+                        BackgroundColor="#F0F0F0"
+                        BorderColor="#2196F3"
+                        CornerRadius="4"
+                        HasShadow="False">
+                        <Label
+                            FontAttributes="Bold"
+                            FontFamily="Courier"
+                            FontSize="11"
+                            Text="{Binding VerificationCode}"
+                            TextColor="#2196F3" />
+                    </Frame>
+
+                    <Label
+                        Grid.Row="2"
+                        Grid.Column="0"
+                        FontAttributes="Bold"
+                        FontSize="12"
+                        Text="Ngày cấp:"
+                        TextColor="#666" />
+                    <Label
+                        Grid.Row="2"
+                        Grid.Column="1"
+                        FontSize="12"
+                        Text="{Binding CreatedAt, StringFormat='{0:dd/MM/yyyy}'}"
+                        TextColor="#333" />
+
+                    <Label
+                        Grid.Row="3"
+                        Grid.Column="0"
+                        FontAttributes="Bold"
+                        FontSize="12"
+                        Text="Tình trạng:"
+                        TextColor="#666" />
+                    <Label
+                        Grid.Row="3"
+                        Grid.Column="1"
+                        FontSize="12"
+                        Text="Còn hạn sử dụng"
+                        TextColor="#4CAF50" />
+                </Grid>
+
+                <!--  Download Info (compact) - Loại bỏ để tránh khoảng trắng  -->
+                <Label
+                    FontSize="10"
+                    HorizontalOptions="Center"
+                    Text="💾 Bấm 'Tải xuống' để lưu chứng chỉ"
+                    TextColor="#999" />
+
+            </StackLayout>
+
+            <!--  Footer Buttons - Giảm padding  -->
+            <Grid
+                Grid.Row="2"
+                Padding="16,8"
+                BackgroundColor="#F8F9FA"
+                ColumnDefinitions="*,8,*">
+                <Grid.Clip>
+                    <RoundRectangleGeometry CornerRadius="0,0,16,16" Rect="0,0,320,50" />
+                </Grid.Clip>
+
+                <Button
+                    Grid.Column="0"
+                    Padding="0,8"
+                    BackgroundColor="#2196F3"
+                    Clicked="OnDownloadClicked"
+                    CornerRadius="6"
+                    FontAttributes="Bold"
+                    FontSize="13"
+                    Text="📥 Tải xuống"
+                    TextColor="White" />
+
+                <Button
+                    Grid.Column="2"
+                    Padding="0,8"
+                    BackgroundColor="#F5F5F5"
+                    BorderColor="#E0E0E0"
+                    BorderWidth="1"
+                    Clicked="OnCloseClicked"
+                    CornerRadius="6"
+                    FontAttributes="Bold"
+                    FontSize="13"
+                    Text="Đóng"
+                    TextColor="#666" />
+            </Grid>
+        </Grid>
+    </Border>
+</toolkit:Popup>

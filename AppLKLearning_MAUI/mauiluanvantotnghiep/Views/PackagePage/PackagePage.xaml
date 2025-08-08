@@ -1,0 +1,522 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    x:Class="mauiluanvantotnghiep.Views.PackagePage.PackagePage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:vm="clr-namespace:mauiluanvantotnghiep.ViewModels"
+    x:Name="PageRoot"
+    Title="Gói cước"
+    BackgroundColor="#F8F6FF"
+    Shell.NavBarIsVisible="False">
+
+    <!--  thiết lập ViewModel  -->
+    <ContentPage.BindingContext>
+        <vm:PackagePageViewModel />
+    </ContentPage.BindingContext>
+
+    <Grid>
+        <!--  Background gradient với màu tím pastel  -->
+        <Rectangle>
+            <Rectangle.Fill>
+                <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                    <GradientStop Offset="0" Color="#F8F6FF" />
+                    <GradientStop Offset="0.3" Color="#F1F3F4" />
+                    <GradientStop Offset="1" Color="#E8E0FF" />
+                </LinearGradientBrush>
+            </Rectangle.Fill>
+        </Rectangle>
+
+        <ScrollView>
+            <VerticalStackLayout Padding="0" Spacing="0">
+
+                <!--  Enhanced Header Section với màu tím pastel  -->
+                <Border
+                    Padding="20,30,20,40"
+                    BackgroundColor="Transparent"
+                    StrokeShape="{RoundRectangle CornerRadius='0,0,35,35'}"
+                    StrokeThickness="0">
+                    <Border.Background>
+                        <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                            <GradientStop Offset="0" Color="#B19CD9" />
+                            <GradientStop Offset="0.5" Color="#C8A2C8" />
+                            <GradientStop Offset="1" Color="#E6B3E8" />
+                        </LinearGradientBrush>
+                    </Border.Background>
+                    <Border.Shadow>
+                        <Shadow
+                            Brush="Black"
+                            Opacity="0.3"
+                            Radius="20"
+                            Offset="0,8" />
+                    </Border.Shadow>
+
+                    <VerticalStackLayout Spacing="15">
+                        <!--  Enhanced Header  -->
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+
+                            <Border
+                                Grid.Column="0"
+                                Padding="15,10"
+                                BackgroundColor="#40FFFFFF"
+                                HorizontalOptions="Center"
+                                StrokeShape="{RoundRectangle CornerRadius='25'}"
+                                StrokeThickness="0">
+                                <Image
+                                    HeightRequest="45"
+                                    HorizontalOptions="Center"
+                                    IsAnimationPlaying="True"
+                                    Source="logo.gif"
+                                    WidthRequest="280" />
+                            </Border>
+                        </Grid>
+
+                        <!--  Package Information Cards  -->
+                        <Border
+                            Margin="0,15,0,0"
+                            Padding="20,15"
+                            BackgroundColor="#30FFFFFF"
+                            Stroke="#40FFFFFF"
+                            StrokeShape="{RoundRectangle CornerRadius='20'}"
+                            StrokeThickness="1">
+                            <VerticalStackLayout Spacing="8">
+                                <Label
+                                    x:Name="PackageTitle"
+                                    FontAttributes="Bold"
+                                    FontSize="26"
+                                    HorizontalOptions="Center"
+                                    LineBreakMode="TailTruncation"
+                                    MaxLines="2"
+                                    Text="{Binding Source={x:Reference CarouselViewActive}, Path=CurrentItem.PackageName}"
+                                    TextColor="White" />
+
+                                <BoxView
+                                    HeightRequest="2"
+                                    HorizontalOptions="Center"
+                                    WidthRequest="60"
+                                    Color="#FFE1E0" />
+
+                                <Grid Margin="0,10,0,0">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="*" />
+                                    </Grid.ColumnDefinitions>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto" />
+                                        <RowDefinition Height="Auto" />
+                                    </Grid.RowDefinitions>
+
+                                    <Border
+                                        Grid.Row="0"
+                                        Grid.Column="0"
+                                        Margin="5"
+                                        Padding="12,8"
+                                        BackgroundColor="#20FFFFFF"
+                                        StrokeShape="{RoundRectangle CornerRadius='12'}"
+                                        StrokeThickness="0">
+                                        <StackLayout HorizontalOptions="Center" Orientation="Horizontal">
+                                            <Label
+                                                FontFamily="MaterialIcons"
+                                                FontSize="16"
+                                                Text="💰"
+                                                TextColor="#FFE1E0"
+                                                VerticalOptions="Center" />
+                                            <Label
+                                                Margin="8,0,0,0"
+                                                FontAttributes="Bold"
+                                                FontSize="16"
+                                                Text="{Binding Source={x:Reference CarouselViewActive}, Path=CurrentItem.Price, StringFormat='{0:N0} VNĐ'}"
+                                                TextColor="#FFE1E0"
+                                                VerticalOptions="Center" />
+                                        </StackLayout>
+                                    </Border>
+
+                                    <Border
+                                        Grid.Row="0"
+                                        Grid.Column="1"
+                                        Margin="5"
+                                        Padding="12,8"
+                                        BackgroundColor="#20FFFFFF"
+                                        StrokeShape="{RoundRectangle CornerRadius='12'}"
+                                        StrokeThickness="0">
+                                        <StackLayout HorizontalOptions="Center" Orientation="Horizontal">
+                                            <Label
+                                                FontFamily="MaterialIcons"
+                                                FontSize="16"
+                                                Text="📅"
+                                                TextColor="White"
+                                                VerticalOptions="Center" />
+                                            <Label
+                                                Margin="8,0,0,0"
+                                                FontSize="13"
+                                                Text="{Binding Source={x:Reference CarouselViewActive}, Path=CurrentItem.RegistrationDate, StringFormat='{0:dd/MM}'}"
+                                                TextColor="White"
+                                                VerticalOptions="Center" />
+                                        </StackLayout>
+                                    </Border>
+
+                                    <Border
+                                        Grid.Row="1"
+                                        Grid.ColumnSpan="2"
+                                        Margin="5"
+                                        Padding="12,8"
+                                        BackgroundColor="#20FFFFFF"
+                                        StrokeShape="{RoundRectangle CornerRadius='12'}"
+                                        StrokeThickness="0">
+                                        <StackLayout HorizontalOptions="Center" Orientation="Horizontal">
+                                            <Label
+                                                FontFamily="MaterialIcons"
+                                                FontSize="16"
+                                                Text="⏰"
+                                                TextColor="White"
+                                                VerticalOptions="Center" />
+                                            <Label
+                                                Margin="8,0,0,0"
+                                                FontSize="14"
+                                                Text="{Binding Source={x:Reference CarouselViewActive}, Path=CurrentItem.ExpirationDateDisplay, StringFormat='Hết hạn: {0}'}"
+                                                TextColor="White"
+                                                VerticalOptions="Center" />
+                                        </StackLayout>
+                                    </Border>
+                                </Grid>
+                            </VerticalStackLayout>
+                        </Border>
+                    </VerticalStackLayout>
+                </Border>
+
+                <!--  Enhanced CarouselView  -->
+                <CarouselView
+                    x:Name="CarouselViewActive"
+                    Margin="15,-25,15,20"
+                    HeightRequest="180"
+                    HorizontalOptions="Center"
+                    IsVisible="{Binding HasActivePackages}"
+                    ItemsSource="{Binding ActivePackages}"
+                    PeekAreaInsets="30">
+                    <CarouselView.ItemTemplate>
+                        <DataTemplate>
+                            <Border
+                                Margin="8"
+                                Padding="0"
+                                BackgroundColor="White"
+                                StrokeShape="{RoundRectangle CornerRadius='15'}"
+                                StrokeThickness="0">
+                                <Border.Shadow>
+                                    <Shadow
+                                        Brush="#B19CD9"
+                                        Opacity="0.15"
+                                        Radius="12"
+                                        Offset="0,4" />
+                                </Border.Shadow>
+                                <Grid>
+                                    <Border StrokeShape="{RoundRectangle CornerRadius='15'}" StrokeThickness="0">
+                                        <Image
+                                            Aspect="AspectFill"
+                                            HeightRequest="180"
+                                            IsAnimationPlaying="True"
+                                            Source="{Binding UrlImage}" />
+                                    </Border>
+
+                                    <!--  Gradient overlay với màu tím pastel  -->
+                                    <Border StrokeShape="{RoundRectangle CornerRadius='15'}" StrokeThickness="0">
+                                        <Border.Background>
+                                            <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                                                <GradientStop Offset="0" Color="Transparent" />
+                                                <GradientStop Offset="0.7" Color="#20B19CD9" />
+                                                <GradientStop Offset="1" Color="#60B19CD9" />
+                                            </LinearGradientBrush>
+                                        </Border.Background>
+                                    </Border>
+
+                                    <!--  Enhanced Active Badge với "ĐANG HOẠT ĐỘNG"  -->
+                                    <Border
+                                        Margin="12,12,0,0"
+                                        Padding="10,6"
+                                        BackgroundColor="#00C851"
+                                        HorizontalOptions="Start"
+                                        StrokeShape="{RoundRectangle CornerRadius='15'}"
+                                        StrokeThickness="0"
+                                        VerticalOptions="Start">
+                                        <Border.Shadow>
+                                            <Shadow
+                                                Brush="Black"
+                                                Opacity="0.3"
+                                                Radius="4"
+                                                Offset="0,2" />
+                                        </Border.Shadow>
+                                        <StackLayout Orientation="Horizontal" Spacing="6">
+                                            <Label
+                                                FontSize="12"
+                                                Text="✓"
+                                                TextColor="White"
+                                                VerticalOptions="Center" />
+                                            <Label
+                                                FontAttributes="Bold"
+                                                FontSize="12"
+                                                Text="ĐANG HOẠT ĐỘNG"
+                                                TextColor="White"
+                                                VerticalOptions="Center" />
+                                        </StackLayout>
+                                    </Border>
+                                </Grid>
+                            </Border>
+                        </DataTemplate>
+                    </CarouselView.ItemTemplate>
+                </CarouselView>
+
+                <!--  Enhanced Inactive Packages Section  -->
+                <VerticalStackLayout
+                    Margin="0,10,0,30"
+                    Padding="20,0"
+                    Spacing="20">
+
+                    <Border
+                        Padding="20,15"
+                        BackgroundColor="White"
+                        IsVisible="{Binding HasInactivePackages}"
+                        StrokeShape="{RoundRectangle CornerRadius='15'}"
+                        StrokeThickness="0">
+                        <Border.Shadow>
+                            <Shadow
+                                Brush="#B19CD9"
+                                Opacity="0.1"
+                                Radius="8"
+                                Offset="0,2" />
+                        </Border.Shadow>
+                        <StackLayout Orientation="Horizontal" Spacing="12">
+                            <Border
+                                Padding="8"
+                                BackgroundColor="#F3F0FF"
+                                StrokeShape="{RoundRectangle CornerRadius='8'}"
+                                StrokeThickness="0"
+                                VerticalOptions="Center">
+                                <Label
+                                    FontSize="18"
+                                    Text="📦"
+                                    VerticalOptions="Center" />
+                            </Border>
+                            <StackLayout VerticalOptions="Center">
+                                <Label
+                                    FontAttributes="Bold"
+                                    FontSize="20"
+                                    Text="Gói cước khả dụng"
+                                    TextColor="#6B46C1" />
+                                <Label
+                                    FontSize="14"
+                                    Text="Chọn gói phù hợp với bạn"
+                                    TextColor="#8B5CF6" />
+                            </StackLayout>
+                        </StackLayout>
+                    </Border>
+
+                    <CollectionView
+                        Margin="0,0,0,0"
+                        IsVisible="{Binding HasInactivePackages}"
+                        ItemsSource="{Binding InactivePackages}">
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate>
+                                <Border
+                                    Margin="8"
+                                    Padding="0"
+                                    BackgroundColor="White"
+                                    StrokeShape="{RoundRectangle CornerRadius='15'}"
+                                    StrokeThickness="0">
+                                    <Border.Shadow>
+                                        <Shadow
+                                            Brush="#B19CD9"
+                                            Opacity="0.15"
+                                            Radius="12"
+                                            Offset="0,4" />
+                                    </Border.Shadow>
+                                    <Border.GestureRecognizers>
+                                        <TapGestureRecognizer Command="{Binding Source={x:Reference PageRoot}, Path=BindingContext.ShowPackageDetailCommand}" CommandParameter="{Binding .}" />
+                                    </Border.GestureRecognizers>
+                                    <Grid HeightRequest="100">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="100" />
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="Auto" />
+                                        </Grid.ColumnDefinitions>
+
+                                        <!--  Package Image  -->
+                                        <Border
+                                            Grid.Column="0"
+                                            Margin="10"
+                                            StrokeShape="{RoundRectangle CornerRadius='10'}"
+                                            StrokeThickness="0">
+                                            <Image Aspect="AspectFill" Source="{Binding UrlImage}" />
+                                        </Border>
+
+                                        <!--  Package Info  -->
+                                        <VerticalStackLayout
+                                            Grid.Column="1"
+                                            Margin="10"
+                                            Spacing="5"
+                                            VerticalOptions="Center">
+                                            <Label
+                                                FontAttributes="Bold"
+                                                FontSize="16"
+                                                LineBreakMode="TailTruncation"
+                                                MaxLines="1"
+                                                Text="{Binding PackageName}"
+                                                TextColor="#6B46C1" />
+                                            <Label
+                                                FontSize="12"
+                                                Text="{Binding DurationDay, StringFormat='Thời hạn: {0} ngày'}"
+                                                TextColor="Gray" />
+                                            <Label
+                                                FontAttributes="Bold"
+                                                FontSize="14"
+                                                Text="{Binding Price, StringFormat='{0:N0} VNĐ'}"
+                                                TextColor="#8B5CF6" />
+                                        </VerticalStackLayout>
+
+                                        <!--  Buy Button  -->
+                                        <Button
+                                            Grid.Column="2"
+                                            Margin="10"
+                                            Padding="12,6"
+                                            BackgroundColor="#8B5CF6"
+                                            Command="{Binding Source={x:Reference PageRoot}, Path=BindingContext.BuyCommand}"
+                                            CommandParameter="{Binding .}"
+                                            CornerRadius="8"
+                                            FontAttributes="Bold"
+                                            FontSize="12"
+                                            Text="Mua"
+                                            TextColor="White"
+                                            VerticalOptions="Center"
+                                            WidthRequest="60">
+                                            <Button.Shadow>
+                                                <Shadow
+                                                    Brush="#8B5CF6"
+                                                    Opacity="0.3"
+                                                    Radius="4"
+                                                    Offset="0,2" />
+                                            </Button.Shadow>
+                                        </Button>
+                                    </Grid>
+                                </Border>
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+                    </CollectionView>
+                </VerticalStackLayout>
+            </VerticalStackLayout>
+        </ScrollView>
+
+        <!--  Package Detail Popup  -->
+        <Grid
+            BackgroundColor="#80000000"
+            IsVisible="{Binding IsPackageDetailVisible}"
+            ZIndex="1000">
+            <Grid.GestureRecognizers>
+                <TapGestureRecognizer Command="{Binding ClosePackageDetailCommand}" />
+            </Grid.GestureRecognizers>
+
+            <Border
+                Margin="40"
+                Padding="0"
+                BackgroundColor="White"
+                HorizontalOptions="Center"
+                StrokeShape="{RoundRectangle CornerRadius='20'}"
+                StrokeThickness="0"
+                VerticalOptions="Center">
+                <Border.Shadow>
+                    <Shadow
+                        Brush="Black"
+                        Opacity="0.3"
+                        Radius="20"
+                        Offset="0,8" />
+                </Border.Shadow>
+
+                <VerticalStackLayout Spacing="0">
+                    <!--  Header with close button  -->
+                    <Grid Padding="20,15">
+                        <Label
+                            FontAttributes="Bold"
+                            FontSize="20"
+                            HorizontalOptions="Center"
+                            Text="Chi tiết gói cước"
+                            TextColor="#6B46C1" />
+                        <Button
+                            Padding="8"
+                            BackgroundColor="Transparent"
+                            Command="{Binding ClosePackageDetailCommand}"
+                            FontSize="16"
+                            HorizontalOptions="End"
+                            Text="✕"
+                            TextColor="Gray"
+                            VerticalOptions="Start" />
+                    </Grid>
+
+                    <!--  Package Image  -->
+                    <Border
+                        Margin="20,0,20,15"
+                        HeightRequest="200"
+                        StrokeShape="{RoundRectangle CornerRadius='15'}"
+                        StrokeThickness="0">
+                        <Image Aspect="AspectFill" Source="{Binding SelectedPackageDetail.UrlImage}" />
+                    </Border>
+
+                    <!--  Package Details  -->
+                    <StackLayout Margin="20,0,20,20" Spacing="15">
+                        <Border
+                            Padding="15,10"
+                            BackgroundColor="#F8F6FF"
+                            StrokeShape="{RoundRectangle CornerRadius='10'}"
+                            StrokeThickness="0">
+                            <StackLayout Spacing="8">
+                                <Label
+                                    FontAttributes="Bold"
+                                    FontSize="18"
+                                    Text="{Binding SelectedPackageDetail.PackageName}"
+                                    TextColor="#6B46C1" />
+                                <Label
+                                    FontSize="14"
+                                    Text="{Binding SelectedPackageDetail.DurationDay, StringFormat='Thời hạn: {0} ngày'}"
+                                    TextColor="Gray" />
+                                <Label
+                                    FontAttributes="Bold"
+                                    FontSize="16"
+                                    Text="{Binding SelectedPackageDetail.Price, StringFormat='Giá: {0:N0} VNĐ'}"
+                                    TextColor="#8B5CF6" />
+                            </StackLayout>
+                        </Border>
+
+                        <!--  Action Buttons  -->
+                        <Grid ColumnDefinitions="*,*" ColumnSpacing="10">
+                            <Button
+                                Grid.Column="0"
+                                Padding="12"
+                                BackgroundColor="#E5E7EB"
+                                Command="{Binding ClosePackageDetailCommand}"
+                                CornerRadius="10"
+                                FontAttributes="Bold"
+                                Text="Đóng"
+                                TextColor="Gray" />
+                            <Button
+                                Grid.Column="1"
+                                Padding="12"
+                                BackgroundColor="#8B5CF6"
+                                Command="{Binding BuyCommand}"
+                                CommandParameter="{Binding SelectedPackageDetail}"
+                                CornerRadius="10"
+                                FontAttributes="Bold"
+                                Text="Mua ngay"
+                                TextColor="White">
+                                <Button.Shadow>
+                                    <Shadow
+                                        Brush="#8B5CF6"
+                                        Opacity="0.3"
+                                        Radius="4"
+                                        Offset="0,2" />
+                                </Button.Shadow>
+                            </Button>
+                        </Grid>
+                    </StackLayout>
+                </VerticalStackLayout>
+            </Border>
+        </Grid>
+    </Grid>
+</ContentPage>

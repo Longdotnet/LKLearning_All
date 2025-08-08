@@ -1,0 +1,49 @@
+{
+  "project_info": {
+    "project_number": "1083971214619",
+    "firebase_url": "https://testnotifications-66d15-default-rtdb.firebaseio.com",
+    "project_id": "testnotifications-66d15",
+    "storage_bucket": "testnotifications-66d15.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1083971214619:android:8da39401ebcf28fb3f07be",
+        "android_client_info": {
+          "package_name": "com.companyname.mauiluanvantotnghiep"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAHLohbDqWhKURUL_BeN1WDrN6cRVBd-UI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1083971214619:android:2843c982bbaed56a3f07be",
+        "android_client_info": {
+          "package_name": "com.example.english_app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAHLohbDqWhKURUL_BeN1WDrN6cRVBd-UI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -1,0 +1,980 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    x:Class="mauiluanvantotnghiep.Views.ExamPage.ExamQuestionPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:behaviors="clr-namespace:mauiluanvantotnghiep.Behaviors"
+    xmlns:conv="clr-namespace:mauiluanvantotnghiep.Converters"
+    xmlns:sel="clr-namespace:mauiluanvantotnghiep.Selectors"
+    xmlns:vm="clr-namespace:mauiluanvantotnghiep.ViewModels"
+    x:Name="ExamQuestionPageRoot"
+    Title="Bài Kiểm Tra"
+    BackgroundColor="#F8F9FA">
+
+    <ContentPage.BindingContext>
+        <vm:ExamQuestionPageViewModel />
+    </ContentPage.BindingContext>
+
+    <ContentPage.Resources>
+        <!--  Converters  -->
+        <conv:StringNotNullOrEmptyConverter x:Key="StringNotNullOrEmptyConverter" />
+        <conv:InverseBooleanConverter x:Key="InverseBooleanConverter" />
+        <conv:HtmlWrapperConverter x:Key="HtmlWrapperConverter" />
+        <conv:IndexToDisplayConverter x:Key="IndexToDisplayConverter" />
+        <conv:BoolToColorConverter x:Key="BoolToColorConverter" />
+
+        <!--  MCQ Template  -->
+        <DataTemplate x:Key="MCQTemplate">
+            <Grid>
+                <Frame
+                    Padding="0"
+                    BackgroundColor="White"
+                    BorderColor="#E0E0E0"
+                    CornerRadius="12"
+                    HasShadow="True">
+                    <VerticalStackLayout Spacing="0">
+                        <!--  Header Section  -->
+                        <Grid
+                            Padding="20,16"
+                            BackgroundColor="#1565C0"
+                            RowDefinitions="Auto,Auto">
+
+                            <!--  Question Progress and Timer Row  -->
+                            <Grid Grid.Row="0" ColumnDefinitions="*,Auto,*">
+
+                                <!--  Question Number  -->
+                                <HorizontalStackLayout
+                                    Grid.Column="0"
+                                    HorizontalOptions="Start"
+                                    Spacing="8"
+                                    VerticalOptions="Center">
+                                    <Frame
+                                        Padding="8,4"
+                                        BackgroundColor="White"
+                                        CornerRadius="12"
+                                        HasShadow="False">
+                                        <Label
+                                            FontAttributes="Bold"
+                                            FontSize="14"
+                                            Text="{Binding BindingContext.CurrentIndex, Source={x:Reference ExamQuestionPageRoot}, Converter={StaticResource IndexToDisplayConverter}}"
+                                            TextColor="#1565C0" />
+                                    </Frame>
+                                    <Label
+                                        FontAttributes="Bold"
+                                        FontSize="14"
+                                        Text="{Binding BindingContext.Questions.Count, Source={x:Reference ExamQuestionPageRoot}, StringFormat='/ {0}'}"
+                                        TextColor="White"
+                                        VerticalOptions="Center" />
+                                </HorizontalStackLayout>
+
+                                <!--  Timer  -->
+                                <Frame
+                                    Grid.Column="1"
+                                    Padding="12,6"
+                                    BackgroundColor="#FF5722"
+                                    CornerRadius="20"
+                                    HasShadow="False">
+                                    <HorizontalStackLayout Spacing="6">
+                                        <Label
+                                            FontFamily="MaterialIcons"
+                                            FontSize="16"
+                                            Text="⏰"
+                                            TextColor="White"
+                                            VerticalOptions="Center" />
+                                        <Label
+                                            FontAttributes="Bold"
+                                            FontSize="16"
+                                            Text="{Binding BindingContext.TimerDisplay, Source={x:Reference ExamQuestionPageRoot}}"
+                                            TextColor="White" />
+                                    </HorizontalStackLayout>
+                                </Frame>
+
+                                <!--  Question Score  -->
+                                <Frame
+                                    Grid.Column="2"
+                                    Padding="8,4"
+                                    BackgroundColor="White"
+                                    CornerRadius="12"
+                                    HasShadow="False"
+                                    HorizontalOptions="End">
+                                    <Label
+                                        FontAttributes="Bold"
+                                        FontSize="14"
+                                        Text="{Binding Model.QuestionScore, StringFormat='{0} điểm'}"
+                                        TextColor="#1565C0" />
+                                </Frame>
+                            </Grid>
+
+                            <!--  Progress Bar  -->
+                            <ProgressBar
+                                Grid.Row="1"
+                                Margin="0,12,0,0"
+                                BackgroundColor="#90CAF9"
+                                HeightRequest="6"
+                                Progress="{Binding BindingContext.ProgressValue, Source={x:Reference ExamQuestionPageRoot}}"
+                                ProgressColor="White" />
+                        </Grid>
+
+                        <!--  Question Content  -->
+                        <VerticalStackLayout Padding="24,20" Spacing="20">
+
+                            <!--  Question Text  -->
+                            <Label
+                                FontAttributes="Bold"
+                                FontSize="18"
+                                LineBreakMode="WordWrap"
+                                Text="{Binding QuestionText}"
+                                TextColor="#212121" />
+
+                            <!--  Question Description  -->
+                            <Frame
+                                Padding="0"
+                                BackgroundColor="#FAFAFA"
+                                BorderColor="#E0E0E0"
+                                CornerRadius="8"
+                                HasShadow="False"
+                                IsVisible="{Binding QuestionDescription, Converter={StaticResource StringNotNullOrEmptyConverter}}">
+                                <WebView
+                                    Margin="16"
+                                    HeightRequest="150"
+                                    Source="{Binding QuestionDescription, Converter={StaticResource HtmlWrapperConverter}}"
+                                    VerticalOptions="FillAndExpand">
+                                    <WebView.Behaviors>
+                                        <behaviors:WebViewScrollBehavior />
+                                    </WebView.Behaviors>
+                                </WebView>
+                            </Frame>
+
+                            <!--  Answer Options  -->
+                            <Label
+                                FontAttributes="Bold"
+                                FontSize="16"
+                                Text="Chọn đáp án:"
+                                TextColor="#424242" />
+
+                            <CollectionView ItemsSource="{Binding Options}" SelectionMode="None">
+                                <CollectionView.ItemTemplate>
+                                    <DataTemplate>
+                                        <Grid Margin="0,6">
+                                            <Frame
+                                                Padding="16,12"
+                                                BackgroundColor="{Binding BackgroundColor}"
+                                                BorderColor="{Binding IsSelected, Converter={StaticResource BoolToColorConverter}, ConverterParameter='#1976D2|#E0E0E0'}"
+                                                CornerRadius="8"
+                                                HasShadow="False">
+                                                <Grid ColumnDefinitions="Auto,*">
+                                                    <RadioButton
+                                                        Grid.Column="0"
+                                                        IsChecked="{Binding IsSelected, Mode=TwoWay}"
+                                                        VerticalOptions="Center" />
+                                                    <Label
+                                                        Grid.Column="1"
+                                                        Margin="12,0,0,0"
+                                                        FontSize="16"
+                                                        LineBreakMode="WordWrap"
+                                                        Text="{Binding Text}"
+                                                        TextColor="#212121"
+                                                        VerticalOptions="Center" />
+                                                </Grid>
+                                                <Frame.GestureRecognizers>
+                                                    <TapGestureRecognizer Command="{Binding SelectCommand}" />
+                                                </Frame.GestureRecognizers>
+                                            </Frame>
+                                        </Grid>
+                                    </DataTemplate>
+                                </CollectionView.ItemTemplate>
+                            </CollectionView>
+                        </VerticalStackLayout>
+
+                        <!--  Navigation Footer - SỬA ĐỔI  -->
+                        <Grid
+                            Padding="16,12"
+                            BackgroundColor="#F5F5F5"
+                            RowDefinitions="Auto,Auto">
+
+                            <!--  Navigation Buttons Row  -->
+                            <Grid Grid.Row="0" ColumnDefinitions="*,*">
+                                <!--  Previous Button  -->
+                                <Button
+                                    Grid.Column="0"
+                                    Margin="0,0,4,0"
+                                    Padding="12,8"
+                                    BackgroundColor="#E3F2FD"
+                                    BorderColor="#1976D2"
+                                    BorderWidth="1"
+                                    Command="{Binding BindingContext.PrevCommand, Source={x:Reference ExamQuestionPageRoot}}"
+                                    CornerRadius="8"
+                                    FontAttributes="Bold"
+                                    FontSize="14"
+                                    IsEnabled="{Binding BindingContext.CanGoPrev, Source={x:Reference ExamQuestionPageRoot}}"
+                                    Text="‹ Câu trước"
+                                    TextColor="#1976D2" />
+
+                                <!--  Next Button  -->
+                                <Button
+                                    Grid.Column="1"
+                                    Margin="4,0,0,0"
+                                    Padding="12,8"
+                                    BackgroundColor="#1976D2"
+                                    Command="{Binding BindingContext.NextCommand, Source={x:Reference ExamQuestionPageRoot}}"
+                                    CornerRadius="8"
+                                    FontAttributes="Bold"
+                                    FontSize="14"
+                                    IsEnabled="{Binding BindingContext.CanGoNext, Source={x:Reference ExamQuestionPageRoot}}"
+                                    Text="Câu tiếp ›"
+                                    TextColor="White" />
+                            </Grid>
+
+                            <!--  Submit Button Row  -->
+                            <Button
+                                Grid.Row="1"
+                                Margin="0,8,0,0"
+                                Padding="16,12"
+                                BackgroundColor="#4CAF50"
+                                Command="{Binding BindingContext.SubmitExamCommand, Source={x:Reference ExamQuestionPageRoot}}"
+                                CornerRadius="8"
+                                FontAttributes="Bold"
+                                FontSize="16"
+                                IsEnabled="{Binding BindingContext.IsSubmitting, Source={x:Reference ExamQuestionPageRoot}, Converter={StaticResource InverseBooleanConverter}}"
+                                Text="📝 Nộp bài"
+                                TextColor="White" />
+                        </Grid>
+                    </VerticalStackLayout>
+                </Frame>
+            </Grid>
+        </DataTemplate>
+
+        <!--  True/False Template  -->
+        <DataTemplate x:Key="TFTemplate">
+            <Grid>
+                <Frame
+                    Padding="0"
+                    BackgroundColor="White"
+                    BorderColor="#E0E0E0"
+                    CornerRadius="12"
+                    HasShadow="True">
+                    <VerticalStackLayout Spacing="0">
+                        <!--  Header Section  -->
+                        <Grid
+                            Padding="20,16"
+                            BackgroundColor="#7B1FA2"
+                            RowDefinitions="Auto,Auto">
+
+                            <!--  Question Progress and Timer Row  -->
+                            <Grid Grid.Row="0" ColumnDefinitions="*,Auto,*">
+
+                                <!--  Question Number  -->
+                                <HorizontalStackLayout
+                                    Grid.Column="0"
+                                    HorizontalOptions="Start"
+                                    Spacing="8"
+                                    VerticalOptions="Center">
+                                    <Frame
+                                        Padding="8,4"
+                                        BackgroundColor="White"
+                                        CornerRadius="12"
+                                        HasShadow="False">
+                                        <Label
+                                            FontAttributes="Bold"
+                                            FontSize="14"
+                                            Text="{Binding BindingContext.CurrentIndex, Source={x:Reference ExamQuestionPageRoot}, Converter={StaticResource IndexToDisplayConverter}}"
+                                            TextColor="#7B1FA2" />
+                                    </Frame>
+                                    <Label
+                                        FontAttributes="Bold"
+                                        FontSize="14"
+                                        Text="{Binding BindingContext.Questions.Count, Source={x:Reference ExamQuestionPageRoot}, StringFormat='/ {0}'}"
+                                        TextColor="White"
+                                        VerticalOptions="Center" />
+                                </HorizontalStackLayout>
+
+                                <!--  Timer  -->
+                                <Frame
+                                    Grid.Column="1"
+                                    Padding="12,6"
+                                    BackgroundColor="#FF5722"
+                                    CornerRadius="20"
+                                    HasShadow="False">
+                                    <HorizontalStackLayout Spacing="6">
+                                        <Label
+                                            FontFamily="MaterialIcons"
+                                            FontSize="16"
+                                            Text="⏰"
+                                            TextColor="White"
+                                            VerticalOptions="Center" />
+                                        <Label
+                                            FontAttributes="Bold"
+                                            FontSize="16"
+                                            Text="{Binding BindingContext.TimerDisplay, Source={x:Reference ExamQuestionPageRoot}}"
+                                            TextColor="White" />
+                                    </HorizontalStackLayout>
+                                </Frame>
+
+                                <!--  Question Type Badge  -->
+                                <Frame
+                                    Grid.Column="2"
+                                    Padding="8,4"
+                                    BackgroundColor="White"
+                                    CornerRadius="12"
+                                    HasShadow="False"
+                                    HorizontalOptions="End">
+                                    <Label
+                                        FontAttributes="Bold"
+                                        FontSize="14"
+                                        Text="Đúng/Sai"
+                                        TextColor="#7B1FA2" />
+                                </Frame>
+                            </Grid>
+
+                            <!--  Progress Bar  -->
+                            <ProgressBar
+                                Grid.Row="1"
+                                Margin="0,12,0,0"
+                                BackgroundColor="#CE93D8"
+                                HeightRequest="6"
+                                Progress="{Binding BindingContext.ProgressValue, Source={x:Reference ExamQuestionPageRoot}}"
+                                ProgressColor="White" />
+                        </Grid>
+
+                        <!--  Question Content  -->
+                        <VerticalStackLayout Padding="24,20" Spacing="20">
+
+                            <!--  Question Text  -->
+                            <Label
+                                FontAttributes="Bold"
+                                FontSize="18"
+                                LineBreakMode="WordWrap"
+                                Text="{Binding QuestionText}"
+                                TextColor="#212121" />
+
+                            <!--  Question Description  -->
+                            <Frame
+                                Padding="0"
+                                BackgroundColor="#FAFAFA"
+                                BorderColor="#E0E0E0"
+                                CornerRadius="8"
+                                HasShadow="False"
+                                IsVisible="{Binding QuestionDescription, Converter={StaticResource StringNotNullOrEmptyConverter}}">
+                                <WebView
+                                    Margin="16"
+                                    HeightRequest="150"
+                                    Source="{Binding QuestionDescription, Converter={StaticResource HtmlWrapperConverter}}"
+                                    VerticalOptions="FillAndExpand">
+                                    <WebView.Behaviors>
+                                        <behaviors:WebViewScrollBehavior />
+                                    </WebView.Behaviors>
+                                </WebView>
+                            </Frame>
+
+                            <!--  True/False Options  -->
+                            <Label
+                                FontAttributes="Bold"
+                                FontSize="16"
+                                Text="Chọn Đúng hoặc Sai:"
+                                TextColor="#424242" />
+
+                            <Grid ColumnDefinitions="*,*" ColumnSpacing="16">
+
+                                <!--  True Option  -->
+                                <Frame
+                                    Grid.Column="0"
+                                    Padding="20,16"
+                                    BackgroundColor="{Binding Options[0].BackgroundColor}"
+                                    BorderColor="{Binding Options[0].IsSelected, Converter={StaticResource BoolToColorConverter}, ConverterParameter='#4CAF50|#E0E0E0'}"
+                                    CornerRadius="12"
+                                    HasShadow="False">
+                                    <Grid ColumnDefinitions="Auto,*">
+                                        <RadioButton
+                                            Grid.Column="0"
+                                            IsChecked="{Binding Options[0].IsSelected, Mode=TwoWay}"
+                                            VerticalOptions="Center" />
+                                        <VerticalStackLayout
+                                            Grid.Column="1"
+                                            Margin="12,0,0,0"
+                                            HorizontalOptions="Center"
+                                            Spacing="4">
+                                            <Label
+                                                FontSize="24"
+                                                HorizontalOptions="Center"
+                                                Text="✓"
+                                                TextColor="#4CAF50" />
+                                            <Label
+                                                FontAttributes="Bold"
+                                                FontSize="13"
+                                                HorizontalOptions="Center"
+                                                Text="ĐÚNG"
+                                                TextColor="#212121" />
+                                        </VerticalStackLayout>
+                                    </Grid>
+                                    <Frame.GestureRecognizers>
+                                        <TapGestureRecognizer Command="{Binding Options[0].SelectCommand}" />
+                                    </Frame.GestureRecognizers>
+                                </Frame>
+
+                                <!--  False Option  -->
+                                <Frame
+                                    Grid.Column="1"
+                                    Padding="20,16"
+                                    BackgroundColor="{Binding Options[1].BackgroundColor}"
+                                    BorderColor="{Binding Options[1].IsSelected, Converter={StaticResource BoolToColorConverter}, ConverterParameter='#F44336|#E0E0E0'}"
+                                    CornerRadius="12"
+                                    HasShadow="False">
+                                    <Grid ColumnDefinitions="Auto,*">
+                                        <RadioButton
+                                            Grid.Column="0"
+                                            IsChecked="{Binding Options[1].IsSelected, Mode=TwoWay}"
+                                            VerticalOptions="Center" />
+                                        <VerticalStackLayout
+                                            Grid.Column="1"
+                                            Margin="12,0,0,0"
+                                            HorizontalOptions="Center"
+                                            Spacing="4">
+                                            <Label
+                                                FontSize="24"
+                                                HorizontalOptions="Center"
+                                                Text="✗"
+                                                TextColor="#F44336" />
+                                            <Label
+                                                FontAttributes="Bold"
+                                                FontSize="13"
+                                                HorizontalOptions="Center"
+                                                Text="SAI"
+                                                TextColor="#212121" />
+                                        </VerticalStackLayout>
+                                    </Grid>
+                                    <Frame.GestureRecognizers>
+                                        <TapGestureRecognizer Command="{Binding Options[1].SelectCommand}" />
+                                    </Frame.GestureRecognizers>
+                                </Frame>
+                            </Grid>
+                        </VerticalStackLayout>
+
+                        <!--  Navigation Footer - SỬA ĐỔI  -->
+                        <Grid
+                            Padding="16,12"
+                            BackgroundColor="#F5F5F5"
+                            RowDefinitions="Auto,Auto">
+
+                            <!--  Navigation Buttons Row  -->
+                            <Grid Grid.Row="0" ColumnDefinitions="*,*">
+                                <!--  Previous Button  -->
+                                <Button
+                                    Grid.Column="0"
+                                    Margin="0,0,4,0"
+                                    Padding="12,8"
+                                    BackgroundColor="#E3F2FD"
+                                    BorderColor="#7B1FA2"
+                                    BorderWidth="1"
+                                    Command="{Binding BindingContext.PrevCommand, Source={x:Reference ExamQuestionPageRoot}}"
+                                    CornerRadius="8"
+                                    FontAttributes="Bold"
+                                    FontSize="14"
+                                    IsEnabled="{Binding BindingContext.CanGoPrev, Source={x:Reference ExamQuestionPageRoot}}"
+                                    Text="‹ Câu trước"
+                                    TextColor="#7B1FA2" />
+
+                                <!--  Next Button  -->
+                                <Button
+                                    Grid.Column="1"
+                                    Margin="4,0,0,0"
+                                    Padding="12,8"
+                                    BackgroundColor="#7B1FA2"
+                                    Command="{Binding BindingContext.NextCommand, Source={x:Reference ExamQuestionPageRoot}}"
+                                    CornerRadius="8"
+                                    FontAttributes="Bold"
+                                    FontSize="14"
+                                    IsEnabled="{Binding BindingContext.CanGoNext, Source={x:Reference ExamQuestionPageRoot}}"
+                                    Text="Câu tiếp ›"
+                                    TextColor="White" />
+                            </Grid>
+
+                            <!--  Submit Button Row  -->
+                            <Button
+                                Grid.Row="1"
+                                Margin="0,8,0,0"
+                                Padding="16,12"
+                                BackgroundColor="#4CAF50"
+                                Command="{Binding BindingContext.SubmitExamCommand, Source={x:Reference ExamQuestionPageRoot}}"
+                                CornerRadius="8"
+                                FontAttributes="Bold"
+                                FontSize="16"
+                                IsEnabled="{Binding BindingContext.IsSubmitting, Source={x:Reference ExamQuestionPageRoot}, Converter={StaticResource InverseBooleanConverter}}"
+                                Text="📝 Nộp bài"
+                                TextColor="White" />
+                        </Grid>
+                    </VerticalStackLayout>
+                </Frame>
+            </Grid>
+        </DataTemplate>
+
+        <!--  Fill in the Blank Template  -->
+        <DataTemplate x:Key="FillBlankTemplate">
+            <Grid>
+                <Frame
+                    Padding="0"
+                    BackgroundColor="White"
+                    BorderColor="#E0E0E0"
+                    CornerRadius="12"
+                    HasShadow="True">
+                    <VerticalStackLayout Spacing="0">
+                        <!--  Header Section  -->
+                        <Grid
+                            Padding="20,16"
+                            BackgroundColor="#FF6F00"
+                            RowDefinitions="Auto,Auto">
+
+                            <!--  Question Progress and Timer Row  -->
+                            <Grid Grid.Row="0" ColumnDefinitions="*,Auto,*">
+
+                                <!--  Question Number  -->
+                                <HorizontalStackLayout
+                                    Grid.Column="0"
+                                    HorizontalOptions="Start"
+                                    Spacing="8"
+                                    VerticalOptions="Center">
+                                    <Frame
+                                        Padding="8,4"
+                                        BackgroundColor="White"
+                                        CornerRadius="12"
+                                        HasShadow="False">
+                                        <Label
+                                            FontAttributes="Bold"
+                                            FontSize="14"
+                                            Text="{Binding BindingContext.CurrentIndex, Source={x:Reference ExamQuestionPageRoot}, Converter={StaticResource IndexToDisplayConverter}}"
+                                            TextColor="#FF6F00" />
+                                    </Frame>
+                                    <Label
+                                        FontAttributes="Bold"
+                                        FontSize="14"
+                                        Text="{Binding BindingContext.Questions.Count, Source={x:Reference ExamQuestionPageRoot}, StringFormat='/ {0}'}"
+                                        TextColor="White"
+                                        VerticalOptions="Center" />
+                                </HorizontalStackLayout>
+
+                                <!--  Timer  -->
+                                <Frame
+                                    Grid.Column="1"
+                                    Padding="12,6"
+                                    BackgroundColor="#FF5722"
+                                    CornerRadius="20"
+                                    HasShadow="False">
+                                    <HorizontalStackLayout Spacing="6">
+                                        <Label
+                                            FontFamily="MaterialIcons"
+                                            FontSize="16"
+                                            Text="⏰"
+                                            TextColor="White"
+                                            VerticalOptions="Center" />
+                                        <Label
+                                            FontAttributes="Bold"
+                                            FontSize="16"
+                                            Text="{Binding BindingContext.TimerDisplay, Source={x:Reference ExamQuestionPageRoot}}"
+                                            TextColor="White" />
+                                    </HorizontalStackLayout>
+                                </Frame>
+
+                                <!--  Question Type Badge  -->
+                                <Frame
+                                    Grid.Column="2"
+                                    Padding="8,4"
+                                    BackgroundColor="White"
+                                    CornerRadius="12"
+                                    HasShadow="False"
+                                    HorizontalOptions="End">
+                                    <Label
+                                        FontAttributes="Bold"
+                                        FontSize="14"
+                                        Text="Điền từ"
+                                        TextColor="#FF6F00" />
+                                </Frame>
+                            </Grid>
+
+                            <!--  Progress Bar  -->
+                            <ProgressBar
+                                Grid.Row="1"
+                                Margin="0,12,0,0"
+                                BackgroundColor="#FFB74D"
+                                HeightRequest="6"
+                                Progress="{Binding BindingContext.ProgressValue, Source={x:Reference ExamQuestionPageRoot}}"
+                                ProgressColor="White" />
+                        </Grid>
+
+                        <!--  Question Content  -->
+                        <VerticalStackLayout Padding="24,20" Spacing="20">
+
+                            <!--  Question Text  -->
+                            <Label
+                                FontAttributes="Bold"
+                                FontSize="18"
+                                LineBreakMode="WordWrap"
+                                Text="{Binding QuestionText}"
+                                TextColor="#212121" />
+
+                            <!--  Question Description  -->
+                            <Frame
+                                Padding="0"
+                                BackgroundColor="#FAFAFA"
+                                BorderColor="#E0E0E0"
+                                CornerRadius="8"
+                                HasShadow="False"
+                                IsVisible="{Binding QuestionDescription, Converter={StaticResource StringNotNullOrEmptyConverter}}">
+                                <WebView
+                                    Margin="16"
+                                    HeightRequest="150"
+                                    Source="{Binding QuestionDescription, Converter={StaticResource HtmlWrapperConverter}}"
+                                    VerticalOptions="FillAndExpand">
+                                    <WebView.Behaviors>
+                                        <behaviors:WebViewScrollBehavior />
+                                    </WebView.Behaviors>
+                                </WebView>
+                            </Frame>
+
+                            <!--  Answer Input  -->
+                            <Label
+                                FontAttributes="Bold"
+                                FontSize="16"
+                                Text="Nhập đáp án của bạn:"
+                                TextColor="#424242" />
+
+                            <Frame
+                                Padding="0"
+                                BackgroundColor="#FFF3E0"
+                                BorderColor="{Binding FillBlankBorderColor}"
+                                CornerRadius="12"
+                                HasShadow="False">
+                                <Entry
+                                    Margin="16,12"
+                                    FontSize="18"
+                                    Placeholder="Nhập câu trả lời..."
+                                    PlaceholderColor="#999"
+                                    Text="{Binding UserAnswer, Mode=TwoWay}"
+                                    TextColor="#212121" />
+                            </Frame>
+
+                            <!--  Helper Text  -->
+                            <Label
+                                FontSize="14"
+                                HorizontalTextAlignment="Center"
+                                Text="💡 Vui lòng nhập chính xác từ/cụm từ cần điền"
+                                TextColor="#666" />
+                        </VerticalStackLayout>
+
+                        <!--  Navigation Footer - SỬA ĐỔI  -->
+                        <Grid
+                            Padding="16,12"
+                            BackgroundColor="#F5F5F5"
+                            RowDefinitions="Auto,Auto">
+
+                            <!--  Navigation Buttons Row  -->
+                            <Grid Grid.Row="0" ColumnDefinitions="*,*">
+                                <!--  Previous Button  -->
+                                <Button
+                                    Grid.Column="0"
+                                    Margin="0,0,4,0"
+                                    Padding="12,8"
+                                    BackgroundColor="#E3F2FD"
+                                    BorderColor="#FF6F00"
+                                    BorderWidth="1"
+                                    Command="{Binding BindingContext.PrevCommand, Source={x:Reference ExamQuestionPageRoot}}"
+                                    CornerRadius="8"
+                                    FontAttributes="Bold"
+                                    FontSize="14"
+                                    IsEnabled="{Binding BindingContext.CanGoPrev, Source={x:Reference ExamQuestionPageRoot}}"
+                                    Text="‹ Câu trước"
+                                    TextColor="#FF6F00" />
+
+                                <!--  Next Button  -->
+                                <Button
+                                    Grid.Column="1"
+                                    Margin="4,0,0,0"
+                                    Padding="12,8"
+                                    BackgroundColor="#FF6F00"
+                                    Command="{Binding BindingContext.NextCommand, Source={x:Reference ExamQuestionPageRoot}}"
+                                    CornerRadius="8"
+                                    FontAttributes="Bold"
+                                    FontSize="14"
+                                    IsEnabled="{Binding BindingContext.CanGoNext, Source={x:Reference ExamQuestionPageRoot}}"
+                                    Text="Câu tiếp ›"
+                                    TextColor="White" />
+                            </Grid>
+
+                            <!--  Submit Button Row  -->
+                            <Button
+                                Grid.Row="1"
+                                Margin="0,8,0,0"
+                                Padding="16,12"
+                                BackgroundColor="#4CAF50"
+                                Command="{Binding BindingContext.SubmitExamCommand, Source={x:Reference ExamQuestionPageRoot}}"
+                                CornerRadius="8"
+                                FontAttributes="Bold"
+                                FontSize="16"
+                                IsEnabled="{Binding BindingContext.IsSubmitting, Source={x:Reference ExamQuestionPageRoot}, Converter={StaticResource InverseBooleanConverter}}"
+                                Text="📝 Nộp bài"
+                                TextColor="White" />
+                        </Grid>
+                    </VerticalStackLayout>
+                </Frame>
+            </Grid>
+        </DataTemplate>
+
+        <!--  Audio Template  -->
+        <DataTemplate x:Key="AudioTemplate">
+            <Grid>
+                <Frame
+                    Padding="0"
+                    BackgroundColor="White"
+                    BorderColor="#E0E0E0"
+                    CornerRadius="12"
+                    HasShadow="True">
+                    <VerticalStackLayout Spacing="0">
+                        <!--  Header Section  -->
+                        <Grid
+                            Padding="20,16"
+                            BackgroundColor="#388E3C"
+                            RowDefinitions="Auto,Auto">
+
+                            <!--  Question Progress and Timer Row  -->
+                            <Grid Grid.Row="0" ColumnDefinitions="*,Auto,*">
+
+                                <!--  Question Number  -->
+                                <HorizontalStackLayout
+                                    Grid.Column="0"
+                                    HorizontalOptions="Start"
+                                    Spacing="8"
+                                    VerticalOptions="Center">
+                                    <Frame
+                                        Padding="8,4"
+                                        BackgroundColor="White"
+                                        CornerRadius="12"
+                                        HasShadow="False">
+                                        <Label
+                                            FontAttributes="Bold"
+                                            FontSize="14"
+                                            Text="{Binding BindingContext.CurrentIndex, Source={x:Reference ExamQuestionPageRoot}, Converter={StaticResource IndexToDisplayConverter}}"
+                                            TextColor="#388E3C" />
+                                    </Frame>
+                                    <Label
+                                        FontAttributes="Bold"
+                                        FontSize="14"
+                                        Text="{Binding BindingContext.Questions.Count, Source={x:Reference ExamQuestionPageRoot}, StringFormat='/ {0}'}"
+                                        TextColor="White"
+                                        VerticalOptions="Center" />
+                                </HorizontalStackLayout>
+
+                                <!--  Timer  -->
+                                <Frame
+                                    Grid.Column="1"
+                                    Padding="12,6"
+                                    BackgroundColor="#FF5722"
+                                    CornerRadius="20"
+                                    HasShadow="False">
+                                    <HorizontalStackLayout Spacing="6">
+                                        <Label
+                                            FontFamily="MaterialIcons"
+                                            FontSize="16"
+                                            Text="⏰"
+                                            TextColor="White"
+                                            VerticalOptions="Center" />
+                                        <Label
+                                            FontAttributes="Bold"
+                                            FontSize="16"
+                                            Text="{Binding BindingContext.TimerDisplay, Source={x:Reference ExamQuestionPageRoot}}"
+                                            TextColor="White" />
+                                    </HorizontalStackLayout>
+                                </Frame>
+
+                                <!--  Question Type Badge  -->
+                                <Frame
+                                    Grid.Column="2"
+                                    Padding="8,4"
+                                    BackgroundColor="White"
+                                    CornerRadius="12"
+                                    HasShadow="False"
+                                    HorizontalOptions="End">
+                                    <Label
+                                        FontAttributes="Bold"
+                                        FontSize="14"
+                                        Text="🎧 Nghe"
+                                        TextColor="#388E3C" />
+                                </Frame>
+                            </Grid>
+
+                            <!--  Progress Bar  -->
+                            <ProgressBar
+                                Grid.Row="1"
+                                Margin="0,12,0,0"
+                                BackgroundColor="#81C784"
+                                HeightRequest="6"
+                                Progress="{Binding BindingContext.ProgressValue, Source={x:Reference ExamQuestionPageRoot}}"
+                                ProgressColor="White" />
+                        </Grid>
+
+                        <!--  Question Content  -->
+                        <VerticalStackLayout Padding="24,20" Spacing="20">
+
+                            <!--  Question Text  -->
+                            <Label
+                                FontAttributes="Bold"
+                                FontSize="18"
+                                LineBreakMode="WordWrap"
+                                Text="{Binding QuestionText}"
+                                TextColor="#212121" />
+
+                            <!--  Question Description  -->
+                            <Frame
+                                Padding="0"
+                                BackgroundColor="#FAFAFA"
+                                BorderColor="#E0E0E0"
+                                CornerRadius="8"
+                                HasShadow="False"
+                                IsVisible="{Binding QuestionDescription, Converter={StaticResource StringNotNullOrEmptyConverter}}">
+                                <WebView
+                                    Margin="16"
+                                    HeightRequest="150"
+                                    Source="{Binding QuestionDescription, Converter={StaticResource HtmlWrapperConverter}}"
+                                    VerticalOptions="FillAndExpand">
+                                    <WebView.Behaviors>
+                                        <behaviors:WebViewScrollBehavior />
+                                    </WebView.Behaviors>
+                                </WebView>
+                            </Frame>
+
+                            <!--  Audio Blanks  -->
+                            <Label
+                                FontAttributes="Bold"
+                                FontSize="16"
+                                Text="Điền các từ bạn nghe được:"
+                                TextColor="#424242" />
+
+                            <CollectionView ItemsSource="{Binding Blanks}">
+                                <CollectionView.ItemTemplate>
+                                    <DataTemplate>
+                                        <Grid Margin="0,8">
+                                            <Frame
+                                                Padding="16,12"
+                                                BackgroundColor="#E8F5E8"
+                                                BorderColor="{Binding BorderColor}"
+                                                CornerRadius="12"
+                                                HasShadow="False">
+                                                <Entry
+                                                    FontSize="16"
+                                                    Placeholder="Nhập từ nghe được..."
+                                                    PlaceholderColor="#999"
+                                                    Text="{Binding UserText, Mode=TwoWay}"
+                                                    TextColor="#212121" />
+                                            </Frame>
+                                        </Grid>
+                                    </DataTemplate>
+                                </CollectionView.ItemTemplate>
+                            </CollectionView>
+
+                            <!--  Helper Text  -->
+                            <Label
+                                FontSize="14"
+                                HorizontalTextAlignment="Center"
+                                Text="🎧 Nghe kỹ và điền chính xác các từ bạn nghe được"
+                                TextColor="#666" />
+                        </VerticalStackLayout>
+
+                        <!--  Navigation Footer - SỬA ĐỔI  -->
+                        <Grid
+                            Padding="16,12"
+                            BackgroundColor="#F5F5F5"
+                            RowDefinitions="Auto,Auto">
+
+                            <!--  Navigation Buttons Row  -->
+                            <Grid Grid.Row="0" ColumnDefinitions="*,*">
+                                <!--  Previous Button  -->
+                                <Button
+                                    Grid.Column="0"
+                                    Margin="0,0,4,0"
+                                    Padding="12,8"
+                                    BackgroundColor="#E3F2FD"
+                                    BorderColor="#388E3C"
+                                    BorderWidth="1"
+                                    Command="{Binding BindingContext.PrevCommand, Source={x:Reference ExamQuestionPageRoot}}"
+                                    CornerRadius="8"
+                                    FontAttributes="Bold"
+                                    FontSize="14"
+                                    IsEnabled="{Binding BindingContext.CanGoPrev, Source={x:Reference ExamQuestionPageRoot}}"
+                                    Text="‹ Câu trước"
+                                    TextColor="#388E3C" />
+
+                                <!--  Next Button  -->
+                                <Button
+                                    Grid.Column="1"
+                                    Margin="4,0,0,0"
+                                    Padding="12,8"
+                                    BackgroundColor="#388E3C"
+                                    Command="{Binding BindingContext.NextCommand, Source={x:Reference ExamQuestionPageRoot}}"
+                                    CornerRadius="8"
+                                    FontAttributes="Bold"
+                                    FontSize="14"
+                                    IsEnabled="{Binding BindingContext.CanGoNext, Source={x:Reference ExamQuestionPageRoot}}"
+                                    Text="Câu tiếp ›"
+                                    TextColor="White" />
+                            </Grid>
+
+                            <!--  Submit Button Row  -->
+                            <Button
+                                Grid.Row="1"
+                                Margin="0,8,0,0"
+                                Padding="16,12"
+                                BackgroundColor="#4CAF50"
+                                Command="{Binding BindingContext.SubmitExamCommand, Source={x:Reference ExamQuestionPageRoot}}"
+                                CornerRadius="8"
+                                FontAttributes="Bold"
+                                FontSize="16"
+                                IsEnabled="{Binding BindingContext.IsSubmitting, Source={x:Reference ExamQuestionPageRoot}, Converter={StaticResource InverseBooleanConverter}}"
+                                Text="📝 Nộp bài"
+                                TextColor="White" />
+                        </Grid>
+                    </VerticalStackLayout>
+                </Frame>
+            </Grid>
+        </DataTemplate>
+
+        <!--  Selector  -->
+        <sel:QuestionTemplateSelector
+            x:Key="QuestionSelector"
+            AudioTemplate="{StaticResource AudioTemplate}"
+            FillBlankTemplate="{StaticResource FillBlankTemplate}"
+            MCQTemplate="{StaticResource MCQTemplate}"
+            TrueFalseTemplate="{StaticResource TFTemplate}" />
+    </ContentPage.Resources>
+
+    <Grid>
+        <ScrollView>
+            <VerticalStackLayout
+                Padding="16"
+                BindableLayout.ItemTemplateSelector="{StaticResource QuestionSelector}"
+                BindableLayout.ItemsSource="{Binding CurrentQuestionCollection}"
+                Spacing="0" />
+        </ScrollView>
+
+        <!--  Loading Overlay  -->
+        <Grid BackgroundColor="#80000000" IsVisible="{Binding IsSubmitting}">
+            <Frame
+                Padding="24"
+                BackgroundColor="White"
+                CornerRadius="12"
+                HorizontalOptions="Center"
+                VerticalOptions="Center">
+                <VerticalStackLayout Spacing="16">
+                    <ActivityIndicator
+                        HeightRequest="32"
+                        HorizontalOptions="Center"
+                        IsRunning="{Binding IsSubmitting}"
+                        VerticalOptions="Center"
+                        WidthRequest="32" />
+                    <Label
+                        FontAttributes="Bold"
+                        FontSize="16"
+                        HorizontalOptions="Center"
+                        Text="Đang nộp bài..."
+                        TextColor="#666" />
+                </VerticalStackLayout>
+            </Frame>
+        </Grid>
+    </Grid>
+</ContentPage>

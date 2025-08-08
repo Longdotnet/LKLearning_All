@@ -1,0 +1,492 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    x:Class="mauiluanvantotnghiep.Views.LessonPage.LessonPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:vm="clr-namespace:mauiluanvantotnghiep.ViewModels"
+    xmlns:converters="clr-namespace:mauiluanvantotnghiep.Converters"
+    x:Name="lessonPage"
+    Title="Trở về "
+    BackgroundColor="#EBD6FB"
+    Shell.BackgroundColor="#EBD6FB">
+
+
+
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <converters:InverseBooleanConverter x:Key="InvertedBoolConverter" />
+        </ResourceDictionary>
+    </ContentPage.Resources>
+
+    <AbsoluteLayout BackgroundColor="#EBD6FB">
+
+        <!--  Main content (Grid, CollectionView, etc.)  -->
+        <Grid
+            AbsoluteLayout.LayoutBounds="0,0,1,1"
+            AbsoluteLayout.LayoutFlags="All"
+            ColumnDefinitions="*"
+            RowDefinitions="Auto,*">
+
+            <Frame
+                Grid.Column="0"
+                Padding="0"
+                CornerRadius="150"
+                HeightRequest="150"
+                WidthRequest="150">
+                <Image Aspect="AspectFill" Source="bglesson2.png" />
+            </Frame>
+
+            <!--  Hàng 0: GIF  -->
+            <Image
+                Grid.Row="0"
+                Margin="0,-10,0,0"
+                Aspect="AspectFit"
+                HeightRequest="110"
+                HorizontalOptions="Center"
+                IsAnimationPlaying="True"
+                Source="lessongif.gif" />
+
+            <!--  Hàng 1: ScrollView chứa tất cả content  -->
+            <ScrollView Grid.Row="1" Margin="0,0,0,100">
+                <StackLayout Spacing="10">
+
+                    <!--  Exam History Section  -->
+                    <Frame
+                        Margin="8,0"
+                        Padding="0"
+                        BackgroundColor="White"
+                        CornerRadius="16"
+                        HasShadow="True"
+                        IsVisible="{Binding HasExamHistory}">
+
+                        <StackLayout>
+                            <!--  Header  -->
+                            <Grid Padding="16,12" BackgroundColor="#F8F9FA">
+                                <Grid.GestureRecognizers>
+                                    <TapGestureRecognizer Command="{Binding ToggleExamHistoryCommand}" />
+                                </Grid.GestureRecognizers>
+
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+
+                                <!--  History Icon với background  -->
+                                <Frame
+                                    Grid.Column="0"
+                                    Padding="6"
+                                    BackgroundColor="#E3F2FD"
+                                    BorderColor="#2196F3"
+                                    CornerRadius="15"
+                                    HasShadow="False"
+                                    HeightRequest="30"
+                                    WidthRequest="30">
+                                    <Image
+                                        HeightRequest="18"
+                                        Source="https://img.icons8.com/parakeet/48/activity-history.png"
+                                        VerticalOptions="Center"
+                                        WidthRequest="18" />
+                                </Frame>
+
+                                <Label
+                                    Grid.Column="1"
+                                    Margin="12,0,0,0"
+                                    FontAttributes="Bold"
+                                    FontSize="16"
+                                    Text="Lịch sử bài thi"
+                                    TextColor="#333"
+                                    VerticalOptions="Center" />
+
+                                <!--  Expand/Collapse Icon đơn giản  -->
+                                <Label
+                                    Grid.Column="2"
+                                    FontAttributes="Bold"
+                                    FontSize="18"
+                                    TextColor="#666"
+                                    VerticalOptions="Center">
+                                    <Label.Triggers>
+                                        <DataTrigger
+                                            Binding="{Binding IsExamHistoryExpanded}"
+                                            TargetType="Label"
+                                            Value="True">
+                                            <Setter Property="Text" Value="▲" />
+                                        </DataTrigger>
+                                        <DataTrigger
+                                            Binding="{Binding IsExamHistoryExpanded}"
+                                            TargetType="Label"
+                                            Value="False">
+                                            <Setter Property="Text" Value="▼" />
+                                        </DataTrigger>
+                                    </Label.Triggers>
+                                </Label>
+                            </Grid>
+
+                            <!--  Content (Expandable)  -->
+                            <StackLayout Padding="16,0,16,16" IsVisible="{Binding IsExamHistoryExpanded}">
+                                <CollectionView ItemsSource="{Binding ExamHistories}" SelectionMode="None">
+                                    <CollectionView.ItemTemplate>
+                                        <DataTemplate>
+                                            <Frame
+                                                Margin="0,4"
+                                                Padding="12"
+                                                BackgroundColor="#FAFAFA"
+                                                BorderColor="#E0E0E0"
+                                                CornerRadius="12"
+                                                HasShadow="False">
+
+                                                <Grid ColumnDefinitions="Auto,*,Auto,Auto" RowSpacing="0">
+
+                                                    <!--  Status Icon với background và border  -->
+                                                    <Frame
+                                                        Grid.Column="0"
+                                                        Padding="8"
+                                                        CornerRadius="20"
+                                                        HasShadow="True"
+                                                        HeightRequest="40"
+                                                        WidthRequest="40">
+
+                                                        <!--  Background color based on status  -->
+                                                        <Frame.Triggers>
+                                                            <DataTrigger
+                                                                Binding="{Binding IsPassed}"
+                                                                TargetType="Frame"
+                                                                Value="True">
+                                                                <Setter Property="BackgroundColor" Value="#E8F5E8" />
+                                                                <Setter Property="BorderColor" Value="#4CAF50" />
+                                                            </DataTrigger>
+                                                            <DataTrigger
+                                                                Binding="{Binding IsPassed}"
+                                                                TargetType="Frame"
+                                                                Value="False">
+                                                                <Setter Property="BackgroundColor" Value="#FFEBEE" />
+                                                                <Setter Property="BorderColor" Value="#F44336" />
+                                                            </DataTrigger>
+                                                            <DataTrigger
+                                                                Binding="{Binding IsPassed}"
+                                                                TargetType="Frame"
+                                                                Value="{x:Null}">
+                                                                <Setter Property="BackgroundColor" Value="#FFF8E1" />
+                                                                <Setter Property="BorderColor" Value="#FF9800" />
+                                                            </DataTrigger>
+                                                        </Frame.Triggers>
+
+                                                        <Image
+                                                            Aspect="AspectFit"
+                                                            HeightRequest="20"
+                                                            Source="{Binding StatusIcon}"
+                                                            WidthRequest="20" />
+                                                    </Frame>
+
+                                                    <!--  Info  -->
+                                                    <StackLayout
+                                                        Grid.Column="1"
+                                                        Margin="12,0"
+                                                        Spacing="2"
+                                                        VerticalOptions="Center">
+                                                        <Label
+                                                            FontAttributes="Bold"
+                                                            FontSize="14"
+                                                            Text="{Binding StatusText}"
+                                                            TextColor="#333" />
+                                                        <Label
+                                                            FontSize="12"
+                                                            Text="{Binding DateText}"
+                                                            TextColor="#666" />
+                                                    </StackLayout>
+
+                                                    <!--  Score với background  -->
+                                                    <Frame
+                                                        Grid.Column="2"
+                                                        Padding="8,4"
+                                                        BackgroundColor="#F5F5F5"
+                                                        BorderColor="#BDBDBD"
+                                                        CornerRadius="8"
+                                                        HasShadow="False"
+                                                        VerticalOptions="Center">
+                                                        <StackLayout Spacing="2">
+                                                            <Label
+                                                                FontAttributes="Bold"
+                                                                FontSize="16"
+                                                                HorizontalOptions="Center"
+                                                                Text="{Binding ScoreText}"
+                                                                TextColor="#333" />
+                                                            <Label
+                                                                FontSize="10"
+                                                                HorizontalOptions="Center"
+                                                                Text="điểm"
+                                                                TextColor="#999" />
+                                                        </StackLayout>
+                                                    </Frame>
+
+                                                    <!--  Duration với background  -->
+                                                    <Frame
+                                                        Grid.Column="3"
+                                                        Margin="8,0,0,0"
+                                                        Padding="8,4"
+                                                        BackgroundColor="#F5F5F5"
+                                                        BorderColor="#BDBDBD"
+                                                        CornerRadius="8"
+                                                        HasShadow="False"
+                                                        VerticalOptions="Center">
+                                                        <StackLayout Spacing="2">
+                                                            <Label
+                                                                FontAttributes="Bold"
+                                                                FontSize="14"
+                                                                HorizontalOptions="Center"
+                                                                Text="{Binding DurationText}"
+                                                                TextColor="#333" />
+                                                            <Label
+                                                                FontSize="10"
+                                                                HorizontalOptions="Center"
+                                                                Text="thời gian"
+                                                                TextColor="#999" />
+                                                        </StackLayout>
+                                                    </Frame>
+                                                </Grid>
+                                            </Frame>
+                                        </DataTemplate>
+                                    </CollectionView.ItemTemplate>
+                                </CollectionView>
+                            </StackLayout>
+                        </StackLayout>
+                    </Frame>
+
+                    <!--  Lessons CollectionView  -->
+                    <CollectionView ItemsSource="{Binding Lessons}" SelectionMode="None">
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate>
+                                <Frame
+                                    Margin="8,2"
+                                    Padding="6"
+                                    BackgroundColor="{Binding RowColor}"
+                                    CornerRadius="14"
+                                    HasShadow="True">
+
+                                    <Frame.GestureRecognizers>
+                                        <TapGestureRecognizer Command="{Binding BindingContext.SelectLessonCommand, Source={x:Reference lessonPage}}" CommandParameter="{Binding LessonId}" />
+                                    </Frame.GestureRecognizers>
+
+                                    <Grid>
+                                        <VerticalStackLayout Spacing="4">
+                                            <Label
+                                                FontAttributes="Bold"
+                                                FontSize="15"
+                                                HorizontalOptions="Start"
+                                                Text="{Binding OrderNo, StringFormat='Bài {0}'}"
+                                                TextColor="Black" />
+                                            <Label
+                                                FontAttributes="Bold,Italic"
+                                                FontSize="17"
+                                                Text="{Binding LessonTitle}"
+                                                TextColor="#333333"
+                                                TextDecorations="Underline" />
+                                            <Label
+                                                Padding="3"
+                                                FontSize="13"
+                                                Text="{Binding LessonContent}"
+                                                TextColor="Black"
+                                                VerticalTextAlignment="Start" />
+
+                                            <HorizontalStackLayout Spacing="4">
+                                                <Label
+                                                    Margin="0"
+                                                    FontSize="13"
+                                                    Text="{Binding StatusText, StringFormat='Trạng thái: {0}'}"
+                                                    TextColor="DarkBlue"
+                                                    VerticalOptions="Start" />
+
+                                                <!--  Failed Icon với background  -->
+                                                <Frame
+                                                    Padding="4"
+                                                    BackgroundColor="#FFEBEE"
+                                                    BorderColor="#F44336"
+                                                    CornerRadius="9"
+                                                    HasShadow="False"
+                                                    HeightRequest="18"
+                                                    IsVisible="False"
+                                                    WidthRequest="18">
+                                                    <Frame.Triggers>
+                                                        <DataTrigger
+                                                            Binding="{Binding StatusText}"
+                                                            TargetType="Frame"
+                                                            Value="Failed">
+                                                            <Setter Property="IsVisible" Value="True" />
+                                                        </DataTrigger>
+                                                    </Frame.Triggers>
+                                                    <Image
+                                                        HeightRequest="10"
+                                                        Source="failed.png"
+                                                        WidthRequest="10" />
+                                                </Frame>
+
+                                                <!--  Complete Icon với background  -->
+                                                <Frame
+                                                    Padding="4"
+                                                    BackgroundColor="#E8F5E8"
+                                                    BorderColor="#4CAF50"
+                                                    CornerRadius="10"
+                                                    HasShadow="False"
+                                                    HeightRequest="20"
+                                                    IsVisible="False"
+                                                    WidthRequest="20">
+                                                    <Frame.Triggers>
+                                                        <DataTrigger
+                                                            Binding="{Binding StatusText}"
+                                                            TargetType="Frame"
+                                                            Value="Completed">
+                                                            <Setter Property="IsVisible" Value="True" />
+                                                        </DataTrigger>
+                                                    </Frame.Triggers>
+                                                    <Image
+                                                        HeightRequest="12"
+                                                        Source="tick.png"
+                                                        WidthRequest="12" />
+                                                </Frame>
+                                            </HorizontalStackLayout>
+                                        </VerticalStackLayout>
+
+                                        <!--  Icon góc trên bên phải với background  -->
+                                        <Frame
+                                            Padding="6"
+                                            BackgroundColor="#E3F2FD"
+                                            BorderColor="#2196F3"
+                                            CornerRadius="16"
+                                            HasShadow="False"
+                                            HeightRequest="32"
+                                            HorizontalOptions="End"
+                                            VerticalOptions="Start"
+                                            WidthRequest="32">
+                                            <Frame.GestureRecognizers>
+                                                <TapGestureRecognizer Command="{Binding Source={x:Reference lessonPage}, Path=BindingContext.NavigateToReportCommand}" CommandParameter="{Binding .}" />
+                                            </Frame.GestureRecognizers>
+                                            <Image
+                                                HeightRequest="20"
+                                                Source="feedback.png"
+                                                WidthRequest="20" />
+                                        </Frame>
+                                    </Grid>
+                                </Frame>
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+                    </CollectionView>
+                </StackLayout>
+            </ScrollView>
+        </Grid>
+
+        <!--  Floating Final Test - Updated với 2 trạng thái  -->
+        <!--  Trạng thái chưa vượt qua  -->
+        <Frame
+            Margin="0,0,0,10"
+            Padding="0"
+            AbsoluteLayout.LayoutBounds="0.5,1,0.9,-1"
+            AbsoluteLayout.LayoutFlags="PositionProportional,WidthProportional"
+            BackgroundColor="#FFF8DC"
+            BorderColor="#FFD700"
+            CornerRadius="18"
+            HasShadow="True"
+            IsVisible="{Binding HasPassed, Converter={StaticResource InvertedBoolConverter}}">
+            <Grid
+                Padding="10"
+                BackgroundColor="Transparent"
+                ColumnDefinitions="Auto,*,Auto"
+                VerticalOptions="Center">
+                <Image
+                    Grid.Column="0"
+                    Margin="0,0,8,0"
+                    HeightRequest="32"
+                    IsAnimationPlaying="True"
+                    Source="certificateicon.gif"
+                    VerticalOptions="Center"
+                    WidthRequest="32" />
+                <VerticalStackLayout
+                    Grid.Column="1"
+                    Spacing="2"
+                    VerticalOptions="Center">
+                    <Label
+                        FontAttributes="Bold"
+                        FontSize="15"
+                        Text="Bài Kiểm Tra Cuối Khóa"
+                        TextColor="#B8860B" />
+                    <Label
+                        Padding="3,0,5,0"
+                        FontSize="12"
+                        Text="Hoàn thành bài kiểm tra cuối khóa để kết thúc khóa học này."
+                        TextColor="#7A5C00" />
+                </VerticalStackLayout>
+                <Button
+                    Grid.Column="2"
+                    Padding="10,0"
+                    BackgroundColor="#FFD700"
+                    Command="{Binding GoToFinalTestCommand}"
+                    CornerRadius="10"
+                    FontAttributes="Bold"
+                    HorizontalOptions="End"
+                    Text="Bắt Đầu"
+                    TextColor="#333"
+                    VerticalOptions="Center" />
+            </Grid>
+        </Frame>
+
+        <!--  Trạng thái đã vượt qua  -->
+        <Frame
+            Margin="0,0,0,10"
+            Padding="0"
+            AbsoluteLayout.LayoutBounds="0.5,1,0.9,-1"
+            AbsoluteLayout.LayoutFlags="PositionProportional,WidthProportional"
+            BackgroundColor="#E8F5E8"
+            BorderColor="#4CAF50"
+            CornerRadius="18"
+            HasShadow="True"
+            IsVisible="{Binding HasPassed}">
+            <Grid
+                Padding="10"
+                BackgroundColor="Transparent"
+                ColumnDefinitions="Auto,*,Auto"
+                VerticalOptions="Center">
+                <Frame
+                    Grid.Column="0"
+                    Margin="0,0,8,0"
+                    Padding="6"
+                    BackgroundColor="#4CAF50"
+                    CornerRadius="16"
+                    HasShadow="False"
+                    HeightRequest="32"
+                    VerticalOptions="Center"
+                    WidthRequest="32">
+                    <Label
+                        FontSize="16"
+                        HorizontalOptions="Center"
+                        Text="🏆"
+                        VerticalOptions="Center" />
+                </Frame>
+                <VerticalStackLayout
+                    Grid.Column="1"
+                    Spacing="2"
+                    VerticalOptions="Center">
+                    <Label
+                        FontAttributes="Bold"
+                        FontSize="15"
+                        Text="🎉 Chúc mừng! Bạn đã hoàn thành khóa học"
+                        TextColor="#2E7D32" />
+                    <Label
+                        Padding="3,0,5,0"
+                        FontSize="12"
+                        Text="{Binding CertificateStatusText}"
+                        TextColor="#4CAF50" />
+                </VerticalStackLayout>
+                <Button
+                    Grid.Column="2"
+                    Padding="10,0"
+                    BackgroundColor="#4CAF50"
+                    Command="{Binding ViewCertificateCommand}"
+                    CornerRadius="10"
+                    FontAttributes="Bold"
+                    HorizontalOptions="End"
+                    Text="Xem Chứng Chỉ"
+                    TextColor="White"
+                    VerticalOptions="Center" />
+            </Grid>
+        </Frame>
+    </AbsoluteLayout>
+</ContentPage>

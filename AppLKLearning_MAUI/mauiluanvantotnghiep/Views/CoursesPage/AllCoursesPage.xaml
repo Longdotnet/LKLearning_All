@@ -1,0 +1,327 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    x:Class="mauiluanvantotnghiep.Views.CoursesPage.AllCoursesPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    x:Name="ParentAllPage"
+    Title="{Binding PageTitle}"
+    BackgroundColor="#F8F6FF">
+
+    <Grid>
+        <!--  Background gradient  -->
+        <Rectangle>
+            <Rectangle.Fill>
+                <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                    <GradientStop Offset="0" Color="#F8F6FF" />
+                    <GradientStop Offset="0.3" Color="#F1F3F4" />
+                    <GradientStop Offset="1" Color="#E8E0FF" />
+                </LinearGradientBrush>
+            </Rectangle.Fill>
+        </Rectangle>
+
+        <RefreshView
+            Command="{Binding RefreshCommand}"
+            IsRefreshing="{Binding IsRefreshing}"
+            RefreshColor="#9C88FF">
+
+            <ScrollView>
+                <VerticalStackLayout Padding="15" Spacing="15">
+
+                    <!--  Header Section  -->
+                    <Border
+                        Padding="20,15"
+                        BackgroundColor="White"
+                        StrokeShape="{RoundRectangle CornerRadius='15'}"
+                        StrokeThickness="0">
+                        <Border.Shadow>
+                            <Shadow
+                                Brush="#9C88FF"
+                                Opacity="0.15"
+                                Radius="10"
+                                Offset="0,3" />
+                        </Border.Shadow>
+
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+
+                            <!--  Package Icon  -->
+                            <Border
+                                Grid.Column="0"
+                                Padding="10"
+                                BackgroundColor="#F8F6FF"
+                                StrokeShape="{RoundRectangle CornerRadius='12'}"
+                                StrokeThickness="0">
+                                <Label FontSize="24" Text="📚" />
+                            </Border>
+
+                            <!--  Package Info  -->
+                            <StackLayout
+                                Grid.Column="1"
+                                Margin="15,0"
+                                VerticalOptions="Center">
+                                <Label
+                                    FontAttributes="Bold"
+                                    FontSize="18"
+                                    LineBreakMode="TailTruncation"
+                                    Text="{Binding PackageName}"
+                                    TextColor="#6B46C1" />
+                                <Label
+                                    FontSize="14"
+                                    Text="{Binding CourseCountText}"
+                                    TextColor="#8B5CF6" />
+                            </StackLayout>
+
+                            <!--  Back Button  -->
+                            <Border
+                                Grid.Column="2"
+                                Padding="8"
+                                BackgroundColor="#F8F6FF"
+                                StrokeShape="{RoundRectangle CornerRadius='10'}"
+                                StrokeThickness="0">
+                                <Border.GestureRecognizers>
+                                    <TapGestureRecognizer Tapped="OnBackTapped" />
+                                </Border.GestureRecognizers>
+                                <Label
+                                    FontSize="16"
+                                    Text="←"
+                                    TextColor="#6B46C1" />
+                            </Border>
+                        </Grid>
+                    </Border>
+
+                    <!--  Search Section  -->
+                    <Border
+                        Padding="15,12"
+                        BackgroundColor="White"
+                        StrokeShape="{RoundRectangle CornerRadius='20'}"
+                        StrokeThickness="0">
+                        <Border.Shadow>
+                            <Shadow
+                                Brush="#9C88FF"
+                                Opacity="0.1"
+                                Radius="8"
+                                Offset="0,2" />
+                        </Border.Shadow>
+
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+
+                            <Label
+                                Grid.Column="0"
+                                FontSize="16"
+                                Text="🔍"
+                                VerticalOptions="Center" />
+
+                            <Entry
+                                Grid.Column="1"
+                                Margin="10,0"
+                                BackgroundColor="Transparent"
+                                FontSize="14"
+                                Placeholder="Tìm kiếm khóa học..."
+                                PlaceholderColor="#999"
+                                Text="{Binding SearchText, Mode=TwoWay}"
+                                TextColor="#333" />
+
+                            <!--  Clear Search Button - SỬ DỤNG CONVERTER ĐÃ ĐĂNG KÝ  -->
+                            <Button
+                                Grid.Column="2"
+                                Padding="8"
+                                BackgroundColor="Transparent"
+                                Command="{Binding ClearSearchCommand}"
+                                FontSize="14"
+                                IsVisible="{Binding SearchText}"
+                                Text="✕"
+                                TextColor="#999" />
+
+                            <!--  Search Button  -->
+                            <Button
+                                Grid.Column="3"
+                                Padding="12,8"
+                                BackgroundColor="#9C88FF"
+                                Command="{Binding SearchCommand}"
+                                CornerRadius="15"
+                                FontAttributes="Bold"
+                                FontSize="12"
+                                Text="Tìm"
+                                TextColor="White" />
+                        </Grid>
+                    </Border>
+
+                    <!--  Loading Indicator  -->
+                    <ActivityIndicator
+                        HeightRequest="50"
+                        IsRunning="{Binding IsLoading}"
+                        IsVisible="{Binding IsLoading}"
+                        Color="#9C88FF" />
+
+                    <!--  Error State  -->
+                    <StackLayout
+                        Padding="20"
+                        HorizontalOptions="Center"
+                        IsVisible="{Binding HasError}"
+                        Spacing="15">
+                        <Label
+                            FontSize="50"
+                            HorizontalOptions="Center"
+                            Text="⚠️" />
+                        <Label
+                            FontAttributes="Bold"
+                            FontSize="16"
+                            HorizontalOptions="Center"
+                            Text="Có lỗi xảy ra"
+                            TextColor="#E53E3E" />
+                        <Label
+                            FontSize="14"
+                            HorizontalOptions="Center"
+                            HorizontalTextAlignment="Center"
+                            Text="{Binding ErrorMessage}"
+                            TextColor="#666" />
+                        <Button
+                            BackgroundColor="#9C88FF"
+                            Command="{Binding RefreshCommand}"
+                            CornerRadius="20"
+                            Text="Thử lại"
+                            TextColor="White" />
+                    </StackLayout>
+
+                    <!--  Empty State  -->
+                    <StackLayout
+                        Padding="40"
+                        HorizontalOptions="Center"
+                        IsVisible="{Binding ShowEmptyState}"
+                        Spacing="20">
+                        <Label
+                            FontSize="60"
+                            HorizontalOptions="Center"
+                            Text="📚" />
+                        <Label
+                            FontAttributes="Bold"
+                            FontSize="18"
+                            HorizontalOptions="Center"
+                            Text="Không tìm thấy khóa học"
+                            TextColor="#6B46C1" />
+                        <Label
+                            FontSize="14"
+                            HorizontalOptions="Center"
+                            HorizontalTextAlignment="Center"
+                            Text="Hãy thử từ khóa khác hoặc kiểm tra lại kết nối."
+                            TextColor="#8B5CF6" />
+                    </StackLayout>
+
+                    <!--  Courses Grid  -->
+                    <CollectionView
+                        IsVisible="{Binding HasCourses}"
+                        ItemsLayout="VerticalGrid,2"
+                        ItemsSource="{Binding Courses}"
+                        SelectionMode="None">
+
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate>
+                                <Border
+                                    Margin="8"
+                                    BackgroundColor="White"
+                                    StrokeShape="{RoundRectangle CornerRadius='15'}"
+                                    StrokeThickness="0">
+                                    <Border.Shadow>
+                                        <Shadow
+                                            Brush="#9C88FF"
+                                            Opacity="0.12"
+                                            Radius="10"
+                                            Offset="0,4" />
+                                    </Border.Shadow>
+
+                                    <Border.GestureRecognizers>
+                                        <TapGestureRecognizer Command="{Binding BindingContext.CourseSelectedCommand, Source={x:Reference ParentAllPage}}" CommandParameter="{Binding CourseId}" />
+                                    </Border.GestureRecognizers>
+
+                                    <Grid HeightRequest="280">
+                                        <!--  Course Image  -->
+                                        <Border StrokeShape="{RoundRectangle CornerRadius='15'}" StrokeThickness="0">
+                                            <Image
+                                                Aspect="AspectFill"
+                                                BackgroundColor="#F5F5F5"
+                                                Source="{Binding UrlImage, TargetNullValue='brokenimg.png'}" />
+                                        </Border>
+
+                                        <!--  Gradient Overlay  -->
+                                        <Border
+                                            HeightRequest="100"
+                                            StrokeShape="{RoundRectangle CornerRadius='0,0,15,15'}"
+                                            StrokeThickness="0"
+                                            VerticalOptions="End">
+                                            <Border.Background>
+                                                <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                                                    <GradientStop Offset="0" Color="Transparent" />
+                                                    <GradientStop Offset="0.4" Color="#40000000" />
+                                                    <GradientStop Offset="1" Color="#90000000" />
+                                                </LinearGradientBrush>
+                                            </Border.Background>
+                                        </Border>
+
+                                        <!--  Course Info  -->
+                                        <StackLayout
+                                            Padding="12"
+                                            Spacing="4"
+                                            VerticalOptions="End">
+                                            <Label
+                                                FontAttributes="Bold"
+                                                FontSize="14"
+                                                LineBreakMode="TailTruncation"
+                                                MaxLines="2"
+                                                Text="{Binding CourseName}"
+                                                TextColor="White" />
+
+                                            <!--  Duration Badge  -->
+                                            <Border
+                                                Padding="6,2"
+                                                BackgroundColor="#9C88FF"
+                                                HorizontalOptions="Start"
+                                                StrokeShape="{RoundRectangle CornerRadius='8'}"
+                                                StrokeThickness="0">
+                                                <Label
+                                                    FontSize="10"
+                                                    Text="{Binding DurationInMonths, StringFormat='{0} tháng'}"
+                                                    TextColor="White" />
+                                            </Border>
+                                        </StackLayout>
+
+                                        <!--  Play Icon  -->
+                                        <Border
+                                            Padding="10"
+                                            BackgroundColor="#90FFFFFF"
+                                            HorizontalOptions="Center"
+                                            StrokeShape="{RoundRectangle CornerRadius='20'}"
+                                            StrokeThickness="0"
+                                            VerticalOptions="Center">
+                                            <Border.Shadow>
+                                                <Shadow
+                                                    Brush="Black"
+                                                    Opacity="0.2"
+                                                    Radius="5"
+                                                    Offset="0,2" />
+                                            </Border.Shadow>
+                                            <Label
+                                                FontSize="20"
+                                                Text="▶"
+                                                TextColor="#6B46C1" />
+                                        </Border>
+                                    </Grid>
+                                </Border>
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+                    </CollectionView>
+
+                </VerticalStackLayout>
+            </ScrollView>
+        </RefreshView>
+    </Grid>
+</ContentPage>

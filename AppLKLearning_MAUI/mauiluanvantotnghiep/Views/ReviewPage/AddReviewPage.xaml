@@ -1,0 +1,277 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    x:Class="mauiluanvantotnghiep.Views.ReviewPage.AddReviewPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:vm="clr-namespace:mauiluanvantotnghiep.ViewModels"
+    Title="Thêm đánh giá"
+    BackgroundColor="#F5F7FA">
+
+    <ContentPage.BindingContext>
+        <vm:AddReviewPageViewModel />
+    </ContentPage.BindingContext>
+
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <!--  Modern Card Style  -->
+            <Style x:Key="CardStyle" TargetType="Frame">
+                <Setter Property="BackgroundColor" Value="White" />
+                <Setter Property="CornerRadius" Value="20" />
+                <Setter Property="HasShadow" Value="True" />
+                <Setter Property="Padding" Value="0" />
+                <Setter Property="BorderColor" Value="#F1F5F9" />
+            </Style>
+
+            <!--  Section Title Style  -->
+            <Style x:Key="SectionTitleStyle" TargetType="Label">
+                <Setter Property="FontAttributes" Value="Bold" />
+                <Setter Property="FontSize" Value="18" />
+                <Setter Property="TextColor" Value="#1E293B" />
+                <Setter Property="Margin" Value="0,0,0,16" />
+            </Style>
+
+            <!--  Star Button Style  -->
+            <Style x:Key="StarButtonStyle" TargetType="ImageButton">
+                <Setter Property="BackgroundColor" Value="Transparent" />
+                <Setter Property="HeightRequest" Value="48" />
+                <Setter Property="WidthRequest" Value="48" />
+                <Setter Property="Aspect" Value="AspectFit" />
+            </Style>
+        </ResourceDictionary>
+    </ContentPage.Resources>
+
+    <ScrollView>
+        <StackLayout Padding="20" Spacing="24">
+
+            <!--  Header Section  -->
+            <Frame Style="{StaticResource CardStyle}">
+                <StackLayout Padding="24" Spacing="16">
+                    <!--  Icon Header  -->
+                    <Frame
+                        Padding="16"
+                        BackgroundColor="#F8FAFC"
+                        BorderColor="#E2E8F0"
+                        CornerRadius="50"
+                        HasShadow="False"
+                        HeightRequest="80"
+                        HorizontalOptions="Center"
+                        WidthRequest="80">
+                        <Label
+                            FontSize="32"
+                            HorizontalOptions="Center"
+                            Text="⭐"
+                            TextColor="#F59E0B"
+                            VerticalOptions="Center" />
+                    </Frame>
+
+                    <!--  Title & Description  -->
+                    <StackLayout Spacing="8">
+                        <Label
+                            FontAttributes="Bold"
+                            FontSize="24"
+                            HorizontalOptions="Center"
+                            Text="Chia sẻ trải nghiệm"
+                            TextColor="#1E293B" />
+                        <Label
+                            FontSize="16"
+                            HorizontalOptions="Center"
+                            LineBreakMode="WordWrap"
+                            Text="Đánh giá của bạn giúp cải thiện chất lượng khóa học"
+                            TextColor="#64748B" />
+                    </StackLayout>
+                </StackLayout>
+            </Frame>
+
+            <!--  Rating Section  -->
+            <Frame Style="{StaticResource CardStyle}">
+                <StackLayout Padding="24" Spacing="20">
+                    <Label Style="{StaticResource SectionTitleStyle}" Text="✨ Chọn số sao đánh giá" />
+
+                    <!--  Star Rating  -->
+                    <StackLayout Spacing="16">
+                        <HorizontalStackLayout HorizontalOptions="Center" Spacing="8">
+                            <ImageButton
+                                Command="{Binding TapStarCommand}"
+                                CommandParameter="1"
+                                Source="{Binding Star1Image}"
+                                Style="{StaticResource StarButtonStyle}" />
+                            <ImageButton
+                                Command="{Binding TapStarCommand}"
+                                CommandParameter="2"
+                                Source="{Binding Star2Image}"
+                                Style="{StaticResource StarButtonStyle}" />
+                            <ImageButton
+                                Command="{Binding TapStarCommand}"
+                                CommandParameter="3"
+                                Source="{Binding Star3Image}"
+                                Style="{StaticResource StarButtonStyle}" />
+                            <ImageButton
+                                Command="{Binding TapStarCommand}"
+                                CommandParameter="4"
+                                Source="{Binding Star4Image}"
+                                Style="{StaticResource StarButtonStyle}" />
+                            <ImageButton
+                                Command="{Binding TapStarCommand}"
+                                CommandParameter="5"
+                                Source="{Binding Star5Image}"
+                                Style="{StaticResource StarButtonStyle}" />
+                        </HorizontalStackLayout>
+
+                        <!--  Rating Description  -->
+                        <Label
+                            FontSize="16"
+                            HorizontalOptions="Center"
+                            Text="{Binding Rating, StringFormat='Bạn đã chọn {0} sao'}"
+                            TextColor="#6B7280" />
+                    </StackLayout>
+
+                    <!--  Rating Guide  -->
+                    <Frame
+                        Padding="16"
+                        BackgroundColor="#F0F9FF"
+                        BorderColor="#0EA5E9"
+                        CornerRadius="12"
+                        HasShadow="False">
+                        <StackLayout Spacing="8">
+                            <Label
+                                FontAttributes="Bold"
+                                FontSize="14"
+                                Text="💡 Hướng dẫn đánh giá"
+                                TextColor="#0369A1" />
+                            <StackLayout Spacing="4">
+                                <Label
+                                    FontSize="12"
+                                    Text="⭐ 1 sao: Rất không hài lòng"
+                                    TextColor="#0369A1" />
+                                <Label
+                                    FontSize="12"
+                                    Text="⭐⭐ 2 sao: Không hài lòng"
+                                    TextColor="#0369A1" />
+                                <Label
+                                    FontSize="12"
+                                    Text="⭐⭐⭐ 3 sao: Bình thường"
+                                    TextColor="#0369A1" />
+                                <Label
+                                    FontSize="12"
+                                    Text="⭐⭐⭐⭐ 4 sao: Hài lòng"
+                                    TextColor="#0369A1" />
+                                <Label
+                                    FontSize="12"
+                                    Text="⭐⭐⭐⭐⭐ 5 sao: Rất hài lòng"
+                                    TextColor="#0369A1" />
+                            </StackLayout>
+                        </StackLayout>
+                    </Frame>
+                </StackLayout>
+            </Frame>
+
+            <!--  Comment Section  -->
+            <Frame Style="{StaticResource CardStyle}">
+                <StackLayout Padding="24" Spacing="20">
+                    <Label Style="{StaticResource SectionTitleStyle}" Text="💬 Viết đánh giá chi tiết" />
+
+                    <!--  Comment Input  -->
+                    <Frame
+                        Padding="16"
+                        BackgroundColor="#F8FAFC"
+                        BorderColor="#E2E8F0"
+                        CornerRadius="16"
+                        HasShadow="False">
+                        <Editor
+                            BackgroundColor="Transparent"
+                            FontSize="16"
+                            HeightRequest="140"
+                            Placeholder="Chia sẻ trải nghiệm của bạn về khóa học này..."
+                            PlaceholderColor="#9CA3AF"
+                            Text="{Binding Comment}"
+                            TextColor="#374151" />
+                    </Frame>
+
+                    <!--  Character Count  -->
+                    <Label
+                        FontSize="12"
+                        HorizontalOptions="End"
+                        Text="{Binding Comment.Length, StringFormat='{0} ký tự'}"
+                        TextColor="#9CA3AF" />
+
+                    <!--  Comment Tips  -->
+                    <Frame
+                        Padding="16"
+                        BackgroundColor="#ECFDF5"
+                        BorderColor="#10B981"
+                        CornerRadius="12"
+                        HasShadow="False">
+                        <StackLayout Spacing="8">
+                            <Label
+                                FontAttributes="Bold"
+                                FontSize="14"
+                                Text="📝 Gợi ý nội dung đánh giá"
+                                TextColor="#047857" />
+                            <StackLayout Spacing="4">
+                                <Label
+                                    FontSize="12"
+                                    Text="• Chất lượng nội dung khóa học"
+                                    TextColor="#047857" />
+                                <Label
+                                    FontSize="12"
+                                    Text="• Phong cách giảng dạy của giảng viên"
+                                    TextColor="#047857" />
+                                <Label
+                                    FontSize="12"
+                                    Text="• Tính thực tiễn của kiến thức"
+                                    TextColor="#047857" />
+                                <Label
+                                    FontSize="12"
+                                    Text="• Đề xuất cải thiện"
+                                    TextColor="#047857" />
+                            </StackLayout>
+                        </StackLayout>
+                    </Frame>
+                </StackLayout>
+            </Frame>
+
+            <!--  Submit Section  -->
+            <Frame Style="{StaticResource CardStyle}">
+                <StackLayout Padding="24" Spacing="16">
+                    <!--  Submit Button  -->
+                    <Button
+                        Padding="0,16"
+                        BackgroundColor="#3B82F6"
+                        Command="{Binding SubmitReviewCommand}"
+                        CornerRadius="16"
+                        FontAttributes="Bold"
+                        FontSize="16"
+                        Text="{Binding SubmitButtonText}"
+                        TextColor="White">
+                        <Button.Shadow>
+                            <Shadow
+                                Brush="#3B82F6"
+                                Opacity="0.25"
+                                Radius="12"
+                                Offset="0,4" />
+                        </Button.Shadow>
+                    </Button>
+
+                    <!--  Privacy Note  -->
+                    <Frame
+                        Padding="12"
+                        BackgroundColor="#FEF3C7"
+                        BorderColor="#F59E0B"
+                        CornerRadius="10"
+                        HasShadow="False">
+                        <Label
+                            FontSize="12"
+                            HorizontalOptions="Center"
+                            LineBreakMode="WordWrap"
+                            Text="🔒 Đánh giá của bạn sẽ được hiển thị công khai để giúp đỡ những học viên khác"
+                            TextColor="#D97706" />
+                    </Frame>
+                </StackLayout>
+            </Frame>
+
+            <!--  Bottom Spacing  -->
+            <BoxView HeightRequest="20" Color="Transparent" />
+
+        </StackLayout>
+    </ScrollView>
+</ContentPage>
